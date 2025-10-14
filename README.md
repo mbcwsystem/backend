@@ -29,7 +29,7 @@ megabox/
 │   │   └── permission_utils.py # 사용자 권한(관리자/직원) 검증
 │   │
 │   ├── modules/                # 기능별 독립 모듈 (팀원별 개발 단위)
-│   │   ├── auth/               # 로그인, 회원가입, 인증 관련 기능
+│   │   ├── auth/               # 로그인, 인증 관련 기능
 │   │   │   ├── models.py       # User 모델 (직원/관리자 등)
 │   │   │   ├── schemas.py      # Pydantic 스키마 (요청/응답 구조 정의)
 │   │   │   ├── routers.py      # /auth 관련 API 라우터 정의
@@ -77,7 +77,7 @@ megabox/
 │   │   │   ├── templates/      # 출근용 프론트 HTML 페이지
 │   │   │   └── __init__.py
 │   │   │
-│   │   └── admin/              # 관리자 기능
+│   │   └── admin/              # 관리자 기능, 회원 가입
 │   │       ├── models.py       # 관리자 전용 테이블 (공지, 승인 로그 등)
 │   │       ├── schemas.py      # 관리자 요청/응답 스키마
 │   │       ├── routers.py      # /admin 관련 API
