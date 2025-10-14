@@ -1,4 +1,11 @@
 # 📁 프로젝트 구조 (megabox)
+
+> **개발 환경:**  
+> Python **3.13**  
+> FastAPI (ASGI 기반 비동기 웹 프레임워크)  
+> Docker 사용 (컨테이너 기반 개발/배포 환경)  
+> MySQL **8.0** (SQLAlchemy ORM 연동)
+
 ```
 megabox/
 ├── Dockerfile                  # FastAPI 앱을 Docker 이미지로 빌드하기 위한 설정 파일
