@@ -8,13 +8,29 @@
 
 ```
 megabox/
-├── Dockerfile                  # FastAPI 앱을 Docker 이미지로 빌드하기 위한 설정 파일
-├── docker-compose.yml          # API 서버, DB 등 여러 컨테이너를 동시에 실행하는 설정 파일
 ├── requirements.txt            # FastAPI, SQLAlchemy, Pydantic 등 필요한 패키지 목록
-├── .env                        # 환경 변수 파일 (DB_URL, JWT_SECRET 등)
 ├── README.md                   # 프로젝트 설명서 (팀 소개, 실행법 등)
+├── .gitignore                  # 민감정보 및 불필요한 파일 제외 설정
 │
-├── app/
+├── .github/                    # 깃허브 관련 템플릿 관리
+│   ├── ISSUE_TEMPLATE/         # 이슈 템플릿 폴더
+│   │   ├── bug_report.md       # 버그 리포트 템플릿
+│   │   ├── etc-template.md     # 기타 작업(환경 설정, 문서 등) 템플릿
+│   │   └── feature_request.md  # 기능 추가 요청 템플릿
+│   │
+│   └── PULL_REQUEST_TEMPLATE   # PR 생성 시 자동 불러오는 템플릿
+│
+├── envs/                       # 환경 변수 관리 폴더 (.env는 Git에 포함 X)
+│   ├── .env.dev                # 개발용 환경 변수 (로컬 실행용, gitignore 처리)
+│   └── .env.prod               # 배포용 환경 변수 (서버 실행용, gitignore 처리)
+│
+├── docker/                     # Docker 관련 설정 모음
+│   ├── Dockerfile.dev          # 개발용 Docker 설정 (uvicorn --reload)
+│   ├── Dockerfile.prod         # 배포용 Docker 설정 (gunicorn)
+│   ├── docker-compose.dev.yml  # 개발용 컨테이너 구성 (FastAPI + MySQL)
+│   └── docker-compose.prod.yml # 배포용 컨테이너 구성 (FastAPI + MySQL)
+│
+├── app/                        # FastAPI 애플리케이션 전체 코드
 │   ├── main.py                 # FastAPI 실행 진입점, 모든 라우터 등록
 │   │
 │   ├── core/                   # 프로젝트의 핵심 설정 관리
