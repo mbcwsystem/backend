@@ -8,106 +8,67 @@
 
 ```
 megabox/
-├── requirements.txt            # FastAPI, SQLAlchemy, Pydantic 등 필요한 패키지 목록
-├── README.md                   # 프로젝트 설명서 (팀 소개, 실행법 등)
-├── .gitignore                  # 민감정보 및 불필요한 파일 제외 설정
+├── requirements.txt             # FastAPI, SQLAlchemy 등 필요한 패키지 목록
+├── README.md                    # 프로젝트 소개 및 실행 방법 문서
+├── .gitignore                   # Git에 올리지 않을 파일 설정 (env, __pycache__ 등)
+├── .dockerignore                # Docker 빌드 시 제외할 파일 설정 (venv, .env 등)
 │
-├── .github/                    # 깃허브 관련 템플릿 관리
-│   ├── ISSUE_TEMPLATE/         # 이슈 템플릿 폴더
-│   │   ├── bug_report.md       # 버그 리포트 템플릿
-│   │   ├── etc-template.md     # 기타 작업(환경 설정, 문서 등) 템플릿
-│   │   └── feature_request.md  # 기능 추가 요청 템플릿
-│   │
-│   └── PULL_REQUEST_TEMPLATE   # PR 생성 시 자동 불러오는 템플릿
+├── .github/                     # GitHub 이슈·PR 템플릿 관리 폴더
+│   ├── ISSUE_TEMPLATE/          # 이슈 생성 시 템플릿
+│   │   ├── bug_report.md        # 버그 리포트 템플릿
+│   │   ├── etc-template.md      # 기타 설정/문서 템플릿
+│   │   └── feature_request.md   # 기능 추가 요청 템플릿
+│   └── PULL_REQUEST_TEMPLATE    # PR 생성 시 기본 템플릿
 │
-├── envs/                       # 환경 변수 관리 폴더 (.env는 Git에 포함 X)
-│   ├── .env.dev                # 개발용 환경 변수 (로컬 실행용, gitignore 처리)
-│   └── .env.prod               # 배포용 환경 변수 (서버 실행용, gitignore 처리)
+├── envs/                        # 환경 변수 파일 보관 폴더 (Git 미포함)
+│   ├── .env.dev                 # 개발 환경 변수 (로컬 실행용)
+│   └── .env.prod                # 배포 환경 변수 (서버 실행용)
 │
-├── docker/                     # Docker 관련 설정 모음
-│   ├── Dockerfile.dev          # 개발용 Docker 설정 (uvicorn --reload)
-│   ├── Dockerfile.prod         # 배포용 Docker 설정 (gunicorn)
-│   ├── docker-compose.dev.yml  # 개발용 컨테이너 구성 (FastAPI + MySQL)
-│   └── docker-compose.prod.yml # 배포용 컨테이너 구성 (FastAPI + MySQL)
+├── docker/                      # Docker 관련 설정 폴더
+│   ├── Dockerfile.dev           # 개발용 도커파일 (uvicorn --reload 사용)
+│   ├── Dockerfile.prod          # 배포용 도커파일 (gunicorn 사용)
+│   ├── docker-compose.dev.yml   # 개발용 Docker Compose (FastAPI + MySQL)
+│   └── docker-compose.prod.yml  # 배포용 Docker Compose (FastAPI + MySQL)
 │
-├── app/                        # FastAPI 애플리케이션 전체 코드
-│   ├── main.py                 # FastAPI 실행 진입점, 모든 라우터 등록
+├── app/                         # FastAPI 애플리케이션 전체 코드
+│   ├── main.py                  # FastAPI 실행 진입점 (모든 라우터 등록)
 │   │
-│   ├── core/                   # 프로젝트의 핵심 설정 관리
-│   │   ├── config.py           # 환경변수 로드 및 전역 설정 (CORS, DB 등)
-│   │   ├── database.py         # SQLAlchemy DB 연결 및 세션 관리
-│   │   ├── security.py         # 비밀번호 해싱, JWT 토큰 생성/검증
-│   │   └── __init__.py         # 패키지 인식용 파일
+│   ├── core/                    # 핵심 설정 관리 폴더
+│   │   ├── config.py            # .env 로드 및 환경 변수 설정 (Settings 클래스)
+│   │   ├── database.py          # SQLAlchemy DB 연결 및 세션 관리
+│   │   ├── routers.py           # 전체 라우터 통합 등록
+│   │   ├── security.py          # JWT 토큰 생성/검증, 비밀번호 해싱
+│   │   └── __init__.py          # 패키지 인식용 (비워두기)
 │   │
-│   ├── utils/                  # 전역 공용 유틸리티 (중복 코드 방지)
-│   │   ├── response_utils.py   # API 응답 형식(성공/에러) 통일
-│   │   ├── date_utils.py       # 날짜, 시간 계산 (근무시간, 휴무일 등)
-│   │   └── permission_utils.py # 사용자 권한(관리자/직원) 검증
+│   ├── utils/                   # 공용 유틸리티 함수 모음
+│   │   ├── response_utils.py    # 표준화된 API 응답 포맷 정의
+│   │   ├── date_utils.py        # 날짜/시간 관련 계산 함수
+│   │   └── permission_utils.py  # 관리자/직원 권한 검증 함수
 │   │
-│   ├── modules/                # 기능별 독립 모듈 (팀원별 개발 단위)
-│   │   ├── auth/               # 로그인, 인증 관련 기능
-│   │   │   ├── models.py       # User 모델 (직원/관리자 등)
-│   │   │   ├── schemas.py      # Pydantic 스키마 (요청/응답 구조 정의)
-│   │   │   ├── routers.py      # /auth 관련 API 라우터 정의
-│   │   │   ├── services.py     # 인증, JWT, 로그인 로직 처리
+│   ├── modules/                 # 주요 기능별 모듈 (팀 단위 개발 영역)
+│   │   ├── auth/                # 로그인/회원 인증 기능
+│   │   │   ├── models.py        # User 모델 정의
+│   │   │   ├── schemas.py       # 요청/응답용 Pydantic 스키마
+│   │   │   ├── routers.py       # /auth 관련 라우터
+│   │   │   ├── services.py      # JWT·로그인 로직 처리
 │   │   │   └── __init__.py
 │   │   │
-│   │   ├── schedule/           # 스케줄 관리 (근무표, 일정)
-│   │   │   ├── models.py       # Schedule 모델 (근무일자, 시간 등)
-│   │   │   ├── schemas.py      # 요청/응답 스키마
-│   │   │   ├── routers.py      # /schedule 관련 API 라우터
-│   │   │   ├── services.py     # 스케줄 생성, 수정, 조회 비즈니스 로직
-│   │   │   └── __init__.py
-│   │   │
-│   │   ├── shift/              # 근무교대 관리
-│   │   │   ├── models.py       # Shift 모델 (교대 요청, 승인 상태 등)
-│   │   │   ├── schemas.py      # 교대 관련 요청/응답 스키마
-│   │   │   ├── routers.py      # /shift 관련 라우터
-│   │   │   ├── services.py     # 교대 신청/승인 처리 로직
-│   │   │   └── __init__.py
-│   │   │
-│   │   ├── dayoff/             # 휴무신청 관리
-│   │   │   ├── models.py       # DayOff 모델 (휴가일, 사유 등)
-│   │   │   ├── schemas.py      # 휴무 요청/응답 스키마
-│   │   │   ├── routers.py      # /dayoff 관련 라우터
-│   │   │   ├── services.py     # 휴무 신청/승인/취소 로직
-│   │   │   └── __init__.py
-│   │   │
-│   │   ├── payroll/            # 급여 관리
-│   │   │   ├── models.py       # Payroll 모델 (급여, 세금, 근무시간)
-│   │   │   ├── schemas.py      # 급여 요청/응답 스키마
-│   │   │   ├── routers.py      # /payroll 관련 API
-│   │   │   ├── services.py     # 급여 계산 및 지급 로직
-│   │   │   └── __init__.py
-│   │   │
-│   │   ├── community/          # 커뮤니티 (게시판, 댓글)
-│   │   │   ├── models.py       # Post, Comment 모델
-│   │   │   ├── schemas.py      # 게시글/댓글 요청/응답 스키마
-│   │   │   ├── routers.py      # /community 관련 API
-│   │   │   ├── services.py     # 게시글 작성, 수정, 삭제, 댓글 처리
-│   │   │   └── __init__.py
-│   │   │
-│   │   ├── mainpage/           # 메인페이지 (출근용 페이지)
-│   │   │   ├── routers.py      # /mainpage 관련 API
-│   │   │   ├── services.py     # 출근/퇴근 표시, 근무 현황 로직
-│   │   │   ├── templates/      # 출근용 프론트 HTML 페이지
-│   │   │   └── __init__.py
-│   │   │
-│   │   └── admin/              # 관리자 기능, 회원 가입
-│   │       ├── models.py       # 관리자 전용 테이블 (공지, 승인 로그 등)
-│   │       ├── schemas.py      # 관리자 요청/응답 스키마
-│   │       ├── routers.py      # /admin 관련 API
-│   │       ├── services.py     # 관리자 승인, 통계, 전체 조회 로직
-│   │       └── __init__.py
+│   │   ├── schedule/            # 근무 스케줄 관리 기능
+│   │   ├── shift/               # 근무 교대 기능
+│   │   ├── dayoff/              # 휴무 신청 기능
+│   │   ├── payroll/             # 급여 계산 기능
+│   │   ├── community/           # 게시판/댓글 기능
+│   │   ├── mainpage/            # 메인 출근 페이지 기능
+│   │   └── admin/               # 관리자 기능 (회원관리, 공지 등)
 │   │
-│   └── tests/                  # 기능별 테스트 코드 (pytest)
-│       ├── test_auth.py        # 로그인/회원가입 테스트
-│       ├── test_schedule.py    # 스케줄 기능 테스트
-│       ├── test_shift.py       # 근무교대 테스트
-│       ├── test_dayoff.py      # 휴무신청 테스트
-│       ├── test_payroll.py     # 급여 계산 테스트
-│       ├── test_community.py   # 커뮤니티 기능 테스트
-│       ├── test_mainpage.py    # 메인(출근) 페이지 테스트
-│       ├── test_admin.py       # 관리자 기능 테스트
+│   └── tests/                   # pytest 기반 기능별 테스트 코드
+│       ├── test_auth.py         # 인증 관련 테스트
+│       ├── test_schedule.py     # 스케줄 기능 테스트
+│       ├── test_shift.py        # 근무교대 테스트
+│       ├── test_dayoff.py       # 휴무신청 테스트
+│       ├── test_payroll.py      # 급여 기능 테스트
+│       ├── test_community.py    # 커뮤니티 테스트
+│       ├── test_mainpage.py     # 메인페이지 테스트
+│       ├── test_admin.py        # 관리자 기능 테스트
 │       └── __init__.py
 ```
