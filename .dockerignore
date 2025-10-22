@@ -1,0 +1,27 @@
+# Python 캐시
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 가상환경
+venv/
+.env/
+env/
+.venv/
+
+# 환경 변수 파일
+.env.dev
+.env.prod
+
+# Git 관련
+.git
+.gitignore
+
+# IDE / 시스템 파일
+.vscode/
+.idea/
+.DS_Store
+
+# 테스트 캐시
+.pytest_cache/
