@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     # 기본 설정
     MODE: str = "dev"
-    APP_NAME: str = "Megabox Dev API"
+    APP_NAME: str = "Megabox"
 
     # DB 설정
     DB_USER: str
@@ -29,3 +29,4 @@ class Settings(BaseSettings):
         extra = "ignore"
 
 settings = Settings()
+ADMIN_ROLES = ["점장", "매니저", "바이저"]
