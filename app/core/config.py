@@ -13,9 +13,9 @@ class Settings(BaseSettings):
     DB_NAME: str
 
     # JWT 설정
-    JWT_SECRET_KEY: str
-    JWT_ALGORITHM: str
-    JWT_EXPIRE_MINUTES: int
+    JWT_SECRET_KEY: str = "JWT_SECRET_KEY"
+    JWT_ALGORITHM: str = "JWT_ALGORITHM"
+    JWT_EXPIRE_MINUTES: int = "JWT_EXPIRE_MINUTES"
 
     @property
     def DATABASE_URL(self):
