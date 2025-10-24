@@ -3,7 +3,8 @@ from __future__ import annotations
 from datetime import date
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr, Field
-from app.modules.all_models import InsuranceCategoryEnum, PositionEnum, GenderEnum
+from app.modules.auth.models import PositionEnum, GenderEnum
+from app.modules.admin.models import InsuranceCategoryEnum
 
 # ---------- User(=직원) ----------
 class UserCreate(BaseModel):

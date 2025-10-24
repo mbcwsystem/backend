@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import enum
 from datetime import date, datetime
 from typing import Optional
 from sqlalchemy import String, Date, DateTime, Boolean, ForeignKey, UniqueConstraint, Index, Numeric
@@ -60,3 +62,10 @@ class InsuranceRate(Base):
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+
+class InsuranceCategoryEnum(str, enum.Enum):
+    health = "건강보험"
+    care = "요양보험"
+    employment = "고용보험"
+    pension = "국민연금"
