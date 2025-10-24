@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.modules.all_models import User, PositionEnum
+from app.modules.auth.models import User, PositionEnum
 
 pwd_context = CryptContext(
     schemes=["bcrypt_sha256", "bcrypt"],  # 우선 bcrypt_sha256, 과거 bcrypt도 호환

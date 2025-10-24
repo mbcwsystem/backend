@@ -1,4 +1,5 @@
-# app/modules/auth/models.py
+from __future__ import annotations
+
 from sqlalchemy import Column, Integer, String, Enum, Boolean, Date, JSON
 from sqlalchemy.orm import relationship
 from app.core.database import Base
@@ -37,6 +38,7 @@ class User(Base):
     health_cert_expire = Column(Date, nullable=True, comment="보건증 만료일")
     is_active = Column(Boolean, default=True, comment="재직 상태")
 
+    # 문자열로 충분. 이 라인이 매퍼 구성 시점에 Payroll을 필요로 함
     payrolls = relationship("Payroll", back_populates="user", cascade="all, delete")
 
     def __repr__(self):

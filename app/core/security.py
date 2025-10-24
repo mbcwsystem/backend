@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from app.core.config import settings
 from app.core.database import get_db
-from app.modules.all_models import User, PositionEnum
+from app.modules.auth.models import User, PositionEnum
 
 security = HTTPBearer(auto_error=False)
 
