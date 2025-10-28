@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     # 기본 설정
     MODE: str = "dev"
@@ -34,6 +35,7 @@ class Settings(BaseSettings):
         env_file = "envs/.env.dev"
         env_file_encoding = "utf-8"
         extra = "ignore"
+
 
 settings = Settings()
 ADMIN_ROLES = ["점장", "매니저", "바이저"]

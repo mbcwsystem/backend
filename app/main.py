@@ -1,13 +1,15 @@
 from fastapi import FastAPI
-from app.core.database import Base, engine, SessionLocal
-from app.core.routers import api_router
 from sqlalchemy.orm import configure_mappers
-import app.modules
+
 from app.core.config import settings
-from app.modules.auth.models import User, PositionEnum, GenderEnum
+from app.core.database import Base, SessionLocal, engine
+from app.core.routers import api_router
+from app.modules.auth.models import GenderEnum, PositionEnum, User
 from app.modules.auth.services import hash_password
+
 configure_mappers()
 app = FastAPI()
+
 
 @app.on_event("startup")
 def on_startup():
@@ -29,5 +31,6 @@ def on_startup():
             db.commit()
     finally:
         db.close()
+
 
 app.include_router(api_router, prefix="/api")
