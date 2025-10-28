@@ -17,6 +17,12 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "JWT_ALGORITHM"
     JWT_EXPIRE_MINUTES: int = "JWT_EXPIRE_MINUTES"
 
+    # 슈퍼 관리자 계정
+    ADMIN_USERNAME: str
+    ADMIN_PASSWORD: str
+    ADMIN_NAME: str
+    ADMIN_EMAIL: str
+
     @property
     def DATABASE_URL(self):
         return (
@@ -26,6 +32,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = "envs/.env.dev"
+        env_file_encoding = "utf-8"
         extra = "ignore"
 
 settings = Settings()
