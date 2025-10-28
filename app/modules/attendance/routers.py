@@ -102,6 +102,18 @@ def check_out(
     update_realtime_payroll(current_user.id, db)
     return record
 
+@router.get("/me", response_model=list[schemas.AttendanceResponse])
+def get_my_attendance_records(
+    db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+):
+    records = (
+        db.query(models.Attendance)
+        .filter(models.Attendance.user_id == current_user.id)
+        .order_by(models.Attendance.work_date.desc())
+        .all()
+    )
+    return records
+
 
 def _get_today_record(db: Session, user_id: int, today):
     record = (
