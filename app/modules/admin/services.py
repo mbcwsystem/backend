@@ -1,14 +1,16 @@
 # app/modules/admin/services.py
-from typing import Optional, List, Tuple
 from datetime import date
-from sqlalchemy import select, func, and_
+from typing import List, Optional, Tuple
+
+from sqlalchemy import and_, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.modules.auth.models import User
-from app.modules.admin.models import Holiday, InsuranceRate
 from app.modules.admin import schemas
+from app.modules.admin.models import Holiday, InsuranceRate
+from app.modules.auth.models import User
 from app.modules.auth.services import hash_password  # ← 해시 적용
+
 
 # --------- Users ----------
 def create_user(db: Session, data: schemas.UserCreate) -> User:
@@ -30,19 +32,31 @@ def create_user(db: Session, data: schemas.UserCreate) -> User:
         raise ValueError("이미 사용 중인 username 입니다.")
     return user
 
-def list_users(db: Session, q: Optional[str], limit: int, offset: int) -> Tuple[int, List[User]]:
+
+def list_users(
+    db: Session, q: Optional[str], limit: int, offset: int
+) -> Tuple[int, List[User]]:
     stmt = select(User)
     if q:
         like = f"%{q}%"
-        stmt = stmt.where((User.name.ilike(like)) | (User.username.ilike(like)) | (User.email.ilike(like)))
+        stmt = stmt.where(
+            (User.name.ilike(like))
+            | (User.username.ilike(like))
+            | (User.email.ilike(like))
+        )
 
     # total
     count_stmt = select(func.count()).select_from(stmt.subquery())
     total = db.execute(count_stmt).scalar_one()
 
     # items
-    items = db.execute(stmt.order_by(User.id.desc()).limit(limit).offset(offset)).scalars().all()
+    items = (
+        db.execute(stmt.order_by(User.id.desc()).limit(limit).offset(offset))
+        .scalars()
+        .all()
+    )
     return total, items
+
 
 def update_user(db: Session, user_id: int, data: schemas.UserUpdate) -> User:
     user = db.get(User, user_id)
@@ -64,12 +78,14 @@ def update_user(db: Session, user_id: int, data: schemas.UserUpdate) -> User:
         raise ValueError("중복 또는 제약조건 위반입니다.")
     return user
 
+
 def delete_user(db: Session, user_id: int) -> None:
     user = db.get(User, user_id)
     if not user:
         raise LookupError("해당 사용자가 존재하지 않습니다.")
     db.delete(user)
     # flush/commit은 라우터에서
+
 
 # --------- Holidays (전사 공휴일) ----------
 def create_holiday(db: Session, data: schemas.HolidayCreate) -> Holiday:
@@ -78,7 +94,10 @@ def create_holiday(db: Session, data: schemas.HolidayCreate) -> Holiday:
     db.flush()
     return h
 
-def list_holidays(db: Session, start: Optional[date], end: Optional[date]) -> List[Holiday]:
+
+def list_holidays(
+    db: Session, start: Optional[date], end: Optional[date]
+) -> List[Holiday]:
     stmt = select(Holiday)
     if start:
         stmt = stmt.where(Holiday.date >= start)
@@ -86,7 +105,10 @@ def list_holidays(db: Session, start: Optional[date], end: Optional[date]) -> Li
         stmt = stmt.where(Holiday.date <= end)
     return db.execute(stmt.order_by(Holiday.date.desc())).scalars().all()
 
-def update_holiday(db: Session, holiday_id: int, data: schemas.HolidayUpdate) -> Holiday:
+
+def update_holiday(
+    db: Session, holiday_id: int, data: schemas.HolidayUpdate
+) -> Holiday:
     h = db.get(Holiday, holiday_id)
     if not h:
         raise LookupError("해당 공휴일이 존재하지 않습니다.")
@@ -98,16 +120,21 @@ def update_holiday(db: Session, holiday_id: int, data: schemas.HolidayUpdate) ->
     db.flush()
     return h
 
+
 def delete_holiday(db: Session, holiday_id: int) -> None:
     h = db.get(Holiday, holiday_id)
     if not h:
         raise LookupError("해당 공휴일이 존재하지 않습니다.")
     db.delete(h)
 
+
 # --------- Insurance Rates (카테고리별 레코드) ----------
 def get_insurance_rates(db: Session) -> List[InsuranceRate]:
-    stmt = select(InsuranceRate).order_by(InsuranceRate.effective_date.desc(), InsuranceRate.category.asc())
+    stmt = select(InsuranceRate).order_by(
+        InsuranceRate.effective_date.desc(), InsuranceRate.category.asc()
+    )
     return db.execute(stmt).scalars().all()
+
 
 def set_insurance_rate(db: Session, data: schemas.InsuranceRateSet) -> InsuranceRate:
     existing = db.execute(

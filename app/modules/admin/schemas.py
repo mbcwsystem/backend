@@ -1,21 +1,28 @@
 # app/modules/admin/schemas.py
 from __future__ import annotations
+
 from datetime import date
-from typing import Optional, List
+from typing import List, Optional
+
 from pydantic import BaseModel, EmailStr, Field
-from app.modules.auth.models import PositionEnum, GenderEnum
+
 from app.modules.admin.models import InsuranceCategoryEnum
+from app.modules.auth.models import GenderEnum, PositionEnum
+
 
 # ---------- User(=직원) ----------
 class UserCreate(BaseModel):
     username: str = Field(min_length=3, max_length=50)
-    password: str = Field(min_length=4, max_length=255)  # 해시 대상(서비스에서 해시하도록)
+    password: str = Field(
+        min_length=4, max_length=255
+    )  # 해시 대상(서비스에서 해시하도록)
     name: str
     position: PositionEnum
     gender: GenderEnum
     phone: Optional[str] = None
     email: Optional[EmailStr] = None
     is_active: bool = True
+
 
 class UserUpdate(BaseModel):
     name: Optional[str] = None
@@ -24,6 +31,7 @@ class UserUpdate(BaseModel):
     phone: Optional[str] = None
     email: Optional[EmailStr] = None
     is_active: Optional[bool] = None
+
 
 class UserOut(BaseModel):
     id: int
@@ -38,9 +46,11 @@ class UserOut(BaseModel):
     class Config:
         from_attributes = True
 
+
 class PaginatedUsers(BaseModel):
     total: int
     items: List[UserOut]
+
 
 # ---------- 공휴일(전사 공휴일) ----------
 class HolidayCreate(BaseModel):
@@ -48,10 +58,12 @@ class HolidayCreate(BaseModel):
     date: date
     description: Optional[str] = None
 
+
 class HolidayUpdate(BaseModel):
     name: Optional[str] = None
     date: Optional[date] = None
     description: Optional[str] = None
+
 
 class HolidayOut(BaseModel):
     id: int
@@ -62,11 +74,13 @@ class HolidayOut(BaseModel):
     class Config:
         from_attributes = True
 
+
 # ---------- 보험 요율(카테고리별) ----------
 class InsuranceRateSet(BaseModel):
     category: InsuranceCategoryEnum
     rate: float  # DECIMAL(6,4) 매핑
     effective_date: date
+
 
 class InsuranceRateOut(BaseModel):
     id: int

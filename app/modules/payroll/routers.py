@@ -7,7 +7,7 @@ from app.modules.auth.models import User
 from app.modules.payroll import models, schemas
 from app.utils.permission_utils import RoleChecker
 
-router = APIRouter(prefix="/api/payroll", tags=["Payroll"])
+router = APIRouter(tags=["Payroll"])
 
 
 @router.get("/", response_model=list[schemas.PayrollResponse])

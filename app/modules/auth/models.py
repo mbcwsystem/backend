@@ -1,9 +1,12 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String, Enum, Boolean, Date, JSON
-from sqlalchemy.orm import relationship
-from app.core.database import Base
 import enum
+
+from sqlalchemy import JSON, Boolean, Column, Date, Enum, Integer, String
+from sqlalchemy.orm import relationship
+
+from app.core.database import Base
+
 
 class PositionEnum(str, enum.Enum):
     manager = "점장"
@@ -14,9 +17,11 @@ class PositionEnum(str, enum.Enum):
     cleaner = "미화"
     system = "시스템"
 
+
 class GenderEnum(str, enum.Enum):
     male = "남"
     female = "여"
+
 
 class User(Base):
     __tablename__ = "users"
@@ -39,7 +44,15 @@ class User(Base):
     is_active = Column(Boolean, default=True, comment="재직 상태")
 
     # 문자열로 충분. 이 라인이 매퍼 구성 시점에 Payroll을 필요로 함
-    payrolls = relationship("Payroll", back_populates="user", cascade="all, delete")
+    attendances = relationship(
+        "Attendance", back_populates="user", cascade="all, delete"
+    )  # 출퇴근
+    payrolls = relationship(
+        "Payroll", back_populates="user", cascade="all, delete"
+    )  # 급여
+    user_wages = relationship(
+        "UserWage", back_populates="user", cascade="all, delete"
+    )  # 개별 시급
 
     def __repr__(self):
         return f"<User(username={self.username}, position={self.position})>"
