@@ -1,9 +1,21 @@
 import os
+import time
+from datetime import timezone, timedelta, datetime
 from pydantic_settings import BaseSettings
+
+os.environ["TZ"] = "Asia/Seoul"
+
+try:
+    time.tzset()
+except AttributeError:
+    pass
+
+KST = timezone(timedelta(hours=9))
 
 class Settings(BaseSettings):
     MODE: str = os.getenv("MODE", "dev")
     APP_NAME: str = "Megabox"
+    TIMEZONE: str = "Asia/Seoul"
 
     DB_USER: str
     DB_PASSWORD: str
@@ -26,6 +38,10 @@ class Settings(BaseSettings):
             f"mysql+pymysql://{self.DB_USER}:{self.DB_PASSWORD}"
             f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         )
+
+    @property
+    def now_kst(self) -> datetime:
+        return datetime.now(KST)
 
     class Config:
         env_file = f"envs/.env.{os.getenv('MODE', 'dev')}"
