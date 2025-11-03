@@ -1,7 +1,7 @@
 from datetime import date, time
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 
 
 class AttendanceBase(BaseModel):
@@ -24,3 +24,7 @@ class AttendanceResponse(AttendanceBase):
 
     class Config:
         orm_mode = True
+
+    @field_serializer("check_in", "break_start", "break_end", "check_out")
+    def serialize_time(self, value: Optional[time], _info):
+        return value.strftime("%H:%M:%S") if value else None

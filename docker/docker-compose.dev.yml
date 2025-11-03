@@ -8,6 +8,8 @@ services:
       - "8000:8000"
     env_file:
       - ../envs/.env.dev
+    environment:
+      - TZ=Asia/Seoul
     volumes:
       - ../app:/app/app
     depends_on:
