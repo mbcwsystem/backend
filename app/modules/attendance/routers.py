@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from app.core.database import get_db
 from app.core.security import get_current_user
@@ -143,3 +144,61 @@ def _calc_work_minutes(record: models.Attendance):
         break_minutes = (b_end - b_start).total_seconds() / 60
 
     return int(total_work - break_minutes), int(break_minutes)
+
+class AttendanceTestInput(BaseModel):
+    work_date: str | None = None        # "2025-11-06" 형식 (선택)
+    check_in: str | None = None         # "09:00:00"
+    break_start: str | None = None      # "13:00:00"
+    break_end: str | None = None        # "13:30:00"
+    check_out: str | None = None        # "18:00:00"
+
+
+@router.post("/test/manual", response_model=schemas.AttendanceResponse)
+def create_manual_attendance(
+    payload: AttendanceTestInput,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    ✅ 테스트용 근태 입력 API
+    - JSON으로 check_in, break_start, break_end, check_out을 직접 지정 가능
+    - Payroll(주간/월간) 자동 갱신 반영
+    """
+    # 1️⃣ 날짜 지정 (없으면 오늘 날짜)
+    if payload.work_date:
+        today = datetime.strptime(payload.work_date, "%Y-%m-%d").date()
+    else:
+        today = datetime.now().date()
+
+    # 2️⃣ 기존 기록 조회 or 생성
+    record = (
+        db.query(models.Attendance)
+        .filter_by(user_id=current_user.id, work_date=today)
+        .first()
+    )
+    if not record:
+        record = models.Attendance(user_id=current_user.id, work_date=today)
+        db.add(record)
+
+    # 3️⃣ 문자열을 time 객체로 변환
+    def parse_time(t: str | None):
+        return datetime.strptime(t, "%H:%M:%S").time() if t else None
+
+    record.check_in = parse_time(payload.check_in)
+    record.break_start = parse_time(payload.break_start)
+    record.break_end = parse_time(payload.break_end)
+    record.check_out = parse_time(payload.check_out)
+
+    # 4️⃣ 근무시간 계산
+    if record.check_in and record.check_out:
+        work_minutes, break_minutes = _calc_work_minutes(record)
+        record.total_work_minutes = work_minutes
+        record.total_break_minutes = break_minutes
+
+    db.commit()
+    db.refresh(record)
+
+    # ✅ Payroll (주간/월간) 자동 갱신
+    update_realtime_payroll(current_user.id, db)
+
+    return record

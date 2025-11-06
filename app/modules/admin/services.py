@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple
 from sqlalchemy import and_, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-
+from app.modules.admin.schemas import InsuranceRateSet
 from app.modules.admin import schemas
 from app.modules.admin.models import Holiday, InsuranceRate
 from app.modules.auth.models import User
@@ -136,26 +136,15 @@ def get_insurance_rates(db: Session) -> List[InsuranceRate]:
     return db.execute(stmt).scalars().all()
 
 
-def set_insurance_rate(db: Session, data: schemas.InsuranceRateSet) -> InsuranceRate:
-    existing = db.execute(
-        select(InsuranceRate).where(
-            and_(
-                InsuranceRate.category == data.category,
-                InsuranceRate.effective_date == data.effective_date,
-            )
-        )
-    ).scalar_one_or_none()
-
-    if existing:
-        existing.rate = data.rate
-        db.flush()
-        return existing
-
+def set_insurance_rate(db: Session, payload: InsuranceRateSet):
     obj = InsuranceRate(
-        category=data.category,
-        rate=data.rate,
-        effective_date=data.effective_date,
+        national_pension=payload.national_pension,
+        health_insurance=payload.health_insurance,
+        employment_insurance=payload.employment_insurance,
+        industrial_accident=payload.industrial_accident,
+        effective_date=payload.effective_date,
     )
     db.add(obj)
-    db.flush()
+    db.commit()
+    db.refresh(obj)
     return obj

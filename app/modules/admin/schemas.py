@@ -77,15 +77,21 @@ class HolidayOut(BaseModel):
 
 # ---------- 보험 요율(카테고리별) ----------
 class InsuranceRateSet(BaseModel):
-    category: InsuranceCategoryEnum
-    rate: float  # DECIMAL(6,4) 매핑
+    """4대 보험 요율 등록용 입력 스키마"""
+    national_pension: float
+    health_insurance: float
+    employment_insurance: float
+    industrial_accident: float
     effective_date: date
 
 
 class InsuranceRateOut(BaseModel):
+    """4대 보험 요율 조회용 출력 스키마"""
     id: int
-    category: InsuranceCategoryEnum
-    rate: float
+    national_pension: float
+    health_insurance: float
+    employment_insurance: float
+    industrial_accident: float
     effective_date: date
 
     class Config:
