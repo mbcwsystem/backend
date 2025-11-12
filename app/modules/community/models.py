@@ -1,4 +1,5 @@
 from enum import Enum as PyEnum
+
 from sqlalchemy import (
     Boolean,
     Column,
@@ -29,29 +30,31 @@ class Post(Base):
     category = Column(
         Enum(CategoryEnum),
         nullable=False,
-        comment="공지, 근뮤교대, 휴무신청, 자유게시판",
+        comment="공지, 근무교대, 휴무신청, 자유게시판",
     )
     title = Column(String(255), nullable=False, comment="제목")
     content = Column(Text, nullable=False, comment="내용")
     author_id = Column(
         Integer, ForeignKey("users.id"), nullable=False, comment="작성자 id"
     )
-
-    # 자동생성 여부
     system_generated = Column(
         Boolean, nullable=False, default=False, comment="시스템 자동생성 여부"
     )
 
-    # 근무교대/대타 or 휴무 신청에 의해 자동 생성되므로 FK 설정
-    # 이거 shift랑 dayoff 분들한테 물어봐야하는딩... 관계 설정 부분 말씀나누기
-    shift_request_id = Column(
-        Integer,
-        ForeignKey("shift_request.id"),
-        nullable=True,
-        comment="근무교대/대타신청 연결",
+    shift_request = relationship(
+        "ShiftRequest",
+        back_populates="post",
+        uselist=False,
+        primaryjoin="Post.id==foreign(ShiftRequest.generated_post_id)",
+        viewonly=True,
     )
-    dayoff_request_id = Column(
-        Integer, ForeignKey("dayoff_request.id"), nullable=True, comment="휴무신청 연결"
+
+    dayoff_request = relationship(
+        "DayoffRequest",
+        back_populates="post",
+        uselist=False,
+        primaryjoin="Post.id==foreign(DayoffRequest.generated_post_id)",
+        viewonly=True,
     )
 
     created_at = Column(
@@ -75,18 +78,6 @@ class Post(Base):
         back_populates="post",
         cascade="all, delete-orphan",
         lazy="selectin",
-    )
-
-    shift_request = relationship(
-        "ShiftRequest",
-        back_populates="post",
-        uselist=False,
-    )
-
-    dayoff_request = relationship(
-        "DayoffRequest",
-        back_populates="post",
-        uselist=False,
     )
 
     def __repr__(self):
