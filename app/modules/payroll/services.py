@@ -3,6 +3,7 @@ from decimal import Decimal
 from sqlalchemy.orm import Session
 from app.modules.payroll.models import Payroll, WeeklyPayroll
 from app.modules.attendance import models
+from app.modules.wage.services import get_applicable_wage
 
 def get_week_range(target_date: date):
     """해당 날짜의 주차 시작일(월)과 종료일(일)을 반환"""
@@ -63,7 +64,8 @@ def update_realtime_payroll(user_id: int, db: Session):
     )
     total_month_hours = Decimal(sum(m[0] or 0 for m in total_month_minutes)) / Decimal(60)
 
-    hourly_wage = 9860  # 테스트용 고정 시급
+    hourly_wage = get_applicable_wage(user_id, today)
+
     payroll = (
         db.query(Payroll)
         .filter_by(user_id=user_id, year=year, month=month)
