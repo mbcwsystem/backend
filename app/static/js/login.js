@@ -73,3 +73,8 @@ async function signup() {
         document.getElementById("signup-msg").innerText = data.detail || "회원가입 실패";
     }
 }
+
+
+function goMainPage() {
+    window.location.href = "/main";
+}
