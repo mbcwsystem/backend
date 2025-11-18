@@ -7,9 +7,22 @@ from app.core.routers import api_router
 from app.modules.auth.models import GenderEnum, PositionEnum, User
 from app.modules.auth.services import hash_password
 
+# 아래 테스트코드
+from fastapi import Request
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+
 configure_mappers()
 app = FastAPI()
 
+# 테스트코드
+templates = Jinja2Templates(directory="app/templates")
+# 테스트코드
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+@app.get("/")
+def index(request: Request):
+    return templates.TemplateResponse("login_signup.html", {"request": request})
 
 @app.on_event("startup")
 def on_startup():
