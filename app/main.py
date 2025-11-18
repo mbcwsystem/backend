@@ -11,6 +11,9 @@ from app.modules.auth.services import hash_password
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi import Depends, HTTPException
+from app.core.security import get_current_user
+from fastapi.responses import HTMLResponse
 
 configure_mappers()
 app = FastAPI()
@@ -23,6 +26,10 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 @app.get("/")
 def index(request: Request):
     return templates.TemplateResponse("login_signup.html", {"request": request})
+
+@app.get("/main", response_class=HTMLResponse)
+def render_main_page(request: Request):
+    return templates.TemplateResponse("main.html", {"request": request})
 
 @app.on_event("startup")
 def on_startup():

@@ -71,3 +71,15 @@ button.submit-btn {
     font-size: 13px;
     color: red;
 }
+
+.go-main-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 12px;
+    margin-top: 20px;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+}
