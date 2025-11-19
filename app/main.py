@@ -22,14 +22,25 @@ app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
 # 테스트코드
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
-
-@app.get("/")
+@app.get("/", tags=["Html"])
 def index(request: Request):
     return templates.TemplateResponse("login_signup.html", {"request": request})
 
-@app.get("/main", response_class=HTMLResponse)
+@app.get("/main", response_class=HTMLResponse, tags=["Html"])
 def render_main_page(request: Request):
     return templates.TemplateResponse("main.html", {"request": request})
+
+@app.get("/schedule", response_class=HTMLResponse, tags=["Html"])
+def render_schedule_page(request: Request):
+    return templates.TemplateResponse("schedule.html", {"request": request})
+
+
+
+
+
+
+
+
 
 @app.on_event("startup")
 def on_startup():

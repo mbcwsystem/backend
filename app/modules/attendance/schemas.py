@@ -10,8 +10,8 @@ class AttendanceBase(BaseModel):
     break_start: Optional[time] = None
     break_end: Optional[time] = None
     check_out: Optional[time] = None
-    total_work_minutes: Optional[int] = 0
-    total_break_minutes: Optional[int] = 0
+    total_work_minutes: Optional[int] = None
+    total_break_minutes: Optional[int] = None
 
 
 class AttendanceCreate(BaseModel):
@@ -21,10 +21,7 @@ class AttendanceCreate(BaseModel):
 class AttendanceResponse(AttendanceBase):
     id: int
     user_id: int
+    user_name: Optional[str] = None
 
     class Config:
-        orm_mode = True
-
-    @field_serializer("check_in", "break_start", "break_end", "check_out")
-    def serialize_time(self, value: Optional[time], _info):
-        return value.strftime("%H:%M:%S") if value else None
+        from_attributes = True

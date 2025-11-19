@@ -1,0 +1,97 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #eef2f5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.schedule-container {
+    width: 90%;
+    max-width: 1200px;
+    margin-top: 30px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.header button {
+    background: #eee;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+/* 요일 row */
+.week-days {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: bold;
+    color: #666;
+}
+
+.week-days div {
+    padding: 10px 0;
+    border-bottom: 2px solid #ddd;
+}
+
+/* 스케줄 내용 grid */
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.day-column {
+    min-height: 500px;
+    border-right: 1px solid #eee;
+    padding: 10px;
+}
+
+.day-column:last-child {
+    border-right: none;
+}
+
+/* 스케줄 카드 */
+.schedule-card {
+    background: #f7f7f7;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+.schedule-card:hover {
+    background: #ececec;
+}
+
+/* 일요일 (Sun) */
+.week-days .sun {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* 토요일 (Sat) */
+.week-days .sat {
+    color: #3498db;
+    font-weight: bold;
+}
