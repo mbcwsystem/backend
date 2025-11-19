@@ -64,7 +64,7 @@ def update_realtime_payroll(user_id: int, db: Session):
     )
     total_month_hours = Decimal(sum(m[0] or 0 for m in total_month_minutes)) / Decimal(60)
 
-    hourly_wage = get_applicable_wage(user_id, today)
+    hourly_wage = get_applicable_wage(user_id, today, db)
 
     payroll = (
         db.query(Payroll)

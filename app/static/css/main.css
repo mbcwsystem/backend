@@ -49,6 +49,17 @@ h2 {
     cursor: pointer;
 }
 
+.action-message {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #eaeaea;
+    font-size: 15px;
+    color: #333;
+    min-height: 40px;
+    white-space: pre-line; /* 줄바꿈 허용 */
+}
+
 .btn-group button:nth-child(1) { background: #007bff; color: white; }
 .btn-group button:nth-child(2) { background: #ffc107; color: black; }
 .btn-group button:nth-child(3) { background: #17a2b8; color: white; }

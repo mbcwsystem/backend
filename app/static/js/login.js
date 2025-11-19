@@ -78,3 +78,7 @@ async function signup() {
 function goMainPage() {
     window.location.href = "/main";
 }
+
+function goSchedulePage() {
+    window.location.href = "/schedule";
+}
