@@ -56,6 +56,13 @@ class User(Base):
     weekly_payroll = relationship(
         "WeeklyPayroll", back_populates="user", cascade="all, delete-orphan"
     )
+    posts = relationship(
+        "Post", back_populates="author", cascade="all, delete"
+    )
+    comments = relationship(
+        "Comment", back_populates="author", cascade="all, delete-orphan"
+    )
+
 
     def __repr__(self):
         return f"<User(username={self.username}, position={self.position})>"
