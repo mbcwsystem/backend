@@ -41,22 +41,6 @@ class Post(Base):
         Boolean, nullable=False, default=False, comment="시스템 자동생성 여부"
     )
 
-    shift_request = relationship(
-        "ShiftRequest",
-        back_populates="post",
-        uselist=False,
-        primaryjoin="Post.id==foreign(ShiftRequest.generated_post_id)",
-        viewonly=True,
-    )
-
-    dayoff_request = relationship(
-        "DayoffRequest",
-        back_populates="post",
-        uselist=False,
-        primaryjoin="Post.id==foreign(DayoffRequest.generated_post_id)",
-        viewonly=True,
-    )
-
     created_at = Column(
         DateTime,
         nullable=False,
@@ -72,13 +56,7 @@ class Post(Base):
     )
 
     author = relationship("User", back_populates="posts")
-
-    comments = relationship(
-        "Comment",
-        back_populates="post",
-        cascade="all, delete-orphan",
-        lazy="selectin",
-    )
+    comments = relationship("Comment", back_populates="post")
 
     def __repr__(self):
         short_title = (
@@ -89,7 +67,6 @@ class Post(Base):
         return (
             f"[CommunityPost] id={self.id}, category={self.category.value}, "
             f"title={short_title}, author_id={self.author_id}, "
-            f"system_generated={self.system_generated}"
         )
 
 
