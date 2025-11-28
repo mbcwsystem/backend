@@ -1,0 +1,97 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    width: 380px;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 25px;
+}
+
+.tabs button {
+    width: 50%;
+    padding: 12px;
+    cursor: pointer;
+    border: none;
+    border-bottom: 2px solid #ddd;
+    background: none;
+    font-size: 16px;
+}
+
+.tabs button.active {
+    border-bottom: 3px solid #007bff;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.form-box {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+input, select {
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button.submit-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.msg {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 13px;
+    color: red;
+}
+
+.go-main-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 12px;
+    margin-top: 20px;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.go-schedule-btn {
+    background: #286ea7;
+    color: white;
+    border: none;
+    padding: 12px;
+    margin-top: 20px;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+}

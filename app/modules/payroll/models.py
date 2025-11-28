@@ -26,3 +26,14 @@ class Payroll(Base):
     net_salary = Column(Integer, default=0)
 
     user = relationship("User", back_populates="payrolls")
+
+class WeeklyPayroll(Base):
+    __tablename__ = "weekly_payroll"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    year = Column(Integer, nullable=False)
+    month = Column(Integer, nullable=False)
+    total_work_hours = Column(DECIMAL(5, 2), default=0.0)
+
+    user = relationship("User", back_populates="weekly_payroll")

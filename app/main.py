@@ -7,8 +7,39 @@ from app.core.routers import api_router
 from app.modules.auth.models import GenderEnum, PositionEnum, User
 from app.modules.auth.services import hash_password
 
+# 아래 테스트코드
+from fastapi import Request
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+from fastapi import Depends, HTTPException
+from app.core.security import get_current_user
+from fastapi.responses import HTMLResponse
+
 configure_mappers()
 app = FastAPI()
+
+# 테스트코드
+templates = Jinja2Templates(directory="app/templates")
+# 테스트코드
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+@app.get("/", tags=["Html"])
+def index(request: Request):
+    return templates.TemplateResponse("login_signup.html", {"request": request})
+
+@app.get("/main", response_class=HTMLResponse, tags=["Html"])
+def render_main_page(request: Request):
+    return templates.TemplateResponse("main.html", {"request": request})
+
+@app.get("/schedule", response_class=HTMLResponse, tags=["Html"])
+def render_schedule_page(request: Request):
+    return templates.TemplateResponse("schedule.html", {"request": request})
+
+
+
+
+
+
+
 
 
 @app.on_event("startup")

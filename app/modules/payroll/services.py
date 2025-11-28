@@ -1,85 +1,95 @@
-from datetime import datetime
-
-from sqlalchemy import extract
+from datetime import date, timedelta
+from decimal import Decimal
 from sqlalchemy.orm import Session
-
-from app.modules.attendance import models as attendance_models
-from app.modules.payroll import models as payroll_models
+from app.modules.payroll.models import Payroll, WeeklyPayroll
+from app.modules.attendance import models
 from app.modules.wage.services import get_applicable_wage
+#test
+def get_week_range(target_date: date):
+    """해당 날짜의 주차 시작일(월)과 종료일(일)을 반환"""
+    start = target_date - timedelta(days=target_date.weekday())
+    end = start + timedelta(days=6)
+    return start, end
 
 
 def update_realtime_payroll(user_id: int, db: Session):
-    today = datetime.now().date()
+    today = date.today()
     year, month = today.year, today.month
+    week_start = today - timedelta(days=today.weekday())
+    week_end = week_start + timedelta(days=6)
 
-    records = (
-        db.query(attendance_models.Attendance)
+    print(f"🔄 [DEBUG] update_realtime_payroll triggered for user={user_id}")
+
+    attendances = (
+        db.query(models.Attendance)
         .filter(
-            attendance_models.Attendance.user_id == user_id,
-            extract("year", attendance_models.Attendance.work_date) == year,
-            extract("month", attendance_models.Attendance.work_date) == month,
+            models.Attendance.user_id == user_id,
+            models.Attendance.work_date.between(week_start, week_end),
         )
         .all()
     )
 
-    if not records:
-        return None
+    print(f"🧾 Attendance count this week: {len(attendances)}")
 
-    total_work_minutes = sum(r.total_work_minutes for r in records)
-    total_break_minutes = sum(r.total_break_minutes for r in records)
-    total_hours = round(total_work_minutes / 60, 2)
-    break_hours = round(total_break_minutes / 60, 2)
+    total_week_minutes = sum(a.total_work_minutes or 0 for a in attendances)
+    total_week_hours = Decimal(total_week_minutes) / Decimal(60)
+    print(f"⏱ total_week_hours={total_week_hours}")
 
-    wages = []
-    for record in records:
-        wage = get_applicable_wage(user_id, record.work_date, db)
-        wages.append((wage, record.total_work_minutes))
-
-    if total_work_minutes == 0:
-        weighted_wage = 0
-    else:
-        weighted_wage = sum(w * m for w, m in wages) / total_work_minutes
-
-    total_salary = int(total_hours * weighted_wage)
-
-    payroll = (
-        db.query(payroll_models.Payroll)
+    # WeeklyPayroll
+    weekly = (
+        db.query(WeeklyPayroll)
         .filter_by(user_id=user_id, year=year, month=month)
         .first()
     )
 
+    if not weekly:
+        weekly = WeeklyPayroll(
+            user_id=user_id, year=year, month=month, total_work_hours=total_week_hours
+        )
+        db.add(weekly)
+        print("🆕 WeeklyPayroll created")
+    else:
+        weekly.total_work_hours = total_week_hours
+        print("♻️ WeeklyPayroll updated")
+
+    # Payroll
+    total_month_minutes = (
+        db.query(models.Attendance)
+        .filter(
+            models.Attendance.user_id == user_id,
+            models.Attendance.work_date.between(date(year, month, 1), today),
+        )
+        .with_entities(models.Attendance.total_work_minutes)
+        .all()
+    )
+    total_month_hours = Decimal(sum(m[0] or 0 for m in total_month_minutes)) / Decimal(60)
+
+    hourly_wage = get_applicable_wage(user_id, today, db)
+
+    payroll = (
+        db.query(Payroll)
+        .filter_by(user_id=user_id, year=year, month=month)
+        .first()
+    )
     if not payroll:
-        payroll = payroll_models.Payroll(
+        payroll = Payroll(
             user_id=user_id,
             year=year,
             month=month,
-            total_hours=total_hours,
-            break_hours=break_hours,
-            total_salary=total_salary,
-            insurance_health=0,
-            insurance_employment=0,
-            insurance_pension=0,
-            insurance_care=0,
-            total_deduction=0,
-            net_salary=total_salary,  # 공제 전 실지급액
+            hourly_wage=hourly_wage,
+            total_hours=total_month_hours,
+            weekly_hours=total_week_hours,
+            total_salary=int(hourly_wage * float(total_month_hours)),
         )
         db.add(payroll)
+        print("🆕 Payroll created")
     else:
-        payroll.total_hours = total_hours
-        payroll.break_hours = break_hours
-        payroll.total_salary = total_salary
-        payroll.net_salary = total_salary  # 단순 갱신 (추후 공제 계산 추가 가능)
+        payroll.total_hours = total_month_hours
+        payroll.weekly_hours = total_week_hours
+        payroll.total_salary = int(hourly_wage * float(total_month_hours))
+        print("♻️ Payroll updated")
 
     db.commit()
+    print("✅ Payroll & WeeklyPayroll committed.")
     db.refresh(payroll)
     return payroll
-
-
-def recalculate_all_users(db: Session):
-    from app.modules.auth.models import User
-
-    users = db.query(User).all()
-    for user in users:
-        update_realtime_payroll(user.id, db)
-
-    return {"status": "success", "message": f"{len(users)} users payroll recalculated."}
