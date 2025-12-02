@@ -2,7 +2,7 @@ from datetime import date, timedelta
 from decimal import Decimal
 from sqlalchemy.orm import Session
 from app.modules.payroll.models import Payroll, WeeklyPayroll
-from app.modules.attendance import models
+from app.modules.workstatus import models
 from app.modules.wage.services import get_applicable_wage
 #test
 def get_week_range(target_date: date):

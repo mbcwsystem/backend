@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from sqlalchemy import select
 
 from app.core.database import get_db
-from app.modules.attendance import models, schemas
+from app.modules.workstatus import models, schemas
 from app.modules.auth.models import User
 from app.modules.auth.services import verify_password
 from app.modules.payroll.services import update_realtime_payroll
@@ -14,17 +14,10 @@ from app.modules.payroll.services import update_realtime_payroll
 router = APIRouter(tags=["Attendance"])
 
 
-# -----------------------------
-# 🔐 아이디/비밀번호 입력용 모델
-# -----------------------------
 class AttendanceAuthInput(BaseModel):
     username: str
     password: str
 
-
-# -----------------------------
-# 🔐 사용자 인증 (JWT 사용 ❌)
-# -----------------------------
 def authenticate_attendance_user(db: Session, username: str, password: str) -> User:
     user = db.execute(
         select(User).where(User.username == username)
@@ -39,9 +32,6 @@ def authenticate_attendance_user(db: Session, username: str, password: str) -> U
     return user
 
 
-# -----------------------------
-# 출근
-# -----------------------------
 @router.post("/check-in", response_model=schemas.AttendanceResponse)
 def check_in(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     user = authenticate_attendance_user(db, payload.username, payload.password)
@@ -65,10 +55,6 @@ def check_in(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     record.user_name = user.name
     return record
 
-
-# -----------------------------
-# 휴식 시작
-# -----------------------------
 @router.post("/break-start", response_model=schemas.AttendanceResponse)
 def break_start(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     user = authenticate_attendance_user(db, payload.username, payload.password)
@@ -91,10 +77,6 @@ def break_start(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     record.user_name = user.name
     return record
 
-
-# -----------------------------
-# 휴식 복귀
-# -----------------------------
 @router.post("/break-end", response_model=schemas.AttendanceResponse)
 def break_end(
     payload: AttendanceAuthInput,
@@ -119,10 +101,6 @@ def break_end(
     record.user_name = user.name
     return record
 
-
-# -----------------------------
-# 퇴근
-# -----------------------------
 @router.post("/check-out", response_model=schemas.AttendanceResponse)
 def check_out(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     user = authenticate_attendance_user(db, payload.username, payload.password)
@@ -150,10 +128,6 @@ def check_out(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     record.user_name = user.name
     return record
 
-
-# -----------------------------
-# 유틸 함수들
-# -----------------------------
 def _get_today_record(db: Session, user_id: int, today):
     record = db.query(models.Attendance).filter_by(user_id=user_id, work_date=today).first()
     if not record:
