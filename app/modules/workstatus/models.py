@@ -5,7 +5,7 @@ from app.core.database import Base
 
 
 class Attendance(Base):
-    __tablename__ = "attendance"
+    __tablename__ = "workstatus"
     __table_args__ = (
         UniqueConstraint("user_id", "work_date", name="uq_user_workdate"),
     )
