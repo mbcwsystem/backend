@@ -1,15 +1,7 @@
 from enum import Enum as PyEnum
 
-from sqlalchemy import (
-    Boolean,
-    Column,
-    DateTime,
-    Enum,
-    ForeignKey,
-    Integer,
-    String,
-    Text,
-)
+from sqlalchemy import (Boolean, Column, DateTime, Enum, ForeignKey, Integer,
+                        String, Text)
 from sqlalchemy.orm import relationship
 
 from app.core.config import settings
@@ -56,7 +48,12 @@ class Post(Base):
     )
 
     author = relationship("User", back_populates="posts")
-    comments = relationship("Comment", back_populates="post")
+    comments = relationship(
+        "Comment",
+        back_populates="post",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
 
     def __repr__(self):
         short_title = (
@@ -76,7 +73,7 @@ class Comment(Base):
     id = Column(Integer, primary_key=True, index=True)
     post_id = Column(
         Integer,
-        ForeignKey("community_post.id"),
+        ForeignKey("community_post.id", ondelete="CASCADE"),
         nullable=False,
         comment="대상 게시글 id",
     )
