@@ -1,6 +1,7 @@
 import os
 import time
-from datetime import timezone, timedelta, datetime
+from datetime import datetime, timedelta, timezone
+
 from pydantic_settings import BaseSettings
 
 os.environ["TZ"] = "Asia/Seoul"
@@ -11,6 +12,7 @@ except AttributeError:
     pass
 
 KST = timezone(timedelta(hours=9))
+
 
 class Settings(BaseSettings):
     MODE: str = os.getenv("MODE", "dev")
@@ -48,5 +50,5 @@ class Settings(BaseSettings):
         env_file_encoding = "utf-8"
         extra = "ignore"
 
+
 settings = Settings()
-ADMIN_ROLES = ["점장", "매니저", "바이저"]

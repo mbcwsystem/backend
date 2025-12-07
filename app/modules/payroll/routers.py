@@ -5,7 +5,7 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.modules.auth.models import User
 from app.modules.payroll import models, schemas
-from app.utils.permission_utils import RoleChecker
+from app.utils.permission_utils import is_admin
 
 router = APIRouter(tags=["Payroll"])
 
@@ -14,7 +14,7 @@ router = APIRouter(tags=["Payroll"])
 def get_payroll_list(
     db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
-    if RoleChecker.is_admin(current_user.position):
+    if is_admin(current_user.position):
         payrolls = db.query(models.Payroll).all()
     else:
         payrolls = (
