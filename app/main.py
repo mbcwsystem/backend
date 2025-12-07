@@ -34,6 +34,10 @@ def render_main_page(request: Request):
 def render_schedule_page(request: Request):
     return templates.TemplateResponse("schedule.html", {"request": request})
 
+@app.get("/community", response_class=HTMLResponse, tags=["Html"])
+def render_community_page(request: Request):
+    return templates.TemplateResponse("community.html", {"request": request})
+
 
 
 

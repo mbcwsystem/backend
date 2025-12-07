@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>커뮤니티</title>
+    <link rel="stylesheet" href="/static/css/community.css">
+</head>
+
+<body>
+    <header class="header">
+        <h1>커뮤니티</h1>
+        <div class="user-info">
+            <span id="welcome-name"></span>
+            <button onclick="goBack()">뒤로가기</button>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- 게시글 작성 -->
+        <div class="write-box">
+            <input id="post-title" class="input" type="text" placeholder="제목을 입력하세요 ✏️">
+            <textarea id="post-content" class="textarea" placeholder="내용을 입력하세요"></textarea>
+
+            <div class="row">
+                <select id="post-category" class="select">
+                    <option value="자유게시판">자유게시판</option>
+                    <option value="공지">📢 공지사항 (관리자)</option>
+                </select>
+
+                <button class="submit-btn" onclick="createPost()">작성하기</button>
+            </div>
+        </div>
+
+
+        <!-- 게시글 목록 -->
+        <ul id="post-list" class="post-list"></ul>
+
+    </main>
+
+    <!-- 게시글 상세 모달 -->
+    <div id="post-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2 id="modal-title"></h2>
+            <p id="modal-author"></p>
+            <p id="modal-content"></p>
+            <p id="modal-time"></p>
+
+            <button id="delete-post-btn" style="display:none;">게시글 삭제</button>
+
+            <h3>댓글</h3>
+            <ul id="comment-list"></ul>
+
+            <div class="comment-box">
+                <input id="comment-input" type="text" placeholder="댓글을 입력하세요">
+                <button onclick="createComment()">댓글 등록</button>
+            </div>
+
+            <button onclick="closeModal()">닫기</button>
+        </div>
+    </div>
+
+    <script src="/static/js/community.js"></script>
+</body>
+</html>
