@@ -1,0 +1,97 @@
+from datetime import datetime
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
+
+from app.modules.auth.models import PositionEnum
+from app.modules.community.models import CategoryEnum
+
+
+class PostBase(BaseModel):
+    title: str = Field(..., max_length=255, description="게시글 제목")
+    content: str = Field(..., description="게시글 내용")
+
+
+class CommentBase(BaseModel):
+    content: str = Field(..., description="댓글 내용")
+
+
+class PostCreate(PostBase):
+    """
+    게시글 작성
+    notice: 관리자
+    shift, dayoff: 자동생성(사용자x)
+    free_board: 시스템 제외 모두
+    """
+
+    category: CategoryEnum = Field(..., description="게시글 카테고리")
+
+
+class CommentCreate(CommentBase):
+    """
+    댓글 작성: 시스템 제외 모두
+    """
+
+    pass
+
+
+class PostUpdate(BaseModel):
+    """
+    게시글 수정 (제목, 내용)
+    """
+
+    title: Optional[str] = Field(None, max_length=255, description="수정할 제목")
+    content: Optional[str] = Field(None, description="수정할 내용")
+
+
+class CommentUpdate(BaseModel):
+    """
+    댓글 수정
+    """
+
+    content: Optional[str] = Field(None, description="수정할 내용")
+
+
+class CommentResponse(BaseModel):
+    """
+    댓글 응답
+    """
+
+    id: int
+    post_id: int
+    author_id: int
+    author_name: str
+    author_position: PositionEnum
+
+    content: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class PostResponse(BaseModel):
+    """
+    게시글 상세조회 응답
+    """
+
+    id: int
+    category: CategoryEnum
+
+    title: str
+    content: str
+
+    author_id: int
+    author_name: str
+    author_position: PositionEnum
+
+    system_generated: bool
+    created_at: datetime
+    updated_at: datetime
+
+    # 게시글에 달린 댓글까지 포함
+    comments: List[CommentResponse] = Field(default_factory=list)
+
+    class Config:
+        orm_mode = True
