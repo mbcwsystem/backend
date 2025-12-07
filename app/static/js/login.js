@@ -82,3 +82,8 @@ function goMainPage() {
 function goSchedulePage() {
     window.location.href = "/schedule";
 }
+
+function goCommunityPage() {
+    window.location.href = "/community";
+}
+

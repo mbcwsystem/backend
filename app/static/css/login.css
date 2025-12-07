@@ -95,3 +95,15 @@ button.submit-btn {
     cursor: pointer;
     width: 100%;
 }
+
+.go-community-btn {
+    background: #8b28a7;
+    color: white;
+    border: none;
+    padding: 12px;
+    margin-top: 20px;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+}
