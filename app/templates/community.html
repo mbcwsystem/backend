@@ -9,55 +9,95 @@
 
 <body>
     <header class="header">
-        <h1>커뮤니티</h1>
+        <div class="header-left">
+            <h1>커뮤니티</h1>
+            <p class="header-subtitle">매장 직원들과 소통하는 공간입니다.</p>
+        </div>
         <div class="user-info">
             <span id="welcome-name"></span>
-            <button onclick="goBack()">뒤로가기</button>
+            <button class="outline-btn" onclick="goBack()">메인으로</button>
         </div>
     </header>
 
     <main class="container">
-
         <!-- 게시글 작성 -->
-        <div class="write-box">
-            <input id="post-title" class="input" type="text" placeholder="제목을 입력하세요 ✏️">
-            <textarea id="post-content" class="textarea" placeholder="내용을 입력하세요"></textarea>
+        <section class="write-section">
+            <h2 class="section-title">✏️ 게시글 작성</h2>
+            <p class="section-desc">자유게시판과 공지사항(관리자)을 선택해 글을 작성할 수 있어요.</p>
 
-            <div class="row">
-                <select id="post-category" class="select">
-                    <option value="자유게시판">자유게시판</option>
-                    <option value="공지">📢 공지사항 (관리자)</option>
-                </select>
+            <div class="write-box">
+                <div class="write-row">
+                    <select id="post-category" class="select">
+                        <!-- value는 백엔드 CategoryEnum 값과 일치해야 함 -->
+                        <option value="자유게시판">자유게시판</option>
+                        <option value="공지">📢 공지사항 (관리자)</option>
+                    </select>
+                    <input id="post-title" class="input" type="text" placeholder="제목을 입력하세요 ✏️">
+                </div>
 
-                <button class="submit-btn" onclick="createPost()">작성하기</button>
+                <textarea id="post-content" class="textarea" placeholder="내용을 입력하세요"></textarea>
+
+                <div class="write-footer">
+                    <span class="hint-text">※ 공지사항은 관리자만 작성할 수 있습니다.</span>
+                    <button class="submit-btn" onclick="createPost()">작성하기</button>
+                </div>
             </div>
-        </div>
-
+        </section>
 
         <!-- 게시글 목록 -->
-        <ul id="post-list" class="post-list"></ul>
+        <section class="list-section">
+            <div class="list-header">
+                <h2 class="section-title">📃 게시글 목록</h2>
+                <div class="list-controls">
+                    <select id="filter-category" class="select small" onchange="changeCategoryFilter()">
+                        <option value="all">전체</option>
+                        <option value="자유게시판">자유게시판</option>
+                        <option value="공지">공지사항</option>
+                        <option value="근무교대">근무교대</option>
+                        <option value="휴무신청">휴무신청</option>
+                    </select>
+                </div>
+            </div>
 
+            <ul id="post-list" class="post-list"></ul>
+            <p id="empty-message" class="empty-message" style="display: none;">게시글이 없습니다.</p>
+        </section>
     </main>
 
     <!-- 게시글 상세 모달 -->
     <div id="post-modal" class="modal" style="display:none;">
         <div class="modal-content">
-            <h2 id="modal-title"></h2>
-            <p id="modal-author"></p>
-            <p id="modal-content"></p>
-            <p id="modal-time"></p>
-
-            <button id="delete-post-btn" style="display:none;">게시글 삭제</button>
-
-            <h3>댓글</h3>
-            <ul id="comment-list"></ul>
-
-            <div class="comment-box">
-                <input id="comment-input" type="text" placeholder="댓글을 입력하세요">
-                <button onclick="createComment()">댓글 등록</button>
+            <div class="modal-header">
+                <div>
+                    <span id="modal-category-badge" class="badge"></span>
+                    <h2 id="modal-title"></h2>
+                </div>
+                <button class="icon-btn" onclick="closeModal()">✕</button>
             </div>
 
-            <button onclick="closeModal()">닫기</button>
+            <p id="modal-author" class="modal-author"></p>
+            <p id="modal-time" class="modal-time"></p>
+            <div id="modal-content" class="modal-body-text"></div>
+
+            <div class="modal-actions">
+                <button id="delete-post-btn" class="delete-post-btn" style="display:none;">게시글 삭제</button>
+            </div>
+
+            <hr class="divider">
+
+            <h3 class="comment-title">💬 댓글</h3>
+            <ul id="comment-list" class="comment-list"></ul>
+
+            <div class="comment-box">
+                <input id="comment-input" type="text" placeholder="댓글을 입력하세요" class="comment-input">
+                <button
+                    id="comment-submit-btn"
+                    type="button"
+                    class="comment-btn"
+                >
+                    댓글 등록
+                </button>
+            </div>
         </div>
     </div>
 
