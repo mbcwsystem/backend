@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -23,7 +23,7 @@ def get_community_user(user=Depends(get_current_user)):
 
 
 # 게시글 API -----
-@router.post("/posts", response_model=PostResponse, summary="게시글 생성")
+@router.post("/posts", response_model=PostResponse, status_code=status.HTTP_201_CREATED, summary="게시글 생성")
 def create_post(
     data: PostCreate,
     db: Session = Depends(get_db),
@@ -71,8 +71,7 @@ def delete_post(
 
 # 댓글 API -----
 @router.post(
-    "/posts/{post_id}/comments", response_model=CommentResponse, summary="댓글 생성"
-)
+    "/posts/{post_id}/comments", response_model=CommentResponse, status_code=status.HTTP_201_CREATED, summary="댓글 생성")
 def create_comment(
     post_id: int,
     data: CommentCreate,
