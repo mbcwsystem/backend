@@ -1,18 +1,32 @@
-# 아래 테스트코드
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import configure_mappers
-
 from app.core.config import settings
 from app.core.database import Base, SessionLocal, engine
 from app.core.routers import api_router
 from app.modules.auth.models import GenderEnum, PositionEnum, User
 from app.modules.auth.services import hash_password
+from fastapi.middleware.cors import CORSMiddleware
+
 
 configure_mappers()
 app = FastAPI()
+
+origins = [
+    "http://localhost:5173",
+    "http://mbansan.iptime.org",
+    "http://mbansan.iptime.org:8000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # 테스트코드
 templates = Jinja2Templates(directory="app/templates")
