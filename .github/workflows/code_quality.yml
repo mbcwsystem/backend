@@ -2,7 +2,7 @@ name: Code Quality Check
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "main", "dev", "feature/**" ]
   pull_request:
     branches: [ "main", "dev" ]
 
@@ -26,5 +26,5 @@ jobs:
 
       - name: Run code quality script
         run: |
-          chmod +x code_quality_check.sh
-          ./code_quality_check.sh
+          chmod +x tools/code_quality_check.sh
+          tools/code_quality_check.sh
