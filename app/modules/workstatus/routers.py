@@ -1,37 +1,33 @@
 from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.modules.attendance import models, schemas
 from app.modules.auth.models import User
 from app.modules.auth.services import verify_password
 from app.modules.payroll.services import update_realtime_payroll
+from app.modules.workstatus import models, schemas
 
 router = APIRouter(tags=["Attendance"])
 
 
-# -----------------------------
-# 🔐 아이디/비밀번호 입력용 모델
-# -----------------------------
 class AttendanceAuthInput(BaseModel):
     username: str
     password: str
 
 
-# -----------------------------
-# 🔐 사용자 인증 (JWT 사용 ❌)
-# -----------------------------
 def authenticate_attendance_user(db: Session, username: str, password: str) -> User:
     user = db.execute(
         select(User).where(User.username == username)
     ).scalar_one_or_none()
 
     if not user or not verify_password(password, user.password):
-        raise HTTPException(status_code=401, detail="아이디 또는 비밀번호가 올바르지 않습니다.")
+        raise HTTPException(
+            status_code=401, detail="아이디 또는 비밀번호가 올바르지 않습니다."
+        )
 
     if not user.is_active:
         raise HTTPException(status_code=400, detail="휴면/비활성화된 계정입니다.")
@@ -39,15 +35,14 @@ def authenticate_attendance_user(db: Session, username: str, password: str) -> U
     return user
 
 
-# -----------------------------
-# 출근
-# -----------------------------
 @router.post("/check-in", response_model=schemas.AttendanceResponse)
 def check_in(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     user = authenticate_attendance_user(db, payload.username, payload.password)
 
     today = datetime.now().date()
-    existing = db.query(models.Attendance).filter_by(user_id=user.id, work_date=today).first()
+    existing = (
+        db.query(models.Attendance).filter_by(user_id=user.id, work_date=today).first()
+    )
 
     if existing:
         raise HTTPException(status_code=400, detail="이미 오늘 출근 기록이 있습니다.")
@@ -66,9 +61,6 @@ def check_in(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     return record
 
 
-# -----------------------------
-# 휴식 시작
-# -----------------------------
 @router.post("/break-start", response_model=schemas.AttendanceResponse)
 def break_start(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     user = authenticate_attendance_user(db, payload.username, payload.password)
@@ -92,9 +84,6 @@ def break_start(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     return record
 
 
-# -----------------------------
-# 휴식 복귀
-# -----------------------------
 @router.post("/break-end", response_model=schemas.AttendanceResponse)
 def break_end(
     payload: AttendanceAuthInput,
@@ -120,9 +109,6 @@ def break_end(
     return record
 
 
-# -----------------------------
-# 퇴근
-# -----------------------------
 @router.post("/check-out", response_model=schemas.AttendanceResponse)
 def check_out(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     user = authenticate_attendance_user(db, payload.username, payload.password)
@@ -151,11 +137,10 @@ def check_out(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     return record
 
 
-# -----------------------------
-# 유틸 함수들
-# -----------------------------
 def _get_today_record(db: Session, user_id: int, today):
-    record = db.query(models.Attendance).filter_by(user_id=user_id, work_date=today).first()
+    record = (
+        db.query(models.Attendance).filter_by(user_id=user_id, work_date=today).first()
+    )
     if not record:
         raise HTTPException(status_code=400, detail="출근 기록이 없습니다.")
     return record

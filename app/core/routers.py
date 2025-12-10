@@ -10,9 +10,8 @@ routers = [
     ("/shift", "Shift", "app.modules.shift.routers"),
     ("/dayoff", "DayOff", "app.modules.dayoff.routers"),
     ("/payroll", "Payroll", "app.modules.payroll.routers"),
-    ("/attendance", "Attendance", "app.modules.attendance.routers"),
+    ("/workstatus", "Attendance", "app.modules.workstatus.routers"),
     ("/community", "Community", "app.modules.community.routers"),
-    ("/mainpage", "MainPage", "app.modules.mainpage.routers"),
     ("/admin", "Admin", "app.modules.admin.routers"),
     ("/wage", "Wage", "app.modules.wage.routers"),
 ]
