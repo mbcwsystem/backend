@@ -19,23 +19,26 @@ class Settings(BaseSettings):
     APP_NAME: str = "Megabox"
     TIMEZONE: str = "Asia/Seoul"
 
+    # Database configs
     DB_USER: str
     DB_PASSWORD: str
     DB_HOST: str
     DB_PORT: int
     DB_NAME: str
 
+    # JWT configs
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str
     JWT_EXPIRE_MINUTES: int
 
+    # Admin configs
     ADMIN_USERNAME: str
     ADMIN_PASSWORD: str
     ADMIN_NAME: str
     ADMIN_EMAIL: str
 
     @property
-    def DATABASE_URL(self):
+    def DATABASE_URL(self) -> str:
         return (
             f"mysql+pymysql://{self.DB_USER}:{self.DB_PASSWORD}"
             f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"

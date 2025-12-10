@@ -1,7 +1,15 @@
 from enum import Enum as PyEnum
 
-from sqlalchemy import (Boolean, Column, DateTime, Enum, ForeignKey, Integer,
-                        String, Text)
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.orm import relationship
 
 from app.core.config import settings
