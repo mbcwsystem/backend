@@ -7,12 +7,14 @@ class ScheduleCreateRequest(BaseModel):
     """
     스케줄 생성
     """
-    start_date : datetime
-    end_date : datetime
 
-    week_number : int
+    start_date: datetime
+    end_date: datetime
+
+    week_number: int
     year: int
     month: int
+
 
 class ScheduleCreateResponse(BaseModel):
     """
