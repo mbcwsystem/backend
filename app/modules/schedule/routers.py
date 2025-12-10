@@ -4,11 +4,9 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.security import get_current_user
-from app.modules.auth.models import PositionEnum
-from app.modules.community.schemas import PostCreate
+from app.modules.auth.models import PositionEnum, User
 from app.modules.schedule import services
 from app.modules.schedule.schemas import ScheduleCreateRequest, ScheduleCreateResponse
-from app.utils.permission_utils import is_system
 
 router = APIRouter()
 
@@ -22,7 +20,7 @@ def is_supervisor(user):
 
 
 
-def get_schedule_user(user = Depends(get_current_user)) :
+def get_schedule_user(user: User = Depends(get_current_user)) :
     if not is_supervisor(user):
          raise HTTPException(403, "바이저 이상만 스케줄 관리 가능합니다.")
     return user
