@@ -6,7 +6,6 @@ from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr, Field
 
-from app.modules.admin.models import InsuranceCategoryEnum
 from app.modules.auth.models import GenderEnum, PositionEnum
 
 
@@ -78,6 +77,7 @@ class HolidayOut(BaseModel):
 # ---------- 보험 요율(카테고리별) ----------
 class InsuranceRateSet(BaseModel):
     """4대 보험 요율 등록용 입력 스키마"""
+
     national_pension: float
     health_insurance: float
     employment_insurance: float
@@ -87,6 +87,7 @@ class InsuranceRateSet(BaseModel):
 
 class InsuranceRateOut(BaseModel):
     """4대 보험 요율 조회용 출력 스키마"""
+
     id: int
     national_pension: float
     health_insurance: float

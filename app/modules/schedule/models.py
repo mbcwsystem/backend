@@ -1,14 +1,25 @@
 import enum
 
-from sqlalchemy import Column, Integer, ForeignKey, Date, Boolean, VARCHAR, Enum, DateTime
+from sqlalchemy import (
+    VARCHAR,
+    Boolean,
+    Column,
+    Date,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+)
 from sqlalchemy.dialects.mysql import DECIMAL
 
 from app.core.database import Base
+
 
 class Status(str, enum.Enum):
     pending = "대기"
     approved = "승인"
     rejected = "반려"
+
 
 # 스케쥴표
 class Schedule(Base):
@@ -19,11 +30,12 @@ class Schedule(Base):
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
 
-    #ISO 주차(쿼리 최적화용, 선택적)
+    # ISO 주차(쿼리 최적화용, 선택적)
     week_number = Column(Integer, nullable=False)
     year = Column(Integer, nullable=False)
     month = Column(Integer, nullable=False)
     is_holiday = Column(Boolean, nullable=False)
+
 
 # 주차별 근무 요약
 class WeeklySchedule(Base):
@@ -33,7 +45,8 @@ class WeeklySchedule(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     year = Column(Integer, nullable=False)
     week_number = Column(Integer, nullable=False)
-    total_work_hours = Column(DECIMAL(5,2), default=0)
+    total_work_hours = Column(DECIMAL(5, 2), default=0)
+
 
 # 휴무 신청
 class DayOffRequest(Base):

@@ -1,7 +1,7 @@
 from datetime import date, time
 from typing import Optional
 
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel
 
 
 class AttendanceBase(BaseModel):

@@ -1,8 +1,9 @@
 import enum
 
-from sqlalchemy import Column, Integer, ForeignKey, Enum, DateTime
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer
 
 from app.core.database import Base
+
 
 class Status(str, enum.Enum):
     pending = "대기"
@@ -13,7 +14,6 @@ class Status(str, enum.Enum):
 class ShiftChangeType(str, enum.Enum):
     shift = "교대"
     replacement = "대타"
-
 
 
 class ShiftRequest(Base):
