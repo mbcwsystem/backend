@@ -11,7 +11,7 @@ from app.modules.schedule.schemas import ScheduleCreateRequest, ScheduleCreateRe
 router = APIRouter()
 
 
-def is_supervisor(user):
+def is_supervisor(user: User) -> bool:
     return user.position in{
         PositionEnum.advisor,
         PositionEnum.assistant_manager,
