@@ -1,11 +1,14 @@
 from fastapi import HTTPException
+from sqlalchemy.orm import Session
 
+from app.modules.auth.models import User
 from app.modules.schedule.models import Schedule
-from app.modules.schedule.routers import is_supervisor
+from app.modules.schedule.permissions import is_supervisor
+from app.modules.schedule.schemas import ScheduleCreateRequest
 
 
 # 스케줄 생성
-def create_schedule(db, user, data):
+def create_schedule(db: Session, user: User, data: ScheduleCreateRequest) -> Schedule:
     """
     스케줄 생성
     - 바이저 이상 생성 불가능
