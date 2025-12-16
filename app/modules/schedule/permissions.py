@@ -1,4 +1,4 @@
-from app.modules.auth.models import User, PositionEnum
+from app.modules.auth.models import PositionEnum, User
 
 
 def is_supervisor(user: User) -> bool:

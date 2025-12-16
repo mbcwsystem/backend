@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 from sqlalchemy.orm import Session
 
@@ -10,7 +10,6 @@ from app.modules.schedule.permissions import is_supervisor
 from app.modules.schedule.schemas import ScheduleCreateRequest, ScheduleCreateResponse
 
 router = APIRouter()
-
 
 
 def get_schedule_user(user: User = Depends(get_current_user)) -> User:
