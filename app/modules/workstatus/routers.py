@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.modules.auth.models import User
 from app.modules.auth.services import verify_password
-from app.modules.payroll.services import update_realtime_payroll
 from app.modules.workstatus import models, schemas
 
 router = APIRouter(tags=["Attendance"])
@@ -79,7 +78,6 @@ def break_start(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(record)
 
-    update_realtime_payroll(user.id, db)
     record.user_name = user.name
     return record
 
@@ -102,8 +100,6 @@ def break_end(
     record.break_end = datetime.now().time()
     db.commit()
     db.refresh(record)
-
-    update_realtime_payroll(user.id, db)
 
     record.user_name = user.name
     return record
@@ -132,7 +128,6 @@ def check_out(payload: AttendanceAuthInput, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(record)
 
-    update_realtime_payroll(user.id, db)
     record.user_name = user.name
     return record
 

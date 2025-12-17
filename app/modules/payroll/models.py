@@ -1,4 +1,5 @@
-from sqlalchemy import DECIMAL, Column, ForeignKey, Integer
+from decimal import Decimal
+from sqlalchemy import DECIMAL, Column, ForeignKey, Integer, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -6,37 +7,59 @@ from app.core.database import Base
 
 class Payroll(Base):
     __tablename__ = "payroll"
+    __table_args__ = (
+        UniqueConstraint("user_id", "year", "month", name="uq_user_year_month"),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    year = Column(Integer, nullable=False)
-    month = Column(Integer, nullable=False)
-    hourly_wage = Column(Integer, nullable=False)
-    total_hours = Column(DECIMAL(5, 2), default=0)
-    weekly_hours = Column(DECIMAL(5, 2), default=0)
-    night_hours = Column(DECIMAL(5, 2), default=0)
-    holiday_hours = Column(DECIMAL(5, 2), default=0)
-    break_hours = Column(DECIMAL(5, 2), default=0)
-    total_salary = Column(Integer, default=0)
-    insurance_health = Column(Integer, default=0)
-    insurance_employment = Column(Integer, default=0)
-    insurance_pension = Column(Integer, default=0)
-    insurance_care = Column(Integer, default=0)
-    total_deduction = Column(Integer, default=0)
-    net_salary = Column(Integer, default=0)
+
+    # 기본설정
+    year = Column(Integer, nullable=False)  # 연도
+    month = Column(Integer, nullable=False)  # 월
+    wage = Column(Integer, nullable=False)  # 시급
+
+    # 근무시간
+    day_hours = Column(DECIMAL(5, 2), default=Decimal("0.00"))  # 월간 주간 근무시간
+    night_hours = Column(DECIMAL(5, 2), default=Decimal("0.00"))  # 월간 야간 근무시간
+    weekly_allowance_hours = Column(
+        DECIMAL(5, 2), default=Decimal("0.00")
+    )  # 월간 주휴시간
+    holiday_hours = Column(
+        DECIMAL(5, 2), default=Decimal("0.00")
+    )  # 월간 공휴일 근무시간
+    break_hours = Column(DECIMAL(5, 2), default=Decimal("0.00"))  # 월간 휴식 시간
+
+    # 공제
+    insurance_health = Column(Integer, default=0)  # 건강보험
+    insurance_care = Column(Integer, default=0)  # 요양보험
+    insurance_employment = Column(Integer, default=0)  # 고용보험
+    insurance_pension = Column(Integer, default=0)  # 국민연금
 
     user = relationship("User", back_populates="payrolls")
 
 
-class WeeklyPayroll(Base):
-    __tablename__ = "weekly_payroll"
-
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    user_id = Column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+class PayrollWeeklyAllowanceHours(Base):
+    __tablename__ = "weekly_allowance_hours"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "iso_year",
+            "iso_week",
+            name="uq_user_iso_year_week",
+        ),
     )
-    year = Column(Integer, nullable=False)
-    month = Column(Integer, nullable=False)
-    total_work_hours = Column(DECIMAL(5, 2), default=0.0)
 
-    user = relationship("User", back_populates="weekly_payroll")
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    # 주차
+    iso_year = Column(Integer, nullable=False)
+    iso_week = Column(Integer, nullable=False)
+
+    # 주휴시간
+    allowance_hours = Column(
+        DECIMAL(5, 2),
+        nullable=False,
+        default=Decimal("0.00"),
+    )
