@@ -14,9 +14,11 @@ def get_weekly_allowance_by_month(
     """
     월 기준으로 해당되는 ISO 주휴시간 조회
     """
-    records = db.query(PayrollWeeklyAllowanceHours).filter(
-        PayrollWeeklyAllowanceHours.user_id == user_id
-    ).all()
+    records = (
+        db.query(PayrollWeeklyAllowanceHours)
+        .filter(PayrollWeeklyAllowanceHours.user_id == user_id)
+        .all()
+    )
 
     result = []
 
@@ -27,18 +29,17 @@ def get_weekly_allowance_by_month(
         )
 
         # 해당 월과 겹치는 주만 포함
-        if (
-            week_start.month == month
-            or week_end.month == month
-        ):
-            result.append({
-                "user_id": record.user_id,
-                "iso_year": record.iso_year,
-                "iso_week": record.iso_week,
-                "week_start_date": week_start,
-                "week_end_date": week_end,
-                "allowance_hours": float(record.allowance_hours),
-            })
+        if week_start.month == month or week_end.month == month:
+            result.append(
+                {
+                    "user_id": record.user_id,
+                    "iso_year": record.iso_year,
+                    "iso_week": record.iso_week,
+                    "week_start_date": week_start,
+                    "week_end_date": week_end,
+                    "allowance_hours": float(record.allowance_hours),
+                }
+            )
 
     return result
 
@@ -53,11 +54,15 @@ def upsert_weekly_allowance(
     """
     주휴시간 UPSERT
     """
-    record = db.query(PayrollWeeklyAllowanceHours).filter(
-        PayrollWeeklyAllowanceHours.user_id == user_id,
-        PayrollWeeklyAllowanceHours.iso_year == iso_year,
-        PayrollWeeklyAllowanceHours.iso_week == iso_week,
-    ).first()
+    record = (
+        db.query(PayrollWeeklyAllowanceHours)
+        .filter(
+            PayrollWeeklyAllowanceHours.user_id == user_id,
+            PayrollWeeklyAllowanceHours.iso_year == iso_year,
+            PayrollWeeklyAllowanceHours.iso_week == iso_week,
+        )
+        .first()
+    )
 
     if record:
         record.allowance_hours = allowance_hours

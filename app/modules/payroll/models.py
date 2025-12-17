@@ -22,8 +22,12 @@ class Payroll(Base):
     # 근무시간
     day_hours = Column(DECIMAL(5, 2), default=Decimal("0.00"))  # 월간 주간 근무시간
     night_hours = Column(DECIMAL(5, 2), default=Decimal("0.00"))  # 월간 야간 근무시간
-    weekly_allowance_hours = Column(DECIMAL(5, 2), default=Decimal("0.00"))  # 월간 주휴시간
-    holiday_hours = Column(DECIMAL(5, 2), default=Decimal("0.00"))  # 월간 공휴일 근무시간
+    weekly_allowance_hours = Column(
+        DECIMAL(5, 2), default=Decimal("0.00")
+    )  # 월간 주휴시간
+    holiday_hours = Column(
+        DECIMAL(5, 2), default=Decimal("0.00")
+    )  # 월간 공휴일 근무시간
     break_hours = Column(DECIMAL(5, 2), default=Decimal("0.00"))  # 월간 휴식 시간
 
     # 공제

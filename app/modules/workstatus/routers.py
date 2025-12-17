@@ -101,7 +101,6 @@ def break_end(
     db.commit()
     db.refresh(record)
 
-
     record.user_name = user.name
     return record
 
