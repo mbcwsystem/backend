@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from sqlalchemy import DECIMAL, Column, ForeignKey, Integer, UniqueConstraint
 from sqlalchemy.orm import relationship
 

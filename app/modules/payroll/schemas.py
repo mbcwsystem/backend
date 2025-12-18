@@ -1,6 +1,7 @@
-from pydantic import BaseModel, field_serializer
 from datetime import date
 from typing import Optional
+
+from pydantic import BaseModel, field_serializer
 
 
 class PayrollResponse(BaseModel):

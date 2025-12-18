@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.modules.auth.models import User
 from app.modules.schedule.models import Schedule
-from app.modules.schedule.schemas import ScheduleCreateRequest
+from app.modules.schedule.schemas import ScheduleCreateRequest, ScheduleResponse
 from app.utils.permission_utils import is_admin
 
 
@@ -31,5 +31,21 @@ def create_schedule(db: Session, user: User, data: ScheduleCreateRequest) -> Sch
     db.add(schedule)
     db.commit()
     db.refresh(schedule)
+
+    return schedule
+
+
+def list_schedule(db, year: int, weekNumber: int) -> ScheduleResponse:
+    """
+    스케줄 주차별 목록 조회
+    """
+    schedule = (
+        db.query(Schedule)
+        .filter(
+            Schedule.year == year,
+            Schedule.week_number == weekNumber,
+        )
+        .all()
+    )
 
     return schedule

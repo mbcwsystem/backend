@@ -31,3 +31,21 @@ class ScheduleCreateResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class ScheduleResponse(BaseModel):
+    """
+    스케줄 상세 조회 응답
+    """
+
+    id: int
+    user_id: int
+    start_date: datetime
+    end_date: datetime
+    week_number: int
+    year: int
+    month: int | None  # 월 스냅샷 (표시용)
+    is_holiday: bool
+
+    class Config:
+        from_attributes = True
