@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.modules.auth.models import User
 from app.modules.schedule.models import Schedule
-from app.modules.schedule.permissions import is_supervisor
 from app.modules.schedule.schemas import ScheduleCreateRequest
+from app.utils.permission_utils import is_admin
 
 
 # 스케줄 생성
@@ -15,7 +15,7 @@ def create_schedule(db: Session, user: User, data: ScheduleCreateRequest) -> Sch
     """
 
     # 권한 체크
-    if not is_supervisor(user):
+    if not is_admin(user):
         raise HTTPException(403, "바이저급 이상만 관리 가능합니다.")
 
     schedule = Schedule(

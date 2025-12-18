@@ -6,14 +6,14 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.modules.auth.models import User
 from app.modules.schedule import services
-from app.modules.schedule.permissions import is_supervisor
 from app.modules.schedule.schemas import ScheduleCreateRequest, ScheduleCreateResponse
+from app.utils.permission_utils import is_admin
 
 router = APIRouter()
 
 
 def get_schedule_user(user: User = Depends(get_current_user)) -> User:
-    if not is_supervisor(user):
+    if not is_admin(user):
         raise HTTPException(403, "바이저 이상만 스케줄 관리 가능합니다.")
     return user
 
