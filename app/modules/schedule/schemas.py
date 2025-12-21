@@ -40,6 +40,7 @@ class ScheduleResponse(BaseModel):
 
     id: int
     user_id: int
+    user_name: str
     start_date: datetime
     end_date: datetime
     week_number: int
