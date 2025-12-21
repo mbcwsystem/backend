@@ -8,7 +8,6 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.modules.auth.models import User
 from app.modules.schedule import services
-from app.modules.schedule.models import Schedule
 from app.modules.schedule.schemas import (
     ScheduleCreateRequest,
     ScheduleCreateResponse,
