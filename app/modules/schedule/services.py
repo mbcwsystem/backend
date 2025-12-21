@@ -42,10 +42,7 @@ def list_schedule(db, year: int, weekNumber: int) -> List[ScheduleResponse]:
     스케줄 주차별 목록 조회
     """
     schedules = (
-        db.query(
-            Schedule,
-            User.name.label("user_name")
-        )
+        db.query(Schedule, User.name.label("user_name"))
         .join(User, User.id == Schedule.user_id)
         .filter(
             Schedule.year == year,
@@ -63,8 +60,8 @@ def list_schedule(db, year: int, weekNumber: int) -> List[ScheduleResponse]:
             end_date=schedule.end_date,
             week_number=schedule.week_number,
             year=schedule.year,
-            month= schedule.month,
-            is_holiday= schedule.is_holiday,
+            month=schedule.month,
+            is_holiday=schedule.is_holiday,
         )
         for schedule, user_name in schedules
     ]
