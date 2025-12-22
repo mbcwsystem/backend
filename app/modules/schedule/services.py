@@ -54,7 +54,7 @@ def list_schedule(db, year: int, weekNumber: int) -> List[ScheduleResponse]:
         ScheduleResponse(
             id=schedule.id,
             user_id=schedule.user_id,
-            user_name=user_name,
+            user_name=schedule.user.name,
             start_date=schedule.start_date,
             end_date=schedule.end_date,
             week_number=schedule.week_number,
@@ -62,7 +62,7 @@ def list_schedule(db, year: int, weekNumber: int) -> List[ScheduleResponse]:
             month=schedule.month,
             is_holiday=schedule.is_holiday,
         )
-        for schedule, user_name in schedules
+        for schedule in schedules
     ]
 
 
