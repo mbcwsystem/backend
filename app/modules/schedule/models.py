@@ -28,7 +28,7 @@ class Schedule(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    user = relationship("User")
+    user = relationship("User", back_populates="schedules")
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
 

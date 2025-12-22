@@ -58,5 +58,7 @@ class User(Base):
         "Comment", back_populates="author", cascade="all, delete-orphan"
     )
 
+    #스케줄
+    schedules = relationship("Schedule", back_populates="user", cascade="all, delete")
     def __repr__(self):
         return f"<User(username={self.username}, position={self.position})>"
