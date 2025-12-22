@@ -1,4 +1,3 @@
-# app/modules/auth/schemas.py
 from pydantic import BaseModel
 
 
@@ -8,6 +7,6 @@ class LoginRequest(BaseModel):
 
 
 class TokenResponse(BaseModel):
-    is_system : bool
+    is_system: bool
     access_token: str
     token_type: str = "bearer"
