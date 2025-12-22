@@ -93,6 +93,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# ▶️ YAML config files
+*.yml
+*.yaml
+
 # ============================================
 # End of .gitignore
 # ============================================
