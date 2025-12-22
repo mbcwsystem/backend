@@ -1,5 +1,6 @@
-from sqlalchemy.orm import Session
 from decimal import Decimal
+
+from sqlalchemy.orm import Session
 
 from app.modules.payroll.models import PayrollWeeklyAllowanceHours
 from app.utils.date_utils import get_iso_week_range
