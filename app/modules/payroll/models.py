@@ -1,6 +1,5 @@
 from decimal import Decimal
-
-from sqlalchemy import DECIMAL, Column, ForeignKey, Integer, UniqueConstraint
+from sqlalchemy import DECIMAL, Column, ForeignKey, Integer, UniqueConstraint, Date
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -64,3 +63,26 @@ class PayrollWeeklyAllowanceHours(Base):
         nullable=False,
         default=Decimal("0.00"),
     )
+
+
+class PayrollPayDate(Base):
+    """
+    연/월 기준 급여 지급일 관리 테이블
+    - 해당 연월 Payroll과 매칭하여 지급일 표시
+    """
+
+    __tablename__ = "payroll_pay_date"
+    __table_args__ = (
+        UniqueConstraint(
+            "year",
+            "month",
+            name="uq_payroll_pay_date_year_month",
+        ),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    year = Column(Integer, nullable=False)  # 지급 연도
+    month = Column(Integer, nullable=False)  # 지급 월
+
+    pay_date = Column(Date, nullable=False)  # 해당 월 급여 지급일
