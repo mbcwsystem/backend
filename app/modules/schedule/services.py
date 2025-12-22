@@ -42,8 +42,7 @@ def list_schedule(db, year: int, weekNumber: int) -> List[ScheduleResponse]:
     스케줄 주차별 목록 조회
     """
     schedules = (
-        db.query(Schedule, User.name.label("user_name"))
-        .join(User, User.id == Schedule.user_id)
+        db.query(Schedule)
         .filter(
             Schedule.year == year,
             Schedule.week_number == weekNumber,
@@ -65,3 +64,32 @@ def list_schedule(db, year: int, weekNumber: int) -> List[ScheduleResponse]:
         )
         for schedule, user_name in schedules
     ]
+
+
+def get_schedule(db, scheduleId: int) -> ScheduleResponse:
+
+    """
+    스케줄 상세 조회
+    """
+
+    schedule = (
+        db.query(Schedule)
+        .filter(Schedule.id == scheduleId)
+        .first()
+    )
+
+    if schedule is None:
+        raise HTTPException(status_code=404, detail="존재하지 않는 스케줄입니다.")
+
+
+    return ScheduleResponse(
+        id=schedule.id,
+        user_id=schedule.user_id,
+        user_name=schedule.user.name,
+        start_date=schedule.start_date,
+        end_date=schedule.end_date,
+        week_number=schedule.week_number,
+        year=schedule.year,
+        month=schedule.month,
+        is_holiday=schedule.is_holiday,
+    )
