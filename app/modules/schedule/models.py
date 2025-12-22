@@ -11,6 +11,7 @@ from sqlalchemy import (
     Integer,
 )
 from sqlalchemy.dialects.mysql import DECIMAL
+from sqlalchemy.orm import relationship
 
 from app.core.database import Base
 
@@ -27,6 +28,7 @@ class Schedule(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user = relationship("User")
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
 
