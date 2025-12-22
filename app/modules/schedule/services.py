@@ -67,20 +67,14 @@ def list_schedule(db, year: int, weekNumber: int) -> List[ScheduleResponse]:
 
 
 def get_schedule(db, scheduleId: int) -> ScheduleResponse:
-
     """
     스케줄 상세 조회
     """
 
-    schedule = (
-        db.query(Schedule)
-        .filter(Schedule.id == scheduleId)
-        .first()
-    )
+    schedule = db.query(Schedule).filter(Schedule.id == scheduleId).first()
 
     if schedule is None:
         raise HTTPException(status_code=404, detail="존재하지 않는 스케줄입니다.")
-
 
     return ScheduleResponse(
         id=schedule.id,

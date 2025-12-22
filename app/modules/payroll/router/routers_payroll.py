@@ -1,15 +1,16 @@
 from typing import List, Union
-from fastapi import APIRouter, Depends, Query, HTTPException
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.security import get_current_user
-from app.utils.permission_utils import is_system
 from app.modules.payroll.schemas import (
-    PayrollResponse,
     PayrollPayResponse,
+    PayrollResponse,
 )
 from app.modules.payroll.services.payroll_service import PayrollService
+from app.utils.permission_utils import is_system
 
 router = APIRouter(tags=["Payroll"])
 

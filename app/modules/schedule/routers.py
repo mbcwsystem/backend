@@ -52,14 +52,15 @@ def get_schedule_week(
 ):
     return services.list_schedule(db, year, weekNumber)
 
+
 # 스케줄 상세 조회
 @router.get(
     "/schedule/{scheduleId}",
     response_model=ScheduleResponse,
-    summary="스케줄 상세 조회"
+    summary="스케줄 상세 조회",
 )
 def get_schedule(
-        scheduleId: int,
-        db: Session = Depends(get_db),
+    scheduleId: int,
+    db: Session = Depends(get_db),
 ):
     return services.get_schedule(db, scheduleId)
