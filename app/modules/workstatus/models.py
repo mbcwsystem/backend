@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 
+
 class Attendance(Base):
     __tablename__ = "workstatus"
     __table_args__ = (
