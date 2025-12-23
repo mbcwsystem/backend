@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -81,9 +80,7 @@ def _get_today_record(
     today,
 ):
     record = (
-        db.query(models.Attendance)
-        .filter_by(user_id=user_id, work_date=today)
-        .first()
+        db.query(models.Attendance).filter_by(user_id=user_id, work_date=today).first()
     )
 
     if not record:
@@ -112,9 +109,7 @@ def _calc_work_minutes(record: models.Attendance):
         check_out += timedelta(days=1)
 
     # 전체 체류 시간 (분)
-    total_work_minutes = int(
-        (check_out - check_in).total_seconds() / 60
-    )
+    total_work_minutes = int((check_out - check_in).total_seconds() / 60)
 
     # 휴게 시간 계산
     break_minutes = 0
@@ -126,9 +121,7 @@ def _calc_work_minutes(record: models.Attendance):
         if b_end < b_start:
             b_end += timedelta(days=1)
 
-        break_minutes = int(
-            (b_end - b_start).total_seconds() / 60
-        )
+        break_minutes = int((b_end - b_start).total_seconds() / 60)
 
     # 실 근무 시간, 휴게 시간 반환
     return total_work_minutes - break_minutes, break_minutes
@@ -153,9 +146,7 @@ def check_in(
 
     # 이미 출근 기록이 있는지 확인
     existing = (
-        db.query(models.Attendance)
-        .filter_by(user_id=user.id, work_date=today)
-        .first()
+        db.query(models.Attendance).filter_by(user_id=user.id, work_date=today).first()
     )
 
     if existing:

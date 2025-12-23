@@ -44,9 +44,7 @@ class AttendanceService:
         if check_out < check_in:
             check_out += timedelta(days=1)
 
-        total_work_minutes = int(
-            (check_out - check_in).total_seconds() / 60
-        )
+        total_work_minutes = int((check_out - check_in).total_seconds() / 60)
 
         break_minutes = 0
         if record.break_start and record.break_end:
@@ -56,9 +54,7 @@ class AttendanceService:
             if b_end < b_start:
                 b_end += timedelta(days=1)
 
-            break_minutes = int(
-                (b_end - b_start).total_seconds() / 60
-            )
+            break_minutes = int((b_end - b_start).total_seconds() / 60)
 
         return total_work_minutes - break_minutes, break_minutes
 
@@ -85,10 +81,7 @@ class AttendanceService:
         wage = get_default_wage_by_year(db=db, year=work_date.year)
 
         payroll = Payroll(
-            user_id=user_id,
-            year=work_date.year,
-            month=work_date.month,
-            wage=wage
+            user_id=user_id, year=work_date.year, month=work_date.month, wage=wage
         )
 
         db.add(payroll)
@@ -124,12 +117,9 @@ class AttendanceService:
 
         return record
 
+
 def get_default_wage_by_year(db: Session, year: int) -> int:
-    default_wage = (
-        db.query(DefaultWage)
-        .filter_by(year=year)
-        .first()
-    )
+    default_wage = db.query(DefaultWage).filter_by(year=year).first()
 
     if default_wage:
         return default_wage.wage
