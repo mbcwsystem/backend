@@ -1,13 +1,13 @@
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 
 from sqlalchemy.orm import Session
 
+from app.modules.auth.models import User
 from app.modules.payroll.models import Payroll
 from app.modules.payroll.schemas import (
-    PayrollResponse,
     PayrollPayResponse,
+    PayrollResponse,
 )
-from app.modules.auth.models import User
 from app.utils.permission_utils import is_admin
 
 
