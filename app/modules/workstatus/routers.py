@@ -129,7 +129,7 @@ def _calc_work_minutes(record: models.Attendance):
 
 # 출근
 # -----------------------------------
-@router.post("/check-in", response_model=schemas.AttendanceResponse)
+@router.post("/check-in", response_model=schemas.AttendanceResponse, summary="출근등록")
 def check_in(
     payload: AttendanceAuthInput,
     db: Session = Depends(get_db),
@@ -173,7 +173,7 @@ def check_in(
 
 # 휴식 시작
 # -----------------------------------
-@router.post("/break-start", response_model=schemas.AttendanceResponse)
+@router.post("/break-start", response_model=schemas.AttendanceResponse, summary="휴식등록")
 def break_start(
     payload: AttendanceAuthInput,
     db: Session = Depends(get_db),
@@ -206,7 +206,7 @@ def break_start(
 
 # 휴식 종료
 # -----------------------------------
-@router.post("/break-end", response_model=schemas.AttendanceResponse)
+@router.post("/break-end", response_model=schemas.AttendanceResponse, summary="복귀등록")
 def break_end(
     payload: AttendanceAuthInput,
     db: Session = Depends(get_db),
@@ -243,7 +243,7 @@ def break_end(
 
 # 퇴근
 # -----------------------------------
-@router.post("/check-out", response_model=schemas.AttendanceResponse)
+@router.post("/check-out", response_model=schemas.AttendanceResponse, summary="퇴근등록")
 def check_out(
     payload: AttendanceAuthInput,
     db: Session = Depends(get_db),
