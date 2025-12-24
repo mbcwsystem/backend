@@ -1,0 +1,24 @@
+name: Deploy Dev (FastAPI Docker / Windows)
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Windows Docker Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEV_SERVER_HOST }}
+          username: ${{ secrets.DEV_SERVER_USER }}
+          key: ${{ secrets.DEV_SERVER_SSH_KEY }}
+          script: |
+            cd /c/Users/megab/Desktop/server/backend
+            git pull origin dev
+            docker compose down
+            docker compose build
+            docker compose up -d
