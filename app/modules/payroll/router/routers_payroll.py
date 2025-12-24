@@ -19,7 +19,9 @@ router = APIRouter(tags=["Payroll"])
     response_model=Union[
         List[PayrollResponse],  # 관리자
         PayrollPayResponse,  # 일반 사용자
-    ], summary = "관리자: 전체조회 / 사용자: 개인조회")
+    ],
+    summary="관리자: 전체조회 / 사용자: 개인조회",
+)
 def get_payrolls(
     year: int = Query(...),
     month: int | None = Query(None),
