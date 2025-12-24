@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[WeeklyAllowanceResponse])
+@router.get("/", response_model=list[WeeklyAllowanceResponse], summary="주휴수당조회")
 def get_weekly_allowance(
     user_id: int = Query(...),
     year: int = Query(...),
