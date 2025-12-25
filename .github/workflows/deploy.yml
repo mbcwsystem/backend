@@ -20,7 +20,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # 3️⃣ 서버에 배포 명령
+      # 3️⃣ 서버 배포
       - name: Deploy via SSH
         run: |
           ssh -o StrictHostKeyChecking=no -p 22 ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST }} << 'EOF'
