@@ -10,22 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup SSH agent
+      # 2️⃣ SSH Agent 설정 (최신 버전)
+      - name: Setup SSH key
         uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Add server to known_hosts
-        run: ssh-keyscan -p 22 ${{ secrets.DEV_SERVER_HOST }} >> ~/.ssh/known_hosts
-
+      # 3️⃣ 서버에 배포 명령
       - name: Deploy via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no -p 22 megabox@${{ secrets.DEV_SERVER_HOST }} << 'EOF'
-            cd /c/Users/megab/Desktop/server/backend  # 서버 기준 경로
-            git pull origin dev                        # SSH로 origin 설정됨
+          ssh -o StrictHostKeyChecking=no -p 22 ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST }} << 'EOF'
+            cd "C:/Users/megab/Desktop/server/backend"
+            git pull origin dev
             docker compose down
             docker compose build
             docker compose up -d
