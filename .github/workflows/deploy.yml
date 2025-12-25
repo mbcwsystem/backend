@@ -16,6 +16,7 @@ jobs:
           host: ${{ secrets.DEV_SERVER_HOST }}
           username: ${{ secrets.DEV_SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
           script: |
             cd /c/Users/megab/Desktop/server/backend
             git pull origin dev
