@@ -10,16 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup SSH key
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.7.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -p 22 ${{ secrets.DEV_SERVER_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy via SSH (force TTY)
+      - name: Deploy via SSH
         run: |
-          ssh -tt -i ~/.ssh/id_ed25519 -p 22 megabox@${{ secrets.DEV_SERVER_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -p 22 megabox@${{ secrets.DEV_SERVER_HOST }} << 'EOF'
             cd /c/Users/megab/Desktop/server/backend
             git pull origin dev
             docker compose down
