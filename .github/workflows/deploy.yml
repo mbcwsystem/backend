@@ -19,14 +19,13 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Add server to known_hosts
-        run: |
-          ssh-keyscan -p 22 ${{ secrets.DEV_SERVER_HOST }} >> ~/.ssh/known_hosts
+        run: ssh-keyscan -p 22 ${{ secrets.DEV_SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy via SSH
         run: |
           ssh -o StrictHostKeyChecking=no -p 22 megabox@${{ secrets.DEV_SERVER_HOST }} << 'EOF'
-            cd /c/Users/megab/Desktop/server/backend
-            git pull origin dev
+            cd /c/Users/megab/Desktop/server/backend  # 서버 기준 경로
+            git pull origin dev                        # SSH로 origin 설정됨
             docker compose down
             docker compose build
             docker compose up -d
