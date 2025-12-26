@@ -42,41 +42,49 @@ def create_schedule(
 
 # 특정 주차 스케줄 조회 API
 @router.get(
-    "/week/{year}/{weekNumber}",
+    "/week/{year}/{week_number}",
     response_model=List[ScheduleResponse],
     summary="특정 주차 스케줄 조회",
 )
 def get_schedule_week(
     year: int,
-    weekNumber: int,
+    week_number: int,
     db: Session = Depends(get_db),
     user: User = Depends(get_schedule_user),
 ):
-    return services.list_schedule(db, user, year, weekNumber)
+    return services.list_schedule(db, user, year, week_number)
 
 
 # 스케줄 상세 조회 API
 @router.get(
-    "/{scheduleId}",
+    "/{schedule_id}",
     response_model=ScheduleResponse,
     summary="스케줄 상세 조회",
 )
 def get_schedule(
-    scheduleId: int,
+    schedule_id: int,
     db: Session = Depends(get_db),
     user: User = Depends(get_schedule_user),
 ):
-    return services.get_schedule(db, user, scheduleId)
+    return services.get_schedule(db, user, schedule_id)
 
 
 # 스케줄 수정 API
-@router.patch(
-    "/{scheduleId}/edit", response_model=ScheduleResponse, summary="스케줄 수정"
-)
+@router.patch("/{schedule_id}", response_model=ScheduleResponse, summary="스케줄 수정")
 def update_schedule(
     data: ScheduleUpdateRequest,
-    scheduleId: int,
+    schedule_id: int,
     db: Session = Depends(get_db),
     user=Depends(get_schedule_user),
 ):
-    return services.update_schedule(db, scheduleId, data, user)
+    return services.update_schedule(db, schedule_id, data, user)
+
+
+# 스케줄 삭제 API
+@router.delete("/{schedule_id}", response_model=ScheduleResponse, summary="스케줄 삭제")
+def delete_schedule(
+    schedule_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_schedule_user),
+):
+    return services.delete_schedule(db, schedule_id, user)

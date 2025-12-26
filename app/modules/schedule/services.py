@@ -51,7 +51,9 @@ def create_schedule(db: Session, user: User, data: ScheduleCreateRequest) -> Sch
     return schedule
 
 
-def list_schedule(db, user: User, year: int, weekNumber: int) -> List[ScheduleResponse]:
+def list_schedule(
+    db, user: User, year: int, week_number: int
+) -> List[ScheduleResponse]:
     """
     스케줄 주차별 목록 조회
     """
@@ -64,7 +66,7 @@ def list_schedule(db, user: User, year: int, weekNumber: int) -> List[ScheduleRe
         db.query(Schedule)
         .filter(
             Schedule.year == year,
-            Schedule.week_number == weekNumber,
+            Schedule.week_number == week_number,
         )
         .all()
     )
@@ -72,7 +74,7 @@ def list_schedule(db, user: User, year: int, weekNumber: int) -> List[ScheduleRe
     return [_build_schedule_response(schedule) for schedule in schedules]
 
 
-def get_schedule(db, user: User, scheduleId: int) -> ScheduleResponse:
+def get_schedule(db, user: User, schedule_id: int) -> ScheduleResponse:
     """
     스케줄 상세 조회
     """
@@ -81,7 +83,7 @@ def get_schedule(db, user: User, scheduleId: int) -> ScheduleResponse:
     if is_system(user):
         raise HTTPException(403, "스케줄 조회 권한이 없습니다.")
 
-    schedule = db.query(Schedule).filter(Schedule.id == scheduleId).first()
+    schedule = db.query(Schedule).filter(Schedule.id == schedule_id).first()
 
     if schedule is None:
         raise HTTPException(status_code=404, detail="존재하지 않는 스케줄입니다.")
@@ -89,11 +91,11 @@ def get_schedule(db, user: User, scheduleId: int) -> ScheduleResponse:
     return _build_schedule_response(schedule)
 
 
-def update_schedule(db, scheduleId, data, user):
+def update_schedule(db, schedule_id, data, user):
     """
     스케줄 수정
     """
-    schedule = db.query(Schedule).filter(Schedule.id == scheduleId).first()
+    schedule = db.query(Schedule).filter(Schedule.id == schedule_id).first()
 
     # 스케줄 존재 여부
     if schedule is None:
@@ -122,3 +124,24 @@ def update_schedule(db, scheduleId, data, user):
     db.refresh(schedule)
 
     return _build_schedule_response(schedule)
+
+
+def delete_schedule(db, schedule_id, user):
+    """
+    스케줄 삭제
+    """
+
+    schedule = db.query(Schedule).filter(Schedule.id == schedule_id).first()
+
+    # 스케줄 존재 여부
+    if schedule is None:
+        raise HTTPException(404, "존재하지 않는 스케줄입니다.")
+
+    # 권한 체크
+    if not is_admin(user):
+        raise HTTPException(403, "스케줄 삭제 권한이 없습니다.")
+
+    db.delete(schedule)
+    db.commit()
+
+    return {"message": "스케줄이 삭제되었습니다."}
