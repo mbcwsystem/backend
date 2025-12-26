@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta
-
+from datetime import datetime, timedelta, date, time
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -291,5 +291,77 @@ def check_out(
     db.commit()
     db.refresh(record)
 
+    record.user_name = user.name
+    return record
+
+class AttendanceAllInOneInput(BaseModel):
+    username: str = Field(example="user")
+    password: str = Field(example="user")
+    work_date: date = Field(example="2025-12-26")
+
+    check_in: time = Field(example="09:00:00")
+    break_start: time | None = Field(example="12:00:00")
+    break_end: time | None = Field(example="13:00:00")
+    check_out: time = Field(example="18:00:00")
+
+
+@router.post(
+    "/submit",
+    response_model=schemas.AttendanceResponse,
+    summary="출근~퇴근 통합 등록",
+)
+def submit_attendance_all_in_one(
+    payload: AttendanceAllInOneInput,
+    db: Session = Depends(get_db),
+    system_user: User = Depends(require_system_user),  # 시스템 토큰 검증 유지
+):
+    # 출퇴근 대상자 인증 (ID/PW)
+    user = authenticate_attendance_user(db, payload.username, payload.password)
+
+    work_date = payload.work_date or datetime.now().date()
+
+    # 기존 기록 조회 (없으면 생성)
+    record = (
+        db.query(models.Attendance)
+        .filter_by(user_id=user.id, work_date=work_date)
+        .first()
+    )
+
+    if not record:
+        record = models.Attendance(user_id=user.id, work_date=work_date)
+        db.add(record)
+
+    # 필드 세팅
+    record.check_in = payload.check_in
+    record.break_start = payload.break_start
+    record.break_end = payload.break_end
+    record.check_out = payload.check_out
+
+    # 상태/순서 검증
+    if record.check_out and not record.check_in:
+        raise HTTPException(status_code=400, detail="check_in 없이 check_out은 불가합니다.")
+
+    if record.break_end and not record.break_start:
+        raise HTTPException(status_code=400, detail="break_start 없이 break_end는 불가합니다.")
+
+    # 휴게가 시작됐으면 종료도 있어야 퇴근 가능(기존 정책 유지)
+    if record.break_start and not record.break_end:
+        raise HTTPException(status_code=400, detail="휴식 종료(break_end) 없이 퇴근 처리할 수 없습니다.")
+
+    # 실제 근무시간 계산(원하면 record에 저장하는 컬럼이 있을 때 세팅 가능)
+    work_minutes, break_minutes = _calc_work_minutes(record)
+    if work_minutes < 0:
+        raise HTTPException(status_code=400, detail="근무 시간이 0보다 작을 수 없습니다. 시간 입력을 확인하세요.")
+
+    # 여기서 퇴근 처리 + Payroll 반영 (기존 서비스 연결)
+    AttendanceService.handle_check_out(
+        db=db,
+        record=record,
+    )
+
+    db.commit()
+    db.refresh(record)
+
+    # 응답용 필드 (DB 컬럼 아니면 기존처럼)
     record.user_name = user.name
     return record
