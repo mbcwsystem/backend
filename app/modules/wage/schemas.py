@@ -1,4 +1,3 @@
-# app/modules/wage/schemas.py
 from datetime import date
 from typing import Optional
 
