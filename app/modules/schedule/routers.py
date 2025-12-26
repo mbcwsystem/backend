@@ -12,6 +12,7 @@ from app.modules.schedule.schemas import (
     ScheduleCreateRequest,
     ScheduleCreateResponse,
     ScheduleResponse,
+    ScheduleUpdateRequest,
 )
 from app.utils.permission_utils import is_admin
 
@@ -26,7 +27,7 @@ def get_schedule_user(user: User = Depends(get_current_user)) -> User:
 
 # 스케줄 생성 API
 @router.post(
-    "/schedule/create",
+    "/create",
     response_model=ScheduleCreateResponse,
     status_code=status.HTTP_201_CREATED,
     summary="스케줄 생성",
@@ -39,9 +40,9 @@ def create_schedule(
     return services.create_schedule(db, user, data)
 
 
-# 특정 주차 스케줄 조회
+# 특정 주차 스케줄 조회 API
 @router.get(
-    "/schedule/week/{year}/{weekNumber}",
+    "/week/{year}/{weekNumber}",
     response_model=List[ScheduleResponse],
     summary="특정 주차 스케줄 조회",
 )
@@ -53,9 +54,9 @@ def get_schedule_week(
     return services.list_schedule(db, year, weekNumber)
 
 
-# 스케줄 상세 조회
+# 스케줄 상세 조회 API
 @router.get(
-    "/schedule/{scheduleId}",
+    "/{scheduleId}",
     response_model=ScheduleResponse,
     summary="스케줄 상세 조회",
 )
@@ -64,3 +65,16 @@ def get_schedule(
     db: Session = Depends(get_db),
 ):
     return services.get_schedule(db, scheduleId)
+
+
+# 스케줄 수정 API
+@router.patch(
+    "/{scheduleId}/edit", response_model=ScheduleResponse, summary="스케줄 수정"
+)
+def update_schedule(
+    data: ScheduleUpdateRequest,
+    scheduleId: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_schedule_user),
+):
+    return services.update_schedule(db, scheduleId, data, user)

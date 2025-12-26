@@ -50,3 +50,18 @@ class ScheduleResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ScheduleUpdateRequest(BaseModel):
+    """
+    스케줄 수정
+    """
+
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+    week_number: int | None = None
+    year: int | None = None
+    month: int | None = None
+
+    class Config:
+        orm_mode = True

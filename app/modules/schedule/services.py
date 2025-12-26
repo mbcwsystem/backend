@@ -9,6 +9,20 @@ from app.modules.schedule.schemas import ScheduleCreateRequest, ScheduleResponse
 from app.utils.permission_utils import is_admin
 
 
+def _build_schedule_response(schedule: Schedule) -> ScheduleResponse:
+    return ScheduleResponse(
+        id=schedule.id,
+        user_id=schedule.user_id,
+        user_name=schedule.user.name,
+        start_date=schedule.start_date,
+        end_date=schedule.end_date,
+        week_number=schedule.week_number,
+        year=schedule.year,
+        month=schedule.month,
+        is_holiday=schedule.is_holiday,
+    )
+
+
 # 스케줄 생성
 def create_schedule(db: Session, user: User, data: ScheduleCreateRequest) -> Schedule:
     """
@@ -50,20 +64,7 @@ def list_schedule(db, year: int, weekNumber: int) -> List[ScheduleResponse]:
         .all()
     )
 
-    return [
-        ScheduleResponse(
-            id=schedule.id,
-            user_id=schedule.user_id,
-            user_name=schedule.user.name,
-            start_date=schedule.start_date,
-            end_date=schedule.end_date,
-            week_number=schedule.week_number,
-            year=schedule.year,
-            month=schedule.month,
-            is_holiday=schedule.is_holiday,
-        )
-        for schedule in schedules
-    ]
+    return [_build_schedule_response(schedule) for schedule in schedules]
 
 
 def get_schedule(db, scheduleId: int) -> ScheduleResponse:
@@ -76,14 +77,39 @@ def get_schedule(db, scheduleId: int) -> ScheduleResponse:
     if schedule is None:
         raise HTTPException(status_code=404, detail="존재하지 않는 스케줄입니다.")
 
-    return ScheduleResponse(
-        id=schedule.id,
-        user_id=schedule.user_id,
-        user_name=schedule.user.name,
-        start_date=schedule.start_date,
-        end_date=schedule.end_date,
-        week_number=schedule.week_number,
-        year=schedule.year,
-        month=schedule.month,
-        is_holiday=schedule.is_holiday,
-    )
+    return _build_schedule_response(schedule)
+
+
+def update_schedule(db, scheduleId, data, user):
+    """
+    스케줄 수정
+    """
+    schedule = db.query(Schedule).filter(Schedule.id == scheduleId).first()
+
+    # 스케줄 존재 여부
+    if schedule is None:
+        raise HTTPException(404, "존재하지 않는 스케줄입니다.")
+
+    # 권한 체크
+    if not is_admin(user):
+        raise HTTPException(403, "바이저급 이상만 관리 가능합니다.")
+
+    updated_schedule = data.model_dump(exclude_unset=True)
+
+    allowed_fields = {
+        "start_date",
+        "end_date",
+        "week_number",
+        "year",
+        "month",
+        "is_holiday",
+    }
+
+    for field, value in updated_schedule.items():
+        if field in allowed_fields:
+            setattr(schedule, field, value)
+
+    db.commit()
+    db.refresh(schedule)
+
+    return _build_schedule_response(schedule)

@@ -1,11 +1,11 @@
 from sqlalchemy import (
+    Boolean,
     Column,
     Date,
     ForeignKey,
     Integer,
     Time,
     UniqueConstraint,
-    Boolean,
 )
 from sqlalchemy.orm import relationship
 
