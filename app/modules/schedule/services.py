@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.modules.auth.models import User
 from app.modules.schedule.models import Schedule
 from app.modules.schedule.schemas import ScheduleCreateRequest, ScheduleResponse
-from app.utils.permission_utils import is_admin
+from app.utils.permission_utils import is_admin, is_system
 
 
 def _build_schedule_response(schedule: Schedule) -> ScheduleResponse:
@@ -51,10 +51,15 @@ def create_schedule(db: Session, user: User, data: ScheduleCreateRequest) -> Sch
     return schedule
 
 
-def list_schedule(db, year: int, weekNumber: int) -> List[ScheduleResponse]:
+def list_schedule(db, user: User, year: int, weekNumber: int) -> List[ScheduleResponse]:
     """
     스케줄 주차별 목록 조회
     """
+
+    # 권한 체크 (시스템 계정 차단)
+    if is_system(user):
+        raise HTTPException(403, "스케줄 조회 권한이 없습니다.")
+
     schedules = (
         db.query(Schedule)
         .filter(
@@ -67,10 +72,14 @@ def list_schedule(db, year: int, weekNumber: int) -> List[ScheduleResponse]:
     return [_build_schedule_response(schedule) for schedule in schedules]
 
 
-def get_schedule(db, scheduleId: int) -> ScheduleResponse:
+def get_schedule(db, user: User, scheduleId: int) -> ScheduleResponse:
     """
     스케줄 상세 조회
     """
+
+    # 권한 체크 (시스템 계정 차단)
+    if is_system(user):
+        raise HTTPException(403, "스케줄 조회 권한이 없습니다.")
 
     schedule = db.query(Schedule).filter(Schedule.id == scheduleId).first()
 

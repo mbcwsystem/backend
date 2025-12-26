@@ -35,7 +35,7 @@ def get_schedule_user(user: User = Depends(get_current_user)) -> User:
 def create_schedule(
     data: ScheduleCreateRequest,
     db: Session = Depends(get_db),
-    user=Depends(get_schedule_user),
+    user: User = Depends(get_schedule_user),
 ):
     return services.create_schedule(db, user, data)
 
@@ -50,8 +50,9 @@ def get_schedule_week(
     year: int,
     weekNumber: int,
     db: Session = Depends(get_db),
+    user: User = Depends(get_schedule_user),
 ):
-    return services.list_schedule(db, year, weekNumber)
+    return services.list_schedule(db, user, year, weekNumber)
 
 
 # 스케줄 상세 조회 API
@@ -63,8 +64,9 @@ def get_schedule_week(
 def get_schedule(
     scheduleId: int,
     db: Session = Depends(get_db),
+    user: User = Depends(get_schedule_user),
 ):
-    return services.get_schedule(db, scheduleId)
+    return services.get_schedule(db, user, scheduleId)
 
 
 # 스케줄 수정 API
