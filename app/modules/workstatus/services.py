@@ -34,7 +34,7 @@ class AttendanceService:
     # 근무 시간 계산 (분 단위)
     @staticmethod
     def calc_work_minutes(
-            record: models.Attendance,
+        record: models.Attendance,
     ) -> tuple[int, int, int]:
         work_date = record.work_date
 
@@ -54,8 +54,12 @@ class AttendanceService:
             break_minutes = int((b_end - b_start).total_seconds() / 60)
 
         # 야간 기준
-        night_start = datetime.combine(work_date, datetime.strptime("22:00", "%H:%M").time())
-        night_end = datetime.combine(work_date + timedelta(days=1), datetime.strptime("06:00", "%H:%M").time())
+        night_start = datetime.combine(
+            work_date, datetime.strptime("22:00", "%H:%M").time()
+        )
+        night_end = datetime.combine(
+            work_date + timedelta(days=1), datetime.strptime("06:00", "%H:%M").time()
+        )
 
         day_minutes = 0
         night_minutes = 0
@@ -122,8 +126,8 @@ class AttendanceService:
     ) -> models.Attendance:
         if record.is_payroll_applied:
             return record
-        day_minutes, night_minutes, break_minutes = (
-            AttendanceService.calc_work_minutes(record)
+        day_minutes, night_minutes, break_minutes = AttendanceService.calc_work_minutes(
+            record
         )
         record.total_work_minutes = day_minutes + night_minutes
         record.total_break_minutes = break_minutes
@@ -146,7 +150,6 @@ class AttendanceService:
         payroll.night_hours += AttendanceService.minutes_to_hours(night_minutes)
         payroll.break_hours += AttendanceService.minutes_to_hours(break_minutes)
         record.is_payroll_applied = True
-
 
         return record
 
