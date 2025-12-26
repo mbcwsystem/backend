@@ -35,7 +35,7 @@ class AttendanceService:
     @staticmethod
     def calc_work_minutes(
         record: models.Attendance,
-    ) -> tuple[int, int]:
+    ) -> tuple[int, int, int]:
         work_date = record.work_date
 
         check_in = datetime.combine(work_date, record.check_in)
@@ -44,19 +44,41 @@ class AttendanceService:
         if check_out < check_in:
             check_out += timedelta(days=1)
 
-        total_work_minutes = int((check_out - check_in).total_seconds() / 60)
-
+        # 휴게 시간 계산
         break_minutes = 0
         if record.break_start and record.break_end:
             b_start = datetime.combine(work_date, record.break_start)
             b_end = datetime.combine(work_date, record.break_end)
-
             if b_end < b_start:
                 b_end += timedelta(days=1)
-
             break_minutes = int((b_end - b_start).total_seconds() / 60)
 
-        return total_work_minutes - break_minutes, break_minutes
+        # 야간 기준
+        night_start = datetime.combine(
+            work_date, datetime.strptime("22:00", "%H:%M").time()
+        )
+        night_end = datetime.combine(
+            work_date + timedelta(days=1), datetime.strptime("06:00", "%H:%M").time()
+        )
+
+        day_minutes = 0
+        night_minutes = 0
+
+        current = check_in
+        while current < check_out:
+            next_minute = current + timedelta(minutes=1)
+
+            if night_start <= current < night_end:
+                night_minutes += 1
+            else:
+                day_minutes += 1
+
+            current = next_minute
+
+        # 휴게시간은 주간에서 차감 (정책상 제일 단순)
+        day_minutes = max(day_minutes - break_minutes, 0)
+
+        return day_minutes, night_minutes, break_minutes
 
     # Payroll 가져오기 or 생성
     @staticmethod
@@ -102,9 +124,12 @@ class AttendanceService:
         db: Session,
         record: models.Attendance,
     ) -> models.Attendance:
-        work_minutes, break_minutes = AttendanceService.calc_work_minutes(record)
-
-        record.total_work_minutes = work_minutes
+        if record.is_payroll_applied:
+            return record
+        day_minutes, night_minutes, break_minutes = AttendanceService.calc_work_minutes(
+            record
+        )
+        record.total_work_minutes = day_minutes + night_minutes
         record.total_break_minutes = break_minutes
 
         payroll = AttendanceService.get_or_create_payroll(
@@ -113,7 +138,18 @@ class AttendanceService:
             work_date=record.work_date,
         )
 
-        payroll.day_hours += AttendanceService.minutes_to_hours(work_minutes)
+        if payroll.day_hours is None:
+            payroll.day_hours = Decimal("0.00")
+        if payroll.night_hours is None:
+            payroll.night_hours = Decimal("0.00")
+        if payroll.break_hours is None:
+            payroll.break_hours = Decimal("0.00")
+
+        # 누적
+        payroll.day_hours += AttendanceService.minutes_to_hours(day_minutes)
+        payroll.night_hours += AttendanceService.minutes_to_hours(night_minutes)
+        payroll.break_hours += AttendanceService.minutes_to_hours(break_minutes)
+        record.is_payroll_applied = True
 
         return record
 
