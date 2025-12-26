@@ -9,7 +9,6 @@ from app.modules.payroll.services.weekly_service import (
 
 router = APIRouter(
     prefix="/weekly-allowance",
-    tags=["Payroll"],
 )
 
 

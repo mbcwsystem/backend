@@ -11,7 +11,7 @@ from app.modules.payroll.schemas import (
 )
 from app.modules.payroll.services.payroll_service import PayrollService
 
-router = APIRouter(tags=["Payroll"])
+router = APIRouter()
 
 
 @router.get(

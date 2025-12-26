@@ -13,7 +13,7 @@ from app.modules.workstatus import models, schemas
 from app.utils.permission_utils import is_system
 from app.modules.workstatus.services import AttendanceService
 
-router = APIRouter(tags=["Attendance"])
+router = APIRouter()
 
 
 # Request Schema
