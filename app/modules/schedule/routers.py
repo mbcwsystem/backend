@@ -81,7 +81,7 @@ def update_schedule(
 
 
 # 스케줄 삭제 API
-@router.delete("/{schedule_id}", response_model=ScheduleResponse, summary="스케줄 삭제")
+@router.delete("/{schedule_id}", summary="스케줄 삭제")
 def delete_schedule(
     schedule_id: int,
     db: Session = Depends(get_db),

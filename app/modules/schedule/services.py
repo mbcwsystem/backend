@@ -126,7 +126,7 @@ def update_schedule(db, schedule_id, data, user):
     return _build_schedule_response(schedule)
 
 
-def delete_schedule(db, schedule_id, user):
+def delete_schedule(db: Session, schedule_id: int, user: User):
     """
     스케줄 삭제
     """
