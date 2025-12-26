@@ -102,6 +102,8 @@ class AttendanceService:
         db: Session,
         record: models.Attendance,
     ) -> models.Attendance:
+        if record.is_payroll_applied:
+            return record
         work_minutes, break_minutes = AttendanceService.calc_work_minutes(record)
 
         record.total_work_minutes = work_minutes
@@ -114,6 +116,8 @@ class AttendanceService:
         )
 
         payroll.day_hours += AttendanceService.minutes_to_hours(work_minutes)
+        payroll.break_hours += AttendanceService.minutes_to_hours(break_minutes)
+        record.is_payroll_applied = True
 
         return record
 

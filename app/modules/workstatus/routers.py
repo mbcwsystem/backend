@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, date, time
-from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -294,15 +293,29 @@ def check_out(
     record.user_name = user.name
     return record
 
-class AttendanceAllInOneInput(BaseModel):
-    username: str = Field(example="user")
-    password: str = Field(example="user")
-    work_date: date = Field(example="2025-12-26")
 
-    check_in: time = Field(example="09:00:00")
-    break_start: time | None = Field(example="12:00:00")
-    break_end: time | None = Field(example="13:00:00")
-    check_out: time = Field(example="18:00:00")
+class AttendanceAllInOneInput(BaseModel):
+    username: str
+    password: str
+    work_date: date
+
+    check_in: time
+    break_start: time | None = None
+    break_end: time | None = None
+    check_out: time
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "username": "user",
+                "password": "user",
+                "work_date": "2025-12-26",
+                "check_in": "09:00:00",
+                "break_start": "12:00:00",
+                "break_end": "13:00:00",
+                "check_out": "18:00:00",
+            }
+        }
 
 
 @router.post(
@@ -315,12 +328,12 @@ def submit_attendance_all_in_one(
     db: Session = Depends(get_db),
     system_user: User = Depends(require_system_user),  # 시스템 토큰 검증 유지
 ):
-    # 출퇴근 대상자 인증 (ID/PW)
+    # 출퇴근 대상자 인증
     user = authenticate_attendance_user(db, payload.username, payload.password)
 
     work_date = payload.work_date or datetime.now().date()
 
-    # 기존 기록 조회 (없으면 생성)
+    # 기존 기록 조회
     record = (
         db.query(models.Attendance)
         .filter_by(user_id=user.id, work_date=work_date)
@@ -339,21 +352,30 @@ def submit_attendance_all_in_one(
 
     # 상태/순서 검증
     if record.check_out and not record.check_in:
-        raise HTTPException(status_code=400, detail="check_in 없이 check_out은 불가합니다.")
+        raise HTTPException(
+            status_code=400, detail="check_in 없이 check_out은 불가합니다."
+        )
 
     if record.break_end and not record.break_start:
-        raise HTTPException(status_code=400, detail="break_start 없이 break_end는 불가합니다.")
+        raise HTTPException(
+            status_code=400, detail="break_start 없이 break_end는 불가합니다."
+        )
 
-    # 휴게가 시작됐으면 종료도 있어야 퇴근 가능(기존 정책 유지)
+    # 휴게가 시작됐으면 종료도 있어야 퇴근 가능
     if record.break_start and not record.break_end:
-        raise HTTPException(status_code=400, detail="휴식 종료(break_end) 없이 퇴근 처리할 수 없습니다.")
+        raise HTTPException(
+            status_code=400, detail="휴식 종료(break_end) 없이 퇴근 처리할 수 없습니다."
+        )
 
-    # 실제 근무시간 계산(원하면 record에 저장하는 컬럼이 있을 때 세팅 가능)
+    # 실제 근무시간 계산
     work_minutes, break_minutes = _calc_work_minutes(record)
     if work_minutes < 0:
-        raise HTTPException(status_code=400, detail="근무 시간이 0보다 작을 수 없습니다. 시간 입력을 확인하세요.")
+        raise HTTPException(
+            status_code=400,
+            detail="근무 시간이 0보다 작을 수 없습니다. 시간 입력을 확인하세요.",
+        )
 
-    # 여기서 퇴근 처리 + Payroll 반영 (기존 서비스 연결)
+    # 여기서 퇴근 처리 + Payroll 반영
     AttendanceService.handle_check_out(
         db=db,
         record=record,
@@ -362,6 +384,6 @@ def submit_attendance_all_in_one(
     db.commit()
     db.refresh(record)
 
-    # 응답용 필드 (DB 컬럼 아니면 기존처럼)
+    # 응답용 필드
     record.user_name = user.name
     return record
