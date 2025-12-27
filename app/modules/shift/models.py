@@ -1,7 +1,8 @@
 import enum
 
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer
+from sqlalchemy import Column, Enum, ForeignKey, Integer
 
+from app.core.config import CreatedAtMixin
 from app.core.database import Base
 
 
@@ -16,7 +17,7 @@ class ShiftChangeType(str, enum.Enum):
     replacement = "대타"
 
 
-class ShiftRequest(Base):
+class ShiftRequest(CreatedAtMixin, Base):
     __tablename__ = "shifts_request"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -24,5 +25,4 @@ class ShiftRequest(Base):
     target_id = Column(Integer, ForeignKey("schedule.id"), nullable=False)
     type = Column(Enum(ShiftChangeType), nullable=False, comment="교대, 대타 타입")
     status = Column(Enum(Status), nullable=False, comment="승인 현황")
-    created_at = Column(DateTime, nullable=False)
     approved_by = Column(Integer, ForeignKey("users.id"), nullable=False)

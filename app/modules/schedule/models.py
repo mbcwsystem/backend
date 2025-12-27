@@ -5,7 +5,6 @@ from sqlalchemy import (
     Boolean,
     Column,
     Date,
-    DateTime,
     Enum,
     ForeignKey,
     Integer,
@@ -13,6 +12,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.mysql import DECIMAL
 from sqlalchemy.orm import relationship
 
+from app.core.config import CreatedAtMixin
 from app.core.database import Base
 
 
@@ -51,7 +51,7 @@ class WeeklySchedule(Base):
 
 
 # 휴무 신청
-class DayOffRequest(Base):
+class DayOffRequest(CreatedAtMixin, Base):
     __tablename__ = "day_off_request"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
@@ -60,4 +60,3 @@ class DayOffRequest(Base):
     reason = Column(VARCHAR(255), nullable=False)
     status = Column(Enum(Status), nullable=False, comment="승인 현황")
     approved_by = Column(Integer, ForeignKey("users.id"), nullable=False)
-    created_at = Column(DateTime, nullable=False)
