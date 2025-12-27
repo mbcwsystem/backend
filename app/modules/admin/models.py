@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import enum
-from datetime import date, datetime
+from datetime import date
 from typing import Optional
 
 from sqlalchemy import (
     Boolean,
     Date,
-    DateTime,
     ForeignKey,
     Index,
     Numeric,
@@ -16,11 +15,12 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.core.config import TimeStampedMixin
 from app.core.database import Base
 
 
 # 직원(사원) - 관리자 계정 생성/조회/수정/삭제 대상
-class Employee(Base):
+class Employee(TimeStampedMixin, Base):
     __tablename__ = "employees"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -30,14 +30,6 @@ class Employee(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    # 감사 필드
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
-    )
-
     # 관계
     holidays: Mapped[list["Holiday"]] = relationship(
         "Holiday", back_populates="employee", cascade="all, delete-orphan"
@@ -45,7 +37,7 @@ class Employee(Base):
 
 
 # 공휴일(직원별 쉬는 날 등록)
-class Holiday(Base):
+class Holiday(TimeStampedMixin, Base):
     __tablename__ = "holidays"
     __table_args__ = (
         UniqueConstraint(
@@ -60,19 +52,11 @@ class Holiday(Base):
     )
     holiday_date: Mapped[date] = mapped_column(Date, nullable=False)
     reason: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
-    )
-
     employee: Mapped["Employee"] = relationship("Employee", back_populates="holidays")
 
 
 # 4대 보험 요율(버전/시점 관리)
-class InsuranceRate(Base):
+class InsuranceRate(TimeStampedMixin, Base):
     __tablename__ = "insurance_rates"
     __table_args__ = (
         UniqueConstraint("effective_date", name="uq_insurance_rate_effective_date"),
@@ -89,13 +73,6 @@ class InsuranceRate(Base):
     effective_date: Mapped[date] = mapped_column(
         Date, nullable=False
     )  # 시행일(동일일자 중복 불가)
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
-    )
 
 
 class InsuranceCategoryEnum(str, enum.Enum):
