@@ -105,7 +105,13 @@ def update_post(db: Session, user, post_id: int, data: PostUpdate) -> PostRespon
         post.content = data.content
 
     db.commit()
-    db.refresh(post)
+    # 관계까지 포함해서 재조회
+    post = (
+        db.query(Post)
+        .options(joinedload(Post.comments).joinedload(Comment.author))
+        .filter(Post.id == post_id)
+        .first()
+    )
 
     return _build_post_response(post)
 
@@ -176,7 +182,14 @@ def update_comment(
         comment.content = data.content
 
     db.commit()
-    db.refresh(comment)
+
+    # author 관계까지 포함해서 재조회
+    comment = (
+        db.query(Comment)
+        .options(joinedload(Comment.author))
+        .filter(Comment.id == comment_id)
+        .first()
+    )
 
     return _build_comment_response(comment)
 
