@@ -105,6 +105,8 @@ def update_post(db: Session, user, post_id: int, data: PostUpdate) -> PostRespon
         post.content = data.content
 
     db.commit()
+    db.expire(post)  # 세션 캐시 무효화
+
     # 관계까지 포함해서 재조회
     post = (
         db.query(Post)
@@ -183,6 +185,7 @@ def update_comment(
 
     db.commit()
 
+    db.expire(comment)  # 세션 캐시 무효화
     # author 관계까지 포함해서 재조회
     comment = (
         db.query(Comment)
