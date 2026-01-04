@@ -11,7 +11,7 @@ routers = [
     ("/dayoff", "DayOff", "app.modules.dayoff.routers"),
     ("/payroll", "급여관리", "app.modules.payroll.router.routers"),
     ("/workstatus", "근태관리", "app.modules.workstatus.routers"),
-    ("/community", "Community", "app.modules.community.routers"),
+    ("/community", "커뮤니티관리", "app.modules.community.routers"),
     ("/admin", "Admin", "app.modules.admin.routers"),
     ("/wage", "Wage", "app.modules.wage.routers"),
 ]
