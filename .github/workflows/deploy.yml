@@ -1,4 +1,4 @@
-name: Deploy Dev (FastAPI Docker / Windows)
+name: Deploy Dev Server
 
 on:
   push:
@@ -10,29 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ 리포지토리 체크아웃
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # 2️⃣ SSH Key 설정
-      - name: Setup SSH key
-        uses: webfactory/ssh-agent@v0.9.1
+      - name: Deploy API only
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      # 3️⃣ Known hosts 등록 (서버 호스트키 추가)
-      - name: Add server to known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -p 22 ${{ secrets.DEV_SERVER_HOST }} >> ~/.ssh/known_hosts
-
-      # 4️⃣ 서버에 SSH 접속해서 배포 명령 실행
-      - name: Deploy via SSH
-        run: |
-          ssh -o StrictHostKeyChecking=no -p 22 ${{ secrets.DEV_SERVER_USER }}@${{ secrets.DEV_SERVER_HOST }} << 'EOF'
-            cd "C:/Users/megabox.영사실/Desktop/server"
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            cd C:/apps/megabox
             git pull origin dev
-            docker compose down
-            docker compose build
-            docker compose up -d
-          EOF
+            docker-compose build api
+            docker-compose up -d api
