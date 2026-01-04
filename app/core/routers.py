@@ -6,7 +6,7 @@ api_router = APIRouter()
 
 routers = [
     ("/auth", "Auth", "app.modules.auth.routers"),
-    ("/schedule", "Schedule", "app.modules.schedule.routers"),
+    ("/schedule", "스케줄관리", "app.modules.schedule.routers"),
     ("/shift", "Shift", "app.modules.shift.routers"),
     ("/dayoff", "DayOff", "app.modules.dayoff.routers"),
     ("/payroll", "급여관리", "app.modules.payroll.router.routers"),
