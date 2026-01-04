@@ -61,6 +61,9 @@ class Settings(BaseSettings):
     ADMIN_NAME: str
     ADMIN_EMAIL: str
 
+    # Holiyday config
+    HOLIDAY_API_KEY: str
+
     @property
     def DATABASE_URL(self) -> str:
         return (
