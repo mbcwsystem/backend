@@ -22,9 +22,8 @@ def block_system_user(user: User = Depends(get_current_user)) -> User:
         raise HTTPException(403, "시스템 계정은 접근할 수 없습니다.")
     return user
 
-router = APIRouter(
-    dependencies=[Depends(block_system_user)]
-)
+
+router = APIRouter(dependencies=[Depends(block_system_user)])
 
 
 # 스케줄 생성 API

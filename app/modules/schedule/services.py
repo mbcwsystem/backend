@@ -5,7 +5,11 @@ from sqlalchemy.orm import Session
 
 from app.modules.auth.models import User
 from app.modules.schedule.models import Schedule
-from app.modules.schedule.schemas import ScheduleCreateRequest, ScheduleResponse, ScheduleUpdateRequest
+from app.modules.schedule.schemas import (
+    ScheduleCreateRequest,
+    ScheduleResponse,
+    ScheduleUpdateRequest,
+)
 from app.utils.permission_utils import is_admin, is_system
 
 
@@ -49,9 +53,7 @@ def create_schedule(db: Session, user: User, data: ScheduleCreateRequest) -> Sch
     return schedule
 
 
-def list_schedule(
-    db: Session, year: int, week_number: int
-) -> List[ScheduleResponse]:
+def list_schedule(db: Session, year: int, week_number: int) -> List[ScheduleResponse]:
     """
     스케줄 주차별 목록 조회
     """
@@ -81,7 +83,9 @@ def get_schedule(db: Session, schedule_id: int) -> ScheduleResponse:
     return _build_schedule_response(schedule)
 
 
-def update_schedule(db: Session, schedule_id: int, data: ScheduleUpdateRequest, user: User) -> ScheduleResponse:
+def update_schedule(
+    db: Session, schedule_id: int, data: ScheduleUpdateRequest, user: User
+) -> ScheduleResponse:
     """
     스케줄 수정
     """

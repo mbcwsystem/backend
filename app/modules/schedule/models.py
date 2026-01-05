@@ -1,15 +1,14 @@
-
 from sqlalchemy import (
     Column,
     Date,
+    DateTime,
     ForeignKey,
-    Integer, DateTime,
+    Integer,
 )
 from sqlalchemy.dialects.mysql import DECIMAL
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
-
 
 
 # 스케쥴표
@@ -37,4 +36,3 @@ class WeeklySchedule(Base):
     year = Column(Integer, nullable=False)
     week_number = Column(Integer, nullable=False)
     total_work_hours = Column(DECIMAL(5, 2), default=0)
-

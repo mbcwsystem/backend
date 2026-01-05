@@ -1,7 +1,8 @@
 import enum
-from sqlalchemy import Enum as SAEnum, Boolean, DateTime
 
-from sqlalchemy import Column, Integer, ForeignKey, VARCHAR
+from sqlalchemy import VARCHAR, Boolean, Column, DateTime
+from sqlalchemy import Enum as SAEnum
+from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
 from app.core.config import CreatedAtMixin
@@ -13,6 +14,7 @@ class Status(str, enum.Enum):
     approved = "승인"
     rejected = "반려"
 
+
 # 휴무 신청
 class DayOffRequest(CreatedAtMixin, Base):
     __tablename__ = "day_off_request"
@@ -20,7 +22,9 @@ class DayOffRequest(CreatedAtMixin, Base):
 
     # 신청자
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    user = relationship("User",  foreign_keys=[user_id], back_populates="day_off_requests")
+    user = relationship(
+        "User", foreign_keys=[user_id], back_populates="day_off_requests"
+    )
 
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
@@ -30,4 +34,6 @@ class DayOffRequest(CreatedAtMixin, Base):
 
     # 승인자
     approved_by = Column(Integer, ForeignKey("users.id"), nullable=True)
-    approver = relationship("User",  foreign_keys=[approved_by],back_populates="approved_day_off_requests")
+    approver = relationship(
+        "User", foreign_keys=[approved_by], back_populates="approved_day_off_requests"
+    )

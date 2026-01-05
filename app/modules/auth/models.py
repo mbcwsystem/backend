@@ -81,7 +81,7 @@ class User(Base):
         "DayOffRequest",
         foreign_keys="DayOffRequest.user_id",
         back_populates="user",
-        cascade="all, delete"
+        cascade="all, delete",
     )
 
     # 휴무 승인
@@ -89,8 +89,9 @@ class User(Base):
         "DayOffRequest",
         foreign_keys="DayOffRequest.approved_by",
         back_populates="approver",
-        cascade="all, delete"
+        cascade="all, delete",
     )
+
     # 토큰
     refresh_tokens = relationship(
         "RefreshToken", back_populates="user", cascade="all, delete"
