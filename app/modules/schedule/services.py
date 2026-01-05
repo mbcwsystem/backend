@@ -19,7 +19,6 @@ def _build_schedule_response(schedule: Schedule) -> ScheduleResponse:
         week_number=schedule.week_number,
         year=schedule.year,
         month=schedule.month,
-        is_holiday=schedule.is_holiday,
     )
 
 
@@ -41,7 +40,6 @@ def create_schedule(db: Session, user: User, data: ScheduleCreateRequest) -> Sch
         week_number=data.week_number,
         year=data.year,
         month=data.month,
-        is_holiday=False,  # 기본값 처리
     )
 
     db.add(schedule)
@@ -113,7 +111,6 @@ def update_schedule(db, schedule_id, data, user):
         "week_number",
         "year",
         "month",
-        "is_holiday",
     }
 
     for field, value in updated_schedule.items():

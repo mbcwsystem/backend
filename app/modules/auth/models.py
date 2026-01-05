@@ -76,6 +76,21 @@ class User(Base):
     # 스케줄
     schedules = relationship("Schedule", back_populates="user", cascade="all, delete")
 
+    # 휴무 신청
+    day_off_requests = relationship(
+        "DayOffRequest",
+        foreign_keys="DayOffRequest.user_id",
+        back_populates="user",
+        cascade="all, delete"
+    )
+
+    # 휴무 승인
+    approved_day_off_requests = relationship(
+        "DayOffRequest",
+        foreign_keys="DayOffRequest.approved_by",
+        back_populates="approver",
+        cascade="all, delete"
+    )
     # 토큰
     refresh_tokens = relationship(
         "RefreshToken", back_populates="user", cascade="all, delete"
