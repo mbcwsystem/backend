@@ -14,15 +14,17 @@ from app.modules.schedule.schemas import (
     ScheduleResponse,
     ScheduleUpdateRequest,
 )
-from app.utils.permission_utils import is_admin
-
-router = APIRouter()
+from app.utils.permission_utils import is_system
 
 
-def get_schedule_user(user: User = Depends(get_current_user)) -> User:
-    if not is_admin(user):
-        raise HTTPException(403, "바이저 이상만 스케줄 관리 가능합니다.")
+def block_system_user(user: User = Depends(get_current_user)) -> User:
+    if is_system(user):
+        raise HTTPException(403, "시스템 계정은 접근할 수 없습니다.")
     return user
+
+router = APIRouter(
+    dependencies=[Depends(block_system_user)]
+)
 
 
 # 스케줄 생성 API
@@ -35,7 +37,7 @@ def get_schedule_user(user: User = Depends(get_current_user)) -> User:
 def create_schedule(
     data: ScheduleCreateRequest,
     db: Session = Depends(get_db),
-    user: User = Depends(get_schedule_user),
+    user: User = Depends(get_current_user),
 ):
     return services.create_schedule(db, user, data)
 
@@ -50,9 +52,8 @@ def get_schedule_week(
     year: int,
     week_number: int,
     db: Session = Depends(get_db),
-    user: User = Depends(get_schedule_user),
 ):
-    return services.list_schedule(db, user, year, week_number)
+    return services.list_schedule(db, year, week_number)
 
 
 # 스케줄 상세 조회 API
@@ -64,9 +65,8 @@ def get_schedule_week(
 def get_schedule(
     schedule_id: int,
     db: Session = Depends(get_db),
-    user: User = Depends(get_schedule_user),
 ):
-    return services.get_schedule(db, user, schedule_id)
+    return services.get_schedule(db, schedule_id)
 
 
 # 스케줄 수정 API
@@ -75,7 +75,7 @@ def update_schedule(
     data: ScheduleUpdateRequest,
     schedule_id: int,
     db: Session = Depends(get_db),
-    user=Depends(get_schedule_user),
+    user=Depends(get_current_user),
 ):
     return services.update_schedule(db, schedule_id, data, user)
 
@@ -85,6 +85,6 @@ def update_schedule(
 def delete_schedule(
     schedule_id: int,
     db: Session = Depends(get_db),
-    user: User = Depends(get_schedule_user),
+    user: User = Depends(get_current_user),
 ):
     return services.delete_schedule(db, schedule_id, user)
