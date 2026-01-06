@@ -5,15 +5,16 @@ from datetime import date
 from typing import Optional
 
 from sqlalchemy import (
+    Column,
+    Integer,
     Boolean,
     Date,
-    ForeignKey,
     Index,
     Numeric,
     String,
     UniqueConstraint,
 )
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.config import TimeStampedMixin
 from app.core.database import Base
@@ -30,29 +31,17 @@ class Employee(TimeStampedMixin, Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    # 관계
-    holidays: Mapped[list["Holiday"]] = relationship(
-        "Holiday", back_populates="employee", cascade="all, delete-orphan"
-    )
 
-
-# 공휴일(직원별 쉬는 날 등록)
-class Holiday(TimeStampedMixin, Base):
+# 공휴일
+class Holiday(Base):
     __tablename__ = "holidays"
-    __table_args__ = (
-        UniqueConstraint(
-            "employee_id", "holiday_date", name="uq_holiday_employee_date"
-        ),
-        Index("idx_holiday_date", "holiday_date"),
-    )
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    employee_id: Mapped[int] = mapped_column(
-        ForeignKey("employees.id", ondelete="CASCADE"), nullable=False
-    )
-    holiday_date: Mapped[date] = mapped_column(Date, nullable=False)
-    reason: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    employee: Mapped["Employee"] = relationship("Employee", back_populates="holidays")
+    id = Column(Integer, primary_key=True, index=True)
+
+    date = Column(Date, nullable=False, comment="공휴일 날짜")
+    label = Column(String(100), nullable=False, comment="공휴일 설명")
+
+    __table_args__ = (UniqueConstraint("date", name="uq_holiday_date"),)
 
 
 # 4대 보험 요율(버전/시점 관리)

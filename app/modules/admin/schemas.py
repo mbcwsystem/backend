@@ -53,22 +53,19 @@ class PaginatedUsers(BaseModel):
 
 # ---------- 공휴일(전사 공휴일) ----------
 class HolidayCreate(BaseModel):
-    name: str
     date: date
-    description: Optional[str] = None
+    label: str
 
 
 class HolidayUpdate(BaseModel):
-    name: Optional[str] = None
     date: Optional[date] = None
-    description: Optional[str] = None
+    label: Optional[str] = None
 
 
 class HolidayOut(BaseModel):
     id: int
-    name: str
     date: date
-    description: Optional[str]
+    label: str
 
     class Config:
         from_attributes = True
