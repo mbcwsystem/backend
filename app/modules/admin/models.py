@@ -9,13 +9,12 @@ from sqlalchemy import (
     Integer,
     Boolean,
     Date,
-    ForeignKey,
     Index,
     Numeric,
     String,
     UniqueConstraint,
 )
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.config import TimeStampedMixin
 from app.core.database import Base
@@ -42,10 +41,7 @@ class Holiday(Base):
     date = Column(Date, nullable=False, comment="공휴일 날짜")
     label = Column(String(100), nullable=False, comment="공휴일 설명")
 
-    __table_args__ = (
-        UniqueConstraint("date", name="uq_holiday_date"),
-    )
-
+    __table_args__ = (UniqueConstraint("date", name="uq_holiday_date"),)
 
 
 # 4대 보험 요율(버전/시점 관리)

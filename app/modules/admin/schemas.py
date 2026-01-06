@@ -56,6 +56,7 @@ class HolidayCreate(BaseModel):
     date: date
     label: str
 
+
 class HolidayUpdate(BaseModel):
     date: Optional[date] = None
     label: Optional[str] = None

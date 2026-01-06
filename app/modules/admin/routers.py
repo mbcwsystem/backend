@@ -1,4 +1,5 @@
-import os, requests
+import os
+import requests
 from typing import List, Optional
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
@@ -13,7 +14,6 @@ from . import schemas, services, models
 from dotenv import load_dotenv
 
 
-
 router = APIRouter()  # prefix는 core/routers.py에서 "/admin"으로 붙여줌
 load_dotenv()
 
@@ -21,6 +21,7 @@ HOLIDAY_API_KEY = os.getenv("HOLIDAY_API_KEY")
 
 if not HOLIDAY_API_KEY:
     raise RuntimeError("HOLIDAY_API_KEY is not set")
+
 
 # ---- Users ----
 @router.post(
@@ -94,7 +95,9 @@ def sync_holidays(
     year: int,
     db: Session = Depends(get_db),
 ):
-    url = "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
+    url = (
+        "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
+    )
 
     params = {
         "serviceKey": HOLIDAY_API_KEY,
@@ -145,7 +148,6 @@ def sync_holidays(
         "year": year,
         "saved": saved,
     }
-
 
 
 @router.get(
