@@ -1,5 +1,5 @@
 import os
-import requests # type: ignore
+import requests  # type: ignore
 from typing import List, Optional
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
