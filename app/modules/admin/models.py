@@ -2,12 +2,10 @@ from __future__ import annotations
 
 import enum
 from datetime import date
-from typing import Optional
 
 from sqlalchemy import (
     Column,
     Integer,
-    Boolean,
     Date,
     Index,
     Numeric,
@@ -18,6 +16,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.config import TimeStampedMixin
 from app.core.database import Base
+
 
 # 공휴일
 class Holiday(Base):

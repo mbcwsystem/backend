@@ -43,9 +43,7 @@ def sync_default_wage(
     wage = services.fetch_minimum_wage_by_year(year)
 
     record = (
-        db.query(models.DefaultWage)
-        .filter(models.DefaultWage.year == year)
-        .first()
+        db.query(models.DefaultWage).filter(models.DefaultWage.year == year).first()
     )
 
     if record:
@@ -68,6 +66,7 @@ def sync_default_wage(
 def list_default_wages(db: Session = Depends(get_db)):
     return db.query(models.DefaultWage).order_by(models.DefaultWage.year.desc()).all()
 
+
 @admin_router.post(
     "/all",
     status_code=status.HTTP_201_CREATED,
@@ -83,19 +82,21 @@ def sync_all_default_wages(db: Session = Depends(get_db)):
     updated = 0
 
     for year, wage in data.items():
-        record = db.query(models.DefaultWage)\
-            .filter(models.DefaultWage.year == year)\
-            .first()
+        record = (
+            db.query(models.DefaultWage).filter(models.DefaultWage.year == year).first()
+        )
 
         if record:
             if record.wage != wage:
                 record.wage = wage
                 updated += 1
         else:
-            db.add(models.DefaultWage(
-                year=year,
-                wage=wage,
-            ))
+            db.add(
+                models.DefaultWage(
+                    year=year,
+                    wage=wage,
+                )
+            )
             saved += 1
 
     db.commit()

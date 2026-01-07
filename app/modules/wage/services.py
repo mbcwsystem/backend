@@ -1,4 +1,5 @@
-import requests, re
+import requests
+import re
 from bs4 import BeautifulSoup
 from fastapi import HTTPException
 from datetime import date
@@ -7,13 +8,16 @@ from sqlalchemy.orm import Session
 
 from app.modules.wage.models import DefaultWage, UserWage
 
+
 def _fetch_minimum_wage_table() -> dict[int, int]:
     """
     최저임금위원회 사이트에서
     {연도: 시간급} 딕셔너리로 반환
     """
     try:
-        res = requests.get("https://www.minimumwage.go.kr/minWage/policy/decisionMain.do", timeout=10)
+        res = requests.get(
+            "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do", timeout=10
+        )
         res.raise_for_status()
     except requests.RequestException as e:
         raise HTTPException(502, "최저임금 사이트 호출 실패") from e
@@ -54,12 +58,14 @@ def _fetch_minimum_wage_table() -> dict[int, int]:
 
     return result
 
+
 def fetch_all_minimum_wages() -> dict[int, int]:
     """
     전체 연도 최저임금 반환
     예: {2026: 10320, 2025: 10030, ...}
     """
     return _fetch_minimum_wage_table()
+
 
 def fetch_minimum_wage_by_year(year: int) -> int:
     """
@@ -74,6 +80,7 @@ def fetch_minimum_wage_by_year(year: int) -> int:
         )
 
     return data[year]
+
 
 def get_applicable_wage(user_id: int, work_date: date, db: Session):
     user_wage = (
