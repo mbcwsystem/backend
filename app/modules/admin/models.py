@@ -19,19 +19,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.config import TimeStampedMixin
 from app.core.database import Base
 
-
-# 직원(사원) - 관리자 계정 생성/조회/수정/삭제 대상
-class Employee(TimeStampedMixin, Base):
-    __tablename__ = "employees"
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    name: Mapped[str] = mapped_column(String(100), index=True)
-    phone: Mapped[Optional[str]] = mapped_column(String(30), nullable=True)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-
-
 # 공휴일
 class Holiday(Base):
     __tablename__ = "holidays"
