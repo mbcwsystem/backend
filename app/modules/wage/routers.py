@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.modules.wage import models, schemas
+from app.modules.wage import models, schemas, services
 
 router = APIRouter(tags=["Wage"])
 admin_router = APIRouter(tags=["Admin"])
@@ -26,11 +26,37 @@ def get_user_wage_list(user_id: int, db: Session = Depends(get_db)):
 
 
 @admin_router.post(
-    "/", response_model=schemas.DefaultWageResponse
-)  # 연도 최저임금 설정
-def create_default_wage(data: schemas.DefaultWageCreate, db: Session = Depends(get_db)):
-    record = models.DefaultWage(**data.dict())
-    db.add(record)
+    "/",
+    response_model=schemas.DefaultWageResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def sync_default_wage(
+    year: int,
+    db: Session = Depends(get_db),
+):
+    """
+    연도만 입력하면
+    - 최저임금위원회 사이트에서 자동 수집
+    - DB에 upsert
+    """
+
+    wage = services.fetch_minimum_wage_by_year(year)
+
+    record = (
+        db.query(models.DefaultWage)
+        .filter(models.DefaultWage.year == year)
+        .first()
+    )
+
+    if record:
+        record.wage = wage
+    else:
+        record = models.DefaultWage(
+            year=year,
+            wage=wage,
+        )
+        db.add(record)
+
     db.commit()
     db.refresh(record)
     return record
@@ -41,3 +67,41 @@ def create_default_wage(data: schemas.DefaultWageCreate, db: Session = Depends(g
 )  # 연도별 최저임금 조회
 def list_default_wages(db: Session = Depends(get_db)):
     return db.query(models.DefaultWage).order_by(models.DefaultWage.year.desc()).all()
+
+@admin_router.post(
+    "/all",
+    status_code=status.HTTP_201_CREATED,
+)
+def sync_all_default_wages(db: Session = Depends(get_db)):
+    """
+    최저임금위원회 사이트 기준
+    존재하는 모든 연도 최저임금 DB에 등록
+    """
+
+    data = services.fetch_all_minimum_wages()
+    saved = 0
+    updated = 0
+
+    for year, wage in data.items():
+        record = db.query(models.DefaultWage)\
+            .filter(models.DefaultWage.year == year)\
+            .first()
+
+        if record:
+            if record.wage != wage:
+                record.wage = wage
+                updated += 1
+        else:
+            db.add(models.DefaultWage(
+                year=year,
+                wage=wage,
+            ))
+            saved += 1
+
+    db.commit()
+
+    return {
+        "total": len(data),
+        "inserted": saved,
+        "updated": updated,
+    }
