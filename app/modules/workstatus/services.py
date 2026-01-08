@@ -149,6 +149,7 @@ class AttendanceService:
         payroll.day_hours += AttendanceService.minutes_to_hours(day_minutes)
         payroll.night_hours += AttendanceService.minutes_to_hours(night_minutes)
         payroll.break_hours += AttendanceService.minutes_to_hours(break_minutes)
+        payroll.last_work_day = record.work_date
         record.is_payroll_applied = True
 
         return record
