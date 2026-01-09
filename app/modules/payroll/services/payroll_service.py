@@ -140,7 +140,8 @@ class PayrollService:
             night_wage=night_pay,
             weekly_allowance_pay=weekly_allowance_pay,
             annual_leave_pay=0,
-            holiday_pay=0,
+            holiday_pay=payroll.holiday_hours
+            * payroll.wage,  # 임시처리 임시처리 임시처리 임시처리 제발제발 확인
             extra_pay=0,
             gross_pay=gross_pay,
             # 공제
