@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.modules.payroll.models import Payroll
 from app.modules.wage.models import DefaultWage
 from app.modules.workstatus import models
+from app.modules.admin.models import Holiday
 
 
 class AttendanceService:
@@ -149,6 +150,10 @@ class AttendanceService:
         payroll.day_hours += AttendanceService.minutes_to_hours(day_minutes)
         payroll.night_hours += AttendanceService.minutes_to_hours(night_minutes)
         payroll.break_hours += AttendanceService.minutes_to_hours(break_minutes)
+
+        if is_holiday(db, record.work_date):
+            payroll.holiday_hours += AttendanceService.minutes_to_hours(record.total_work_minutes)
+
         payroll.last_work_day = record.work_date
         record.is_payroll_applied = True
 
@@ -162,3 +167,11 @@ def get_default_wage_by_year(db: Session, year: int) -> int:
         return default_wage.wage
 
     return 0
+
+def is_holiday(db: Session, target_date: date) -> bool:
+    return (
+        db.query(Holiday.id)
+        .filter(Holiday.date == target_date)
+        .first()
+        is not None
+    )
