@@ -21,7 +21,7 @@ class Payroll(Base):
     wage = Column(Integer, nullable=False)  # 시급
 
     # 마지막 근무일
-    last_work_day = Column(Date) # 마지막 근무일
+    last_work_day = Column(Date)  # 마지막 근무일
 
     # 근무시간
     day_hours = Column(DECIMAL(5, 2), default=Decimal("0.00"))  # 월간 주간 근무시간

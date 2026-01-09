@@ -152,7 +152,9 @@ class AttendanceService:
         payroll.break_hours += AttendanceService.minutes_to_hours(break_minutes)
 
         if is_holiday(db, record.work_date):
-            payroll.holiday_hours += AttendanceService.minutes_to_hours(record.total_work_minutes)
+            payroll.holiday_hours += AttendanceService.minutes_to_hours(
+                record.total_work_minutes
+            )
 
         payroll.last_work_day = record.work_date
         record.is_payroll_applied = True
@@ -168,10 +170,6 @@ def get_default_wage_by_year(db: Session, year: int) -> int:
 
     return 0
 
+
 def is_holiday(db: Session, target_date: date) -> bool:
-    return (
-        db.query(Holiday.id)
-        .filter(Holiday.date == target_date)
-        .first()
-        is not None
-    )
+    return db.query(Holiday.id).filter(Holiday.date == target_date).first() is not None
