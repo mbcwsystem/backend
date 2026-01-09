@@ -118,9 +118,9 @@ class PayrollService:
         user = payroll.user
 
         day_pay = int(payroll.wage * float(payroll.day_hours))
-        night_pay = int(payroll.wage * float(payroll.night_hours))
+        night_pay = int(payroll.wage * (float(payroll.night_hours) * 1.5))
         weekly_allowance_pay = int(payroll.wage * float(payroll.weekly_allowance_hours))
-
+        holiday_pay = int (payroll.wage * (float(payroll.holiday_hours) * 1.5))
         gross_pay = day_pay + night_pay + weekly_allowance_pay
 
         total_deduction = (
@@ -140,8 +140,7 @@ class PayrollService:
             night_wage=night_pay,
             weekly_allowance_pay=weekly_allowance_pay,
             annual_leave_pay=0,
-            holiday_pay=payroll.holiday_hours
-            * payroll.wage,  # 임시처리 임시처리 임시처리 임시처리 제발제발 확인
+            holiday_pay=holiday_pay,
             extra_pay=0,
             gross_pay=gross_pay,
             # 공제
