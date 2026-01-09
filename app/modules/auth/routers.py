@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.security import get_current_user  # /auth/me 용
 from app.utils.permission_utils import is_system
 
 from . import schemas, services

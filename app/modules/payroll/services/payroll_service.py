@@ -120,7 +120,7 @@ class PayrollService:
         day_pay = int(payroll.wage * float(payroll.day_hours))
         night_pay = int(payroll.wage * (float(payroll.night_hours) * 1.5))
         weekly_allowance_pay = int(payroll.wage * float(payroll.weekly_allowance_hours))
-        holiday_pay = int (payroll.wage * (float(payroll.holiday_hours) * 1.5))
+        holiday_pay = int(payroll.wage * (float(payroll.holiday_hours) * 1.5))
         gross_pay = day_pay + night_pay + weekly_allowance_pay
 
         total_deduction = (
