@@ -1,6 +1,6 @@
-from typing import Optional
+from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -14,6 +14,11 @@ from app.modules.community.schemas import (
     PostCreate,
     PostResponse,
     PostUpdate,
+    PaginatedResponse,
+    PaginationParams,
+    SearchScope,
+    OrderBy,
+    PostListResponse,
 )
 from app.utils.permission_utils import is_system
 
@@ -42,13 +47,36 @@ def create_post(
     return services.create_post(db, user, data)
 
 
-@router.get("/posts", response_model=list[PostResponse], summary="게시글 목록 조회")
+@router.get(
+    "/posts", response_model=PaginatedResponse[PostListResponse], summary="게시글 목록 조회"
+)
 def list_posts(
-    category: Optional[CategoryEnum] = None,
+    mine: bool = Query(False, description="내가 쓴 글만 보기"),
+    category: CategoryEnum | None = Query(None, description="카테고리 필터"),
+    search_scope: SearchScope = Query(SearchScope.all, description="검색 범위"),
+    search: str | None = Query(None, description="검색어"),
+    order_by: OrderBy = Query(OrderBy.latest, description="정렬 기준"),
+    from_date: date | None = Query(None, description="작성일이 해당 날짜 이후인 게시글 검색 (YYYY-MM-DD)"),
+    to_date: date | None = Query(None, description="작성일이 해당 날짜까지인 게시글 검색(YYYY-MM-DD)"),
     db: Session = Depends(get_db),
     user=Depends(get_community_user),
+    pagination: PaginationParams = Depends(),
 ):
-    return services.list_posts(db, category)
+    # mine이 True일 경우 현재 로그인한 user.id를 넘기고, False면 None을 넘김
+    author_id = user.id if mine else None
+
+    return services.list_posts(
+        db=db,
+        author_id=author_id,
+        category=category,
+        page=pagination.page,
+        page_size=pagination.page_size,
+        search=search,
+        search_scope=search_scope.value,
+        order_by=order_by.value,
+        from_date=from_date,
+        to_date=to_date,
+    )
 
 
 @router.get("/posts/{post_id}", response_model=PostResponse, summary="게시글 상세 조회")
@@ -57,7 +85,7 @@ def get_post(
     db: Session = Depends(get_db),
     user=Depends(get_community_user),
 ):
-    return services.get_post(db, post_id)
+    return services.get_post(db, post_id, user)
 
 
 @router.patch("/posts/{post_id}", response_model=PostResponse, summary="게시글 수정")

@@ -75,6 +75,29 @@ class CommentResponse(BaseModel):
         orm_mode = True
 
 
+class PostListResponse(BaseModel):
+    """
+    게시글 목록조회 응답
+    """
+    id: int
+    category: CategoryEnum
+
+    title: str
+    content: str
+
+    author_id: int
+    author_name: str
+    author_position: PositionEnum
+
+    created_at: datetime
+    updated_at: datetime
+
+    comments_count: int
+
+    class Config:
+        orm_mode = True
+
+
 class PostResponse(BaseModel):
     """
     게시글 상세조회 응답
@@ -122,3 +145,24 @@ class PaginatedResponse(BaseModel, Generic[T]):
     total_pages: int = Field(..., ge=1, description="전체 페이지 수")
     previous: int | None = Field(None, description="이전 페이지 번호")
     next: int | None = Field(None, description="다음 페이지 번호")
+
+
+class SearchScope(str, Enum):
+    """
+    검색 범위
+    """
+
+    all = "all"  # 전체
+    title = "title"  # 제목 검색
+    content = "content"  # 내용 검색
+    author = "author"  # 작성자 검색
+
+
+class OrderBy(str, Enum):
+    """
+    정렬 기준
+    """
+
+    latest = "latest"  # 최신순
+    oldest = "oldest"  # 오래된 순
+    popular = "popular"  # 인기순 (댓글 많은 순)
