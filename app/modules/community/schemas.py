@@ -1,10 +1,14 @@
 from datetime import datetime
-from typing import List, Optional
+from enum import Enum
+from typing import List, Optional, Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
 from app.modules.auth.models import PositionEnum
 from app.modules.community.models import CategoryEnum
+
+
+T = TypeVar("T")
 
 
 class PostBase(BaseModel):
@@ -95,3 +99,26 @@ class PostResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class PaginationParams(BaseModel):
+    """
+    페이지네이션 유효성
+    """
+
+    page: int = Field(1, ge=1, description="요청한 페이지 번호(1부터 시작)")
+    page_size: int = Field(5, ge=1, le=50, description="한 페이지에 보여줄 개수")
+
+
+class PaginatedResponse(BaseModel, Generic[T]):
+    """
+    페이지네이션 응답
+    """
+
+    items: List[T] = Field(default_factory=list)
+    total: int = Field(..., ge=0, description="전체 개수")
+    page: int = Field(..., ge=1, description="요청한 페이지 번호(1부터 시작)")
+    page_size: int = Field(..., ge=1, description="한 페이지에 보여줄 개수")
+    total_pages: int = Field(..., ge=1, description="전체 페이지 수")
+    previous: int | None = Field(None, description="이전 페이지 번호")
+    next: int | None = Field(None, description="다음 페이지 번호")
