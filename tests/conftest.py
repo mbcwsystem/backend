@@ -6,6 +6,7 @@ from app.core.database import Base
 # SQLite 메모리 DB
 TEST_DATABASE_URL = "sqlite:///:memory:"
 
+
 @pytest.fixture(scope="session")
 def engine():
     """테스트용 DB 엔진 생성, 세션 전체에서 공유"""
@@ -13,6 +14,7 @@ def engine():
     Base.metadata.create_all(engine)  # 테이블 생성
     yield engine
     Base.metadata.drop_all(engine)  # 테스트 종료 후 테이블 제거
+
 
 @pytest.fixture(scope="function")
 def db(engine):

@@ -298,7 +298,7 @@ def _build_post_list_response(post: Post) -> PostListResponse:
         author_position=post.author.position,
         created_at=post.created_at,
         updated_at=post.updated_at,
-        comments_count=len(post.comments) if post.comments else 0
+        comments_count=len(post.comments) if post.comments else 0,
     )
 
 

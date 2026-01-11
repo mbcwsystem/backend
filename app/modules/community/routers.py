@@ -48,7 +48,9 @@ def create_post(
 
 
 @router.get(
-    "/posts", response_model=PaginatedResponse[PostListResponse], summary="게시글 목록 조회"
+    "/posts",
+    response_model=PaginatedResponse[PostListResponse],
+    summary="게시글 목록 조회",
 )
 def list_posts(
     mine: bool = Query(False, description="내가 쓴 글만 보기"),
@@ -56,8 +58,12 @@ def list_posts(
     search_scope: SearchScope = Query(SearchScope.all, description="검색 범위"),
     search: str | None = Query(None, description="검색어"),
     order_by: OrderBy = Query(OrderBy.latest, description="정렬 기준"),
-    from_date: date | None = Query(None, description="작성일이 해당 날짜 이후인 게시글 검색 (YYYY-MM-DD)"),
-    to_date: date | None = Query(None, description="작성일이 해당 날짜까지인 게시글 검색(YYYY-MM-DD)"),
+    from_date: date | None = Query(
+        None, description="작성일이 해당 날짜 이후인 게시글 검색 (YYYY-MM-DD)"
+    ),
+    to_date: date | None = Query(
+        None, description="작성일이 해당 날짜까지인 게시글 검색(YYYY-MM-DD)"
+    ),
     db: Session = Depends(get_db),
     user=Depends(get_community_user),
     pagination: PaginationParams = Depends(),

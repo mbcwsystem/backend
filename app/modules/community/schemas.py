@@ -79,6 +79,7 @@ class PostListResponse(BaseModel):
     """
     게시글 목록조회 응답
     """
+
     id: int
     category: CategoryEnum
 
