@@ -12,6 +12,7 @@ from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 # 테스트용 Base
 Base = declarative_base()
 
+
 # -------------더미 모델 정의---------------
 class User(Base):
     __tablename__ = "users"
@@ -56,6 +57,7 @@ TEST_DB_URL = "sqlite:///:memory:"
 engine = create_engine(TEST_DB_URL, echo=False)
 TestingSessionLocal = sessionmaker(bind=engine)
 
+
 @pytest.fixture(scope="function")
 def db():
     """테스트용 DB 세션 + 매 테스트마다 초기화"""
@@ -71,7 +73,9 @@ def db():
 # --------------테스트용 데이터---------------
 @pytest.fixture
 def test_user(db):
-    user = User(username="testuser", password="test", name="Test User", position="manager")
+    user = User(
+        username="testuser", password="test", name="Test User", position="manager"
+    )
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -90,7 +94,12 @@ def comment_data():
 
 # --------------더미 서비스 함수---------------
 def create_post(db, user, data):
-    post = Post(title=data["title"], content=data["content"], category=data["category"], author=user)
+    post = Post(
+        title=data["title"],
+        content=data["content"],
+        category=data["category"],
+        author=user,
+    )
     db.add(post)
     db.commit()
     db.refresh(post)
@@ -130,7 +139,9 @@ def test_update_post_print(db, test_user, post_data):
     post = create_post(db, test_user, post_data)
     print("\n\n원본 게시글:", post.title, post.content)
 
-    updated_post = update_post(db, test_user, post.id, {"title": "수정 제목", "content": "수정 내용"})
+    updated_post = update_post(
+        db, test_user, post.id, {"title": "수정 제목", "content": "수정 내용"}
+    )
     print("업데이트 후 게시글:", updated_post.title, updated_post.content)
 
     assert updated_post.title == "수정 제목"
@@ -142,7 +153,9 @@ def test_update_comment_print(db, test_user, post_data, comment_data):
     comment = create_comment(db, test_user, post.id, comment_data)
     print("\n\n원본 댓글:", comment.content)
 
-    updated_comment = update_comment(db, test_user, comment.id, {"content": "댓글 수정 내용"})
+    updated_comment = update_comment(
+        db, test_user, comment.id, {"content": "댓글 수정 내용"}
+    )
     print("업데이트 후 댓글:", updated_comment.content)
 
     assert updated_comment.content == "댓글 수정 내용"
