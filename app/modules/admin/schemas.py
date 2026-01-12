@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from datetime import date
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_serializer
 
 from app.modules.auth.models import GenderEnum, PositionEnum
 
@@ -104,10 +104,23 @@ class InsuranceRateResponse(BaseModel):
     id: int
     year: int
 
-    national_pension_rate: Decimal
-    health_insurance_rate: Decimal
-    long_term_care_rate: Decimal
-    employment_insurance_rate: Decimal
+    national_pension_rate: Optional[float] = None
+    health_insurance_rate: Optional[float] = None
+    long_term_care_rate: Optional[float] = None
+    employment_insurance_rate: Optional[float] = None
 
-    class Config:
-        orm_mode = True
+    @field_serializer(
+        "national_pension_rate",
+        "health_insurance_rate",
+        "long_term_care_rate",
+        "employment_insurance_rate",
+        when_used="json",
+    )
+    def serialize_rate(self, value: Decimal):
+        if value is None:
+            return None
+        return str(
+            value.quantize(Decimal("0.0000"), rounding=ROUND_HALF_UP)
+        )
+
+    model_config = {"from_attributes": True}
