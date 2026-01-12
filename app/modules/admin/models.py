@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 from datetime import date
-
+from decimal import Decimal
 from sqlalchemy import (
     Column,
     Integer,
@@ -11,6 +11,7 @@ from sqlalchemy import (
     Numeric,
     String,
     UniqueConstraint,
+    DECIMAL
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -53,25 +54,19 @@ class InsuranceRate(TimeStampedMixin, Base):
 
     # 요율은 % 그대로 저장 (예: 9.0000 = 9%)
     national_pension_rate = Column(
-        Numeric(8, 4),
-        nullable=False,
-        comment="국민연금 요율 (근로자 부담)",
+        DECIMAL(8, 4), default=Decimal("0.00"),
     )
 
     health_insurance_rate = Column(
-        Numeric(8, 4),
-        nullable=False,
-        comment="건강보험 요율 (근로자 부담)",
+        DECIMAL(8, 4), default=Decimal("0.00"),
     )
 
     long_term_care_rate = Column(
-        Numeric(8, 4),
-        nullable=False,
-        comment="장기요양보험 요율 (건강보험 대비)",
+        DECIMAL(8, 4),
+        nullable=False, default=Decimal("0.00"),
     )
 
     employment_insurance_rate = Column(
-        Numeric(8, 4),
-        nullable=False,
-        comment="고용보험 요율 (근로자 부담)",
+        DECIMAL(8, 4),
+        nullable=False, default=Decimal("0.00"),
     )
