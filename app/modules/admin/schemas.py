@@ -1,7 +1,7 @@
-# app/modules/admin/schemas.py
 from __future__ import annotations
 
 from datetime import date
+from decimal import Decimal
 from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr, Field
@@ -70,27 +70,44 @@ class HolidayOut(BaseModel):
     class Config:
         from_attributes = True
 
+class InsuranceRateCreate(BaseModel):
+    year: int = Field(..., example=2025)
 
-# ---------- 보험 요율(카테고리별) ----------
-class InsuranceRateSet(BaseModel):
-    """4대 보험 요율 등록용 입력 스키마"""
+    national_pension_rate: Decimal = Field(
+        ..., example="9.0000", description="국민연금 요율 (%)"
+    )
+    health_insurance_rate: Decimal = Field(
+        ..., example="7.1200", description="건강보험 요율 (%)"
+    )
+    long_term_care_rate: Decimal = Field(
+        ..., example="12.9500", description="장기요양보험 요율 (건강보험 대비 %)"
+    )
+    employment_insurance_rate: Decimal = Field(
+        ..., example="0.9000", description="고용보험 요율 (%)"
+    )
 
-    national_pension: float
-    health_insurance: float
-    employment_insurance: float
-    industrial_accident: float
-    effective_date: date
+class InsuranceRateUpdate(BaseModel):
+    national_pension_rate: Decimal | None = Field(
+        None, example="9.0000"
+    )
+    health_insurance_rate: Decimal | None = Field(
+        None, example="7.1200"
+    )
+    long_term_care_rate: Decimal | None = Field(
+        None, example="12.9500"
+    )
+    employment_insurance_rate: Decimal | None = Field(
+        None, example="0.9000"
+    )
 
-
-class InsuranceRateOut(BaseModel):
-    """4대 보험 요율 조회용 출력 스키마"""
-
+class InsuranceRateResponse(BaseModel):
     id: int
-    national_pension: float
-    health_insurance: float
-    employment_insurance: float
-    industrial_accident: float
-    effective_date: date
+    year: int
+
+    national_pension_rate: Decimal
+    health_insurance_rate: Decimal
+    long_term_care_rate: Decimal
+    employment_insurance_rate: Decimal
 
     class Config:
-        from_attributes = True
+        orm_mode = True
