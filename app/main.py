@@ -34,22 +34,22 @@ templates = Jinja2Templates(directory="app/templates")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
-@app.get("/", tags=["Html"])
+@app.get("/", tags=["테스트 홈페이지"])
 def index(request: Request):
     return templates.TemplateResponse("login_signup.html", {"request": request})
 
 
-@app.get("/main", response_class=HTMLResponse, tags=["Html"])
+@app.get("/main", response_class=HTMLResponse, tags=["테스트 홈페이지"])
 def render_main_page(request: Request):
     return templates.TemplateResponse("main.html", {"request": request})
 
 
-@app.get("/schedule", response_class=HTMLResponse, tags=["Html"])
+@app.get("/schedule", response_class=HTMLResponse, tags=["테스트 홈페이지"])
 def render_schedule_page(request: Request):
     return templates.TemplateResponse("schedule.html", {"request": request})
 
 
-@app.get("/community", response_class=HTMLResponse, tags=["Html"])
+@app.get("/community", response_class=HTMLResponse, tags=["테스트 홈페이지"])
 def render_community_page(request: Request):
     return templates.TemplateResponse("community.html", {"request": request})
 
