@@ -74,16 +74,16 @@ class InsuranceRateCreate(BaseModel):
     year: int = Field(..., example=2025)
 
     national_pension_rate: Decimal = Field(
-        ..., example="9.0000", description="국민연금 요율 (%)"
+        ..., example="4.5", description="국민연금 요율 (%)"
     )
     health_insurance_rate: Decimal = Field(
-        ..., example="7.1200", description="건강보험 요율 (%)"
+        ..., example="3.595", description="건강보험 요율 (%)"
     )
     long_term_care_rate: Decimal = Field(
-        ..., example="12.9500", description="장기요양보험 요율 (건강보험 대비 %)"
+        ..., example="12.95", description="장기요양보험 요율 (건강보험 대비 %)"
     )
     employment_insurance_rate: Decimal = Field(
-        ..., example="0.9000", description="고용보험 요율 (%)"
+        ..., example="0.9", description="고용보험 요율 (%)"
     )
 
 class InsuranceRateUpdate(BaseModel):
@@ -119,6 +119,9 @@ class InsuranceRateResponse(BaseModel):
     def serialize_rate(self, value: Decimal):
         if value is None:
             return None
+        if isinstance(value, float):
+            value = Decimal(str(value))
+
         return str(
             value.quantize(Decimal("0.0000"), rounding=ROUND_HALF_UP)
         )
