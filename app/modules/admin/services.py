@@ -1,4 +1,3 @@
-# app/modules/admin/services.py
 from datetime import date
 from typing import List, Optional, Tuple
 
@@ -8,9 +7,12 @@ from sqlalchemy.orm import Session
 
 from app.modules.admin import schemas
 from app.modules.admin.models import Holiday, InsuranceRate
-from app.modules.admin.schemas import InsuranceRateSet
 from app.modules.auth.models import User
-from app.modules.auth.services import hash_password  # ← 해시 적용
+from app.modules.auth.services import hash_password
+from app.modules.admin.schemas import (
+    InsuranceRateCreate,
+    InsuranceRateUpdate,
+)
 
 
 # --------- Users ----------
@@ -129,23 +131,62 @@ def delete_holiday(db: Session, holiday_id: int) -> None:
     db.delete(h)
 
 
-# --------- Insurance Rates (카테고리별 레코드) ----------
-def get_insurance_rates(db: Session) -> List[InsuranceRate]:
-    stmt = select(InsuranceRate).order_by(
-        InsuranceRate.effective_date.desc(), InsuranceRate.category.asc()
-    )
+def get_insurance_rates(db: Session) -> list[InsuranceRate]:
+    stmt = select(InsuranceRate).order_by(InsuranceRate.year.desc())
     return db.execute(stmt).scalars().all()
 
+def get_insurance_rate_by_year(
+    db: Session,
+    year: int,
+) -> InsuranceRate | None:
+    stmt = select(InsuranceRate).where(InsuranceRate.year == year)
+    return db.execute(stmt).scalars().first()
 
-def set_insurance_rate(db: Session, payload: InsuranceRateSet):
-    obj = InsuranceRate(
-        national_pension=payload.national_pension,
-        health_insurance=payload.health_insurance,
-        employment_insurance=payload.employment_insurance,
-        industrial_accident=payload.industrial_accident,
-        effective_date=payload.effective_date,
+def create_insurance_rate(
+    db: Session,
+    payload: InsuranceRateCreate,
+) -> InsuranceRate:
+    rate = InsuranceRate(
+        year=payload.year,
+        national_pension_rate=payload.national_pension_rate,
+        health_insurance_rate=payload.health_insurance_rate,
+        long_term_care_rate=payload.long_term_care_rate,
+        employment_insurance_rate=payload.employment_insurance_rate,
     )
-    db.add(obj)
+    db.add(rate)
     db.commit()
-    db.refresh(obj)
-    return obj
+    db.refresh(rate)
+    return rate
+
+def update_insurance_rate_full(
+    db: Session,
+    rate: InsuranceRate,
+    payload: InsuranceRateCreate,
+) -> InsuranceRate:
+    rate.national_pension_rate = payload.national_pension_rate
+    rate.health_insurance_rate = payload.health_insurance_rate
+    rate.long_term_care_rate = payload.long_term_care_rate
+    rate.employment_insurance_rate = payload.employment_insurance_rate
+
+    db.commit()
+    db.refresh(rate)
+    return rate
+
+def update_insurance_rate_partial(
+    db: Session,
+    rate: InsuranceRate,
+    payload: InsuranceRateUpdate,
+) -> InsuranceRate:
+    for field, value in payload.dict(exclude_unset=True).items():
+        setattr(rate, field, value)
+
+    db.commit()
+    db.refresh(rate)
+    return
+
+def delete_insurance_rate(
+    db: Session,
+    rate: InsuranceRate,
+) -> None:
+    db.delete(rate)
+    db.commit()
