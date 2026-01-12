@@ -8,6 +8,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
@@ -60,6 +61,30 @@ class Post(TimeStampedMixin, Base):
         )
 
 
+class CommentLike(Base):
+    __tablename__ = "community_comment_like"
+    __table_args__ = (
+        # 좋아요는 한 번만
+        UniqueConstraint("user_id", "comment_id", name="uq_comment_like_user_comment"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    comment_id = Column(
+        Integer,
+        ForeignKey("community_comment.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="대상 댓글 id",
+    )
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="유저 id",
+    )
+
+    comment = relationship("Comment", back_populates="likes")
+
+
 class Comment(TimeStampedMixin, Base):
     __tablename__ = "community_comment"
 
@@ -76,6 +101,9 @@ class Comment(TimeStampedMixin, Base):
     content = Column(Text, nullable=False, comment="내용")
     post = relationship("Post", back_populates="comments")
     author = relationship("User", back_populates="comments")
+    likes = relationship(
+        "CommentLike", back_populates="comment", cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         short_content = (
