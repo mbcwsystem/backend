@@ -25,6 +25,7 @@ def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
     )
     return {"is_system": is_system(user), "access_token": token, "token_type": "bearer"}
 
+
 @router.get("/me", response_model=schemas.UserResponse)
 def me(cuurent_user=Depends(get_current_user)):
     return cuurent_user
