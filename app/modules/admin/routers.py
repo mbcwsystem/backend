@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.security import get_current_admin
+from app.modules.admin.schemas import InsuranceRateResponse, InsuranceRateCreate
+from app.modules.admin.models import InsuranceRate
 
 from . import schemas, services, models
 from dotenv import load_dotenv
@@ -207,26 +209,111 @@ def delete_holiday(
     db.delete(holiday)
     db.commit()
 
-
-# ---- Insurance Rates ----
-@router.get("/insurance-rates", response_model=List[schemas.InsuranceRateOut])
-def get_insurance_rates(
-    db: Session = Depends(get_db), _admin=Depends(get_current_admin)
-):
-    return services.get_insurance_rates(db)
-
-
 @router.post(
     "/insurance-rates",
-    response_model=schemas.InsuranceRateOut,
+    response_model=InsuranceRateResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def set_insurance_rate(
-    payload: schemas.InsuranceRateSet,
+def create_insurance_rate(
+    payload: InsuranceRateCreate,
     db: Session = Depends(get_db),
-    _admin=Depends(get_current_admin),
 ):
-    obj = services.set_insurance_rate(db, payload)
+    exists = (
+        db.query(InsuranceRate)
+        .filter(InsuranceRate.year == payload.year)
+        .first()
+    )
+    if exists:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Insurance rate for this year already exists",
+        )
+
+    rate = InsuranceRate(**payload.dict())
+    db.add(rate)
     db.commit()
-    db.refresh(obj)
-    return obj
+    db.refresh(rate)
+
+    return rate
+
+@router.get(
+    "/insurance-rates/{year}",
+    response_model=InsuranceRateResponse,
+)
+def get_insurance_rate(
+    year: int,
+    db: Session = Depends(get_db),
+):
+    rate = (
+        db.query(InsuranceRate)
+        .filter(InsuranceRate.year == year)
+        .first()
+    )
+    if not rate:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Insurance rate not found",
+        )
+
+    return rate
+
+@router.get(
+    "/insurance-rates",
+    response_model=list[InsuranceRateResponse],
+)
+def list_insurance_rates(db: Session = Depends(get_db)):
+    return (
+        db.query(InsuranceRate)
+        .order_by(InsuranceRate.year.desc())
+        .all()
+    )
+
+@router.put(
+    "/insurance-rates/{year}",
+    response_model=InsuranceRateResponse,
+)
+def update_insurance_rate_full(
+    year: int,
+    payload: InsuranceRateCreate,
+    db: Session = Depends(get_db),
+):
+    rate = (
+        db.query(InsuranceRate)
+        .filter(InsuranceRate.year == year)
+        .first()
+    )
+    if not rate:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Insurance rate not found",
+        )
+
+    for field, value in payload.dict().items():
+        setattr(rate, field, value)
+
+    db.commit()
+    db.refresh(rate)
+
+    return rate
+
+@router.delete(
+    "/insurance-rates/{year}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_insurance_rate(
+    year: int,
+    db: Session = Depends(get_db),
+):
+    rate = (
+        db.query(InsuranceRate)
+        .filter(InsuranceRate.year == year)
+        .first()
+    )
+    if not rate:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Insurance rate not found",
+        )
+
+    db.delete(rate)
+    db.commit()
