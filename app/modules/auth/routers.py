@@ -49,7 +49,7 @@ def me(cuurent_user=Depends(get_current_user)):
     return cuurent_user
 
 
-@router.post("/refresh", response_model=schemas.RefreshResponse)
+@router.post("/refresh", response_model=schemas.RefreshRequest)
 def refresh(refresh_token: str, db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(
