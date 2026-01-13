@@ -1,13 +1,17 @@
 from typing import List, Union
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Path
 from sqlalchemy.orm import Session
-
+from sqlalchemy.exc import IntegrityError
 from app.core.database import get_db
-from app.core.security import get_current_user
+from app.core.security import get_current_user, get_current_admin
+from app.modules.payroll.models import PayrollPayDate
 from app.modules.payroll.schemas import (
     PayrollPayResponse,
     PayrollResponse,
+    PayrollPayDateCreate,
+    PayrollPayDateUpdate,
+    PayrollPayDateResponse,
 )
 from app.modules.payroll.services.payroll_service import PayrollService
 from app.utils.permission_utils import is_system
@@ -38,3 +42,96 @@ def get_payrolls(
         year=year,
         month=month,
     )
+
+
+@router.post(
+    "/pay-dates",
+    response_model=PayrollPayDateResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="급여 지급일 등록",
+)
+def create_payroll_pay_date(
+    payload: PayrollPayDateCreate = ...,
+    db: Session = Depends(get_db),
+    _admin=Depends(get_current_admin),
+):
+    pay_date = PayrollPayDate(
+        year=payload.year,
+        month=payload.month,
+        pay_date=payload.pay_date,
+    )
+
+    try:
+        db.add(pay_date)
+        db.commit()
+        db.refresh(pay_date)
+        return pay_date
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="해당 연월의 급여 지급일이 이미 존재합니다",
+        )
+
+
+@router.patch(
+    "/pay-dates/{year}/{month}",
+    response_model=PayrollPayDateResponse,
+    summary="급여 지급일 수정",
+)
+def update_payroll_pay_date(
+    year: int = Path(...),
+    month: int = Path(...),
+    payload: PayrollPayDateUpdate = ...,
+    db: Session = Depends(get_db),
+    _admin=Depends(get_current_admin),
+):
+    pay_date = (
+        db.query(PayrollPayDate)
+        .filter(
+            PayrollPayDate.year == year,
+            PayrollPayDate.month == month,
+        )
+        .first()
+    )
+
+    if not pay_date:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="급여 지급일이 존재하지 않습니다",
+        )
+
+    pay_date.pay_date = payload.pay_date
+    db.commit()
+    db.refresh(pay_date)
+    return pay_date
+
+
+@router.delete(
+    "/pay-dates/{year}/{month}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="급여 지급일 삭제",
+)
+def delete_payroll_pay_date(
+    year: int = Path(...),
+    month: int = Path(...),
+    db: Session = Depends(get_db),
+    _admin=Depends(get_current_admin),
+):
+    pay_date = (
+        db.query(PayrollPayDate)
+        .filter(
+            PayrollPayDate.year == year,
+            PayrollPayDate.month == month,
+        )
+        .first()
+    )
+
+    if not pay_date:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="급여 지급일이 존재하지 않습니다",
+        )
+
+    db.delete(pay_date)
+    db.commit()

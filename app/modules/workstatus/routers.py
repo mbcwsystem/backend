@@ -310,7 +310,7 @@ class AttendanceAllInOneInput(BaseModel):
             "example": {
                 "username": "user",
                 "password": "user",
-                "work_date": "2025-12-26",
+                "work_date": "2026-01-01",
                 "check_in": "09:00:00",
                 "break_start": "12:00:00",
                 "break_end": "13:00:00",
