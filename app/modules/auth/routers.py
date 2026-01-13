@@ -49,7 +49,9 @@ def me(cuurent_user=Depends(get_current_user)):
     return cuurent_user
 
 
-@router.post("/refresh", response_model=schemas.RefreshRequest, summary="리프레쉬 토큰 재발급")
+@router.post(
+    "/refresh", response_model=schemas.RefreshRequest, summary="리프레쉬 토큰 재발급"
+)
 def refresh(refresh_token: str, db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(
