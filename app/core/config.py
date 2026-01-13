@@ -54,6 +54,7 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str
     JWT_EXPIRE_MINUTES: int
+    JWT_EXPIRE_DAYS: int
 
     # Admin configs
     ADMIN_USERNAME: str
@@ -61,7 +62,7 @@ class Settings(BaseSettings):
     ADMIN_NAME: str
     ADMIN_EMAIL: str
 
-    # Holiyday config
+    # Holiday config
     HOLIDAY_API_KEY: str
 
     @property

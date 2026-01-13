@@ -1,10 +1,10 @@
-# app/modules/admin/schemas.py
 from __future__ import annotations
 
 from datetime import date
+from decimal import Decimal, ROUND_HALF_UP
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_serializer
 
 from app.modules.auth.models import GenderEnum, PositionEnum
 
@@ -71,26 +71,44 @@ class HolidayOut(BaseModel):
         from_attributes = True
 
 
-# ---------- 보험 요율(카테고리별) ----------
-class InsuranceRateSet(BaseModel):
-    """4대 보험 요율 등록용 입력 스키마"""
+class InsuranceRateCreate(BaseModel):
+    year: int
 
-    national_pension: float
-    health_insurance: float
-    employment_insurance: float
-    industrial_accident: float
-    effective_date: date
+    national_pension_rate: Decimal
+    health_insurance_rate: Decimal
+    long_term_care_rate: Decimal
+    employment_insurance_rate: Decimal
 
 
-class InsuranceRateOut(BaseModel):
-    """4대 보험 요율 조회용 출력 스키마"""
+class InsuranceRateUpdate(BaseModel):
+    national_pension_rate: Decimal
+    health_insurance_rate: Decimal
+    long_term_care_rate: Decimal
+    employment_insurance_rate: Decimal
 
+
+class InsuranceRateResponse(BaseModel):
     id: int
-    national_pension: float
-    health_insurance: float
-    employment_insurance: float
-    industrial_accident: float
-    effective_date: date
+    year: int
 
-    class Config:
-        from_attributes = True
+    national_pension_rate: Optional[float] = None
+    health_insurance_rate: Optional[float] = None
+    long_term_care_rate: Optional[float] = None
+    employment_insurance_rate: Optional[float] = None
+
+    @field_serializer(
+        "national_pension_rate",
+        "health_insurance_rate",
+        "long_term_care_rate",
+        "employment_insurance_rate",
+        when_used="json",
+    )
+    def serialize_rate(self, value: Decimal):
+        if value is None:
+            return None
+        if isinstance(value, float):
+            value = Decimal(str(value))
+
+        return str(value.quantize(Decimal("0.0000"), rounding=ROUND_HALF_UP))
+
+    model_config = {"from_attributes": True}

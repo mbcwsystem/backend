@@ -54,3 +54,22 @@ def create_access_token(*, sub: str, username: str, is_admin: bool) -> str:
         payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
     )
     return token
+
+
+def create_refresh_token(*, sub: str) -> tuple[str, datetime]:
+    now = datetime.now(timezone.utc)
+    exp = now + timedelta(days=settings.JWT_EXPIRE_DAYS)
+
+    payload = {
+        "sub": sub,
+        "iat": int(now.timestamp()),
+        "exp": int(exp.timestamp()),
+        "type": "refresh",
+    }
+
+    token = jwt.encode(
+        payload,
+        settings.JWT_SECRET_KEY,
+        algorithm=settings.JWT_ALGORITHM,
+    )
+    return token, exp

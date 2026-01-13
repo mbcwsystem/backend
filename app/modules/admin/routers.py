@@ -1,6 +1,6 @@
 import os
 import requests  # type: ignore
-from typing import List, Optional
+from typing import Optional
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.security import get_current_admin
+from app.modules.admin.schemas import InsuranceRateResponse, InsuranceRateCreate
+from app.modules.admin.models import InsuranceRate
 
 from . import schemas, services, models
 from dotenv import load_dotenv
@@ -90,7 +92,9 @@ def delete_user(
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.post("/holidays", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/holidays", status_code=status.HTTP_201_CREATED, summary="공휴일 자동으로 불러오기"
+)
 def sync_holidays(
     year: int,
     db: Session = Depends(get_db),
@@ -136,7 +140,7 @@ def sync_holidays(
         )
 
         try:
-            with db.begin_nested():  # ✅ SAVEPOINT
+            with db.begin_nested():
                 db.add(holiday)
             saved += 1
         except IntegrityError:
@@ -153,6 +157,7 @@ def sync_holidays(
 @router.get(
     "/holidays",
     response_model=list[schemas.HolidayOut],
+    summary="공휴일 조회",
 )
 def list_holidays(
     year: int,
@@ -172,6 +177,7 @@ def list_holidays(
 @router.put(
     "/holidays/{holiday_id}",
     response_model=schemas.HolidayOut,
+    summary="공휴일 수정",
 )
 def update_holiday(
     holiday_id: int,
@@ -195,6 +201,7 @@ def update_holiday(
 @router.delete(
     "/holidays/{holiday_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary="공휴일 삭제",
 )
 def delete_holiday(
     holiday_id: int,
@@ -208,25 +215,100 @@ def delete_holiday(
     db.commit()
 
 
-# ---- Insurance Rates ----
-@router.get("/insurance-rates", response_model=List[schemas.InsuranceRateOut])
-def get_insurance_rates(
-    db: Session = Depends(get_db), _admin=Depends(get_current_admin)
-):
-    return services.get_insurance_rates(db)
-
-
 @router.post(
     "/insurance-rates",
-    response_model=schemas.InsuranceRateOut,
+    response_model=InsuranceRateResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="4대보험 요율 설정",
 )
-def set_insurance_rate(
-    payload: schemas.InsuranceRateSet,
+def create_insurance_rate(
+    payload: InsuranceRateCreate,
     db: Session = Depends(get_db),
-    _admin=Depends(get_current_admin),
 ):
-    obj = services.set_insurance_rate(db, payload)
+    exists = db.query(InsuranceRate).filter(InsuranceRate.year == payload.year).first()
+    if exists:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Insurance rate for this year already exists",
+        )
+
+    rate = InsuranceRate(**payload.dict())
+    db.add(rate)
     db.commit()
-    db.refresh(obj)
-    return obj
+    db.refresh(rate)
+
+    return rate
+
+
+@router.get(
+    "/insurance-rates/{year}",
+    response_model=InsuranceRateResponse,
+    summary="4대보험 요율 연도 조회",
+)
+def get_insurance_rate(
+    year: int,
+    db: Session = Depends(get_db),
+):
+    rate = db.query(InsuranceRate).filter(InsuranceRate.year == year).first()
+    if not rate:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Insurance rate not found",
+        )
+
+    return rate
+
+
+@router.get(
+    "/insurance-rates",
+    response_model=list[InsuranceRateResponse],
+    summary="4대보험 요율 전체 조회",
+)
+def list_insurance_rates(db: Session = Depends(get_db)):
+    return db.query(InsuranceRate).order_by(InsuranceRate.year.desc()).all()
+
+
+@router.put(
+    "/insurance-rates/{year}",
+    response_model=InsuranceRateResponse,
+    summary="4대보험 요율 수정",
+)
+def update_insurance_rate_full(
+    year: int,
+    payload: InsuranceRateCreate,
+    db: Session = Depends(get_db),
+):
+    rate = db.query(InsuranceRate).filter(InsuranceRate.year == year).first()
+    if not rate:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Insurance rate not found",
+        )
+
+    for field, value in payload.dict().items():
+        setattr(rate, field, value)
+
+    db.commit()
+    db.refresh(rate)
+
+    return rate
+
+
+@router.delete(
+    "/insurance-rates/{year}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="4대보험 요율 삭제",
+)
+def delete_insurance_rate(
+    year: int,
+    db: Session = Depends(get_db),
+):
+    rate = db.query(InsuranceRate).filter(InsuranceRate.year == year).first()
+    if not rate:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Insurance rate not found",
+        )
+
+    db.delete(rate)
+    db.commit()

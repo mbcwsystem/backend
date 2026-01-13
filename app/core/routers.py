@@ -5,15 +5,15 @@ from app.modules.wage.routers import admin_router
 api_router = APIRouter()
 
 routers = [
-    ("/auth", "Auth", "app.modules.auth.routers"),
+    ("/auth", "로그인관리", "app.modules.auth.routers"),
     ("/schedule", "스케줄관리", "app.modules.schedule.routers"),
-    ("/shift", "Shift", "app.modules.shift.routers"),
-    ("/dayoff", "DayOff", "app.modules.dayoff.routers"),
+    ("/shift", "스케줄관리", "app.modules.shift.routers"),
+    ("/dayoff", "스케줄관리", "app.modules.dayoff.routers"),
     ("/payroll", "급여관리", "app.modules.payroll.router.routers"),
     ("/workstatus", "근태관리", "app.modules.workstatus.routers"),
     ("/community", "커뮤니티관리", "app.modules.community.routers"),
-    ("/admin", "Admin", "app.modules.admin.routers"),
-    ("/wage", "Wage", "app.modules.wage.routers"),
+    ("/admin", "관리자", "app.modules.admin.routers"),
+    ("/wage", "유저시급", "app.modules.wage.routers"),
 ]
 
 for prefix, tag, module_path in routers:

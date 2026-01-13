@@ -1,18 +1,7 @@
 from __future__ import annotations
 
-import enum
-from datetime import date
-
-from sqlalchemy import (
-    Column,
-    Integer,
-    Date,
-    Index,
-    Numeric,
-    String,
-    UniqueConstraint,
-)
-from sqlalchemy.orm import Mapped, mapped_column
+from decimal import Decimal
+from sqlalchemy import Column, Integer, Date, String, UniqueConstraint, DECIMAL
 
 from app.core.config import TimeStampedMixin
 from app.core.database import Base
@@ -30,28 +19,45 @@ class Holiday(Base):
     __table_args__ = (UniqueConstraint("date", name="uq_holiday_date"),)
 
 
-# 4대 보험 요율(버전/시점 관리)
 class InsuranceRate(TimeStampedMixin, Base):
+    """
+    근로자 공제 보험 요율 (연 단위)
+    - 국민연금
+    - 건강보험
+    - 장기요양보험
+    - 고용보험
+    """
+
     __tablename__ = "insurance_rates"
-    __table_args__ = (
-        UniqueConstraint("effective_date", name="uq_insurance_rate_effective_date"),
-        Index("idx_insurance_rate_effective_date", "effective_date"),
+    __table_args__ = (UniqueConstraint("year", name="uq_insurance_rates_year"),)
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    year = Column(
+        Integer,
+        nullable=False,
+        comment="보험 요율 기준 연도 (예: 2025)",
     )
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    # 각각 % 단위(예: 9.15%)를 9.15로 저장. 소수 2자리까지 허용
-    national_pension: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False)
-    health_insurance: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False)
-    employment_insurance: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False)
-    industrial_accident: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False)
+    # 요율은 % 그대로 저장 (예: 9.0000 = 9%)
+    national_pension_rate = Column(
+        DECIMAL(8, 4),
+        default=Decimal("0.00"),
+    )
 
-    effective_date: Mapped[date] = mapped_column(
-        Date, nullable=False
-    )  # 시행일(동일일자 중복 불가)
+    health_insurance_rate = Column(
+        DECIMAL(8, 4),
+        default=Decimal("0.00"),
+    )
 
+    long_term_care_rate = Column(
+        DECIMAL(8, 4),
+        nullable=False,
+        default=Decimal("0.00"),
+    )
 
-class InsuranceCategoryEnum(str, enum.Enum):
-    health = "건강보험"
-    care = "요양보험"
-    employment = "고용보험"
-    pension = "국민연금"
+    employment_insurance_rate = Column(
+        DECIMAL(8, 4),
+        nullable=False,
+        default=Decimal("0.00"),
+    )

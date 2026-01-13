@@ -29,6 +29,7 @@ def get_user_wage_list(user_id: int, db: Session = Depends(get_db)):
     "/",
     response_model=schemas.DefaultWageResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="최저임금 등록",
 )
 def sync_default_wage(
     year: int,
@@ -61,7 +62,9 @@ def sync_default_wage(
 
 
 @admin_router.get(
-    "/", response_model=list[schemas.DefaultWageResponse]
+    "/",
+    response_model=list[schemas.DefaultWageResponse],
+    summary="연도별 최저임금 조회",
 )  # 연도별 최저임금 조회
 def list_default_wages(db: Session = Depends(get_db)):
     return db.query(models.DefaultWage).order_by(models.DefaultWage.year.desc()).all()
@@ -70,6 +73,7 @@ def list_default_wages(db: Session = Depends(get_db)):
 @admin_router.post(
     "/all",
     status_code=status.HTTP_201_CREATED,
+    summary="최저임금 불러오기",
 )
 def sync_all_default_wages(db: Session = Depends(get_db)):
     """
