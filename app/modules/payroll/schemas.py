@@ -118,3 +118,22 @@ class PayrollPayResponse(BaseModel):
 
     # 실지급액
     net_pay: Optional[int] = None  # 실지급액
+
+
+class PayrollPayDateCreate(BaseModel):
+    year: int
+    month: int
+    pay_date: date
+
+
+class PayrollPayDateUpdate(BaseModel):
+    pay_date: date
+
+
+class PayrollPayDateResponse(BaseModel):
+    id: int
+    year: int
+    month: int
+    pay_date: date
+
+    model_config = {"from_attributes": True}
