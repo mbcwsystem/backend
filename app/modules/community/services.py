@@ -230,7 +230,9 @@ def list_comments(db: Session, user, post_id: int, page: int = 1, page_size: int
         .order_by(Comment.created_at.asc())
     )
 
-    return paginate(query, page, page_size, lambda p: _build_post_list_response(db, p))
+    return paginate(
+        query, page, page_size, lambda c: _build_comment_response(db, c, user)
+    )
 
 
 def update_comment(

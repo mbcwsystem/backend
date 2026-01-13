@@ -217,4 +217,4 @@ def toggle_comment_like(
     """
     댓글에 좋아요를 누르거나 취소
     """
-    return services.toggle_comment_like(db, comment_id, user)
+    return services.toggle_comment_like(db=db, user=user, comment_id=comment_id)
