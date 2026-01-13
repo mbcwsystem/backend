@@ -62,5 +62,16 @@ class User(Base):
     # 스케줄
     schedules = relationship("Schedule", back_populates="user", cascade="all, delete")
 
+    #토큰
+    refresh_token = relationship("RefreshToken", back_populates="user", cascade="all, delete")
+
     def __repr__(self):
         return f"<User(username={self.username}, position={self.position})>"
+
+class RefreshToken(Base):
+    __tablename__ = "refresh_tokens"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), ondelete="CASCADE")
+    token = Column(String(255), unique=True, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
