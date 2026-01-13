@@ -5,7 +5,7 @@ from app.modules.wage.routers import admin_router
 api_router = APIRouter()
 
 routers = [
-    ("/auth", "Auth", "app.modules.auth.routers"),
+    ("/auth", "로그인관리", "app.modules.auth.routers"),
     ("/schedule", "스케줄관리", "app.modules.schedule.routers"),
     ("/shift", "Shift", "app.modules.shift.routers"),
     ("/dayoff", "DayOff", "app.modules.dayoff.routers"),
