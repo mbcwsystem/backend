@@ -55,6 +55,7 @@ def create_access_token(*, sub: str, username: str, is_admin: bool) -> str:
     )
     return token
 
+
 def create_refresh_token(*, sub: str) -> tuple[str, datetime]:
     now = datetime.now(timezone.utc)
     exp = now + timedelta(days=settings.JWT_EXPIRE_DAYS)
