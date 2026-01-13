@@ -138,7 +138,7 @@ def sync_holidays(
         )
 
         try:
-            with db.begin_nested():  # ✅ SAVEPOINT
+            with db.begin_nested():
                 db.add(holiday)
             saved += 1
         except IntegrityError:
