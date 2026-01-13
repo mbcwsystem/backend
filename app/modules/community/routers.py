@@ -44,6 +44,13 @@ def create_post(
     db: Session = Depends(get_db),
     user=Depends(get_community_user),
 ):
+    """
+    게시글 생성
+    - 자유게시판: 모두(출근용 제외)
+    - 공지: 관리자
+    - 교대(대타)/휴무: 자동생성(사용자x)
+    """
+
     return services.create_post(db, user, data)
 
 
@@ -68,11 +75,19 @@ def list_posts(
     user=Depends(get_community_user),
     pagination: PaginationParams = Depends(),
 ):
+    """
+    게시글 목록 조회
+    - 필터링 (내가 쓴 글, 카테고리, 날짜 범위)
+    - 검색 (제목, 내용, 작성자 이름) 범위 지정 가능
+    - 정렬 옵션(최신순, 오래된 순, 인기순 / 디폴트: 최신순 정렬)
+    - 페이지네이션 적용(기본 1페이지, 5개씩 보기)
+    """
     # mine이 True일 경우 현재 로그인한 user.id를 넘기고, False면 None을 넘김
     author_id = user.id if mine else None
 
     return services.list_posts(
         db=db,
+        user=user,
         author_id=author_id,
         category=category,
         page=pagination.page,
@@ -91,6 +106,9 @@ def get_post(
     db: Session = Depends(get_db),
     user=Depends(get_community_user),
 ):
+    """
+    게시글 상세 조회 (댓글 제외)
+    """
     return services.get_post(db, post_id, user)
 
 
@@ -101,6 +119,9 @@ def update_post(
     db: Session = Depends(get_db),
     user=Depends(get_community_user),
 ):
+    """
+    게시글 수정
+    """
     return services.update_post(db, user, post_id, data)
 
 
@@ -110,10 +131,39 @@ def delete_post(
     db: Session = Depends(get_db),
     user=Depends(get_community_user),
 ):
+    """
+    게시글 삭제
+    - 작성자 또는 관리자만 삭제 가능
+    - notice/shift/dayoff는 관리자만 삭제 가능
+    """
     return services.delete_post(db, user, post_id)
 
 
 # 댓글 API -----
+@router.get(
+    "/posts/{post_id}/comments",
+    response_model=PaginatedResponse[CommentResponse],
+    summary="댓글 목록 조회",
+)
+def list_comments(
+    post_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_community_user),
+    pagination: PaginationParams = Depends(),
+):
+    """
+    특정 게시글의 댓글을 페이지네이션해서 조회 \n
+    각 댓글마다 좋아요 수와 현재 유저의 좋아요 여부가 포함됨
+    """
+    return services.list_comments(
+        db=db,
+        user=user,
+        post_id=post_id,
+        page=pagination.page,
+        page_size=pagination.page_size,
+    )
+
+
 @router.post(
     "/posts/{post_id}/comments",
     response_model=CommentResponse,
@@ -126,6 +176,10 @@ def create_comment(
     db: Session = Depends(get_db),
     user=Depends(get_community_user),
 ):
+    """
+    댓글 작성
+    - 출근용 제외 모두
+    """
     return services.create_comment(db, user, post_id, data)
 
 
@@ -138,6 +192,9 @@ def update_comment(
     db: Session = Depends(get_db),
     user=Depends(get_community_user),
 ):
+    """
+    댓글 수정
+    """
     return services.update_comment(db, user, comment_id, data)
 
 
@@ -147,4 +204,17 @@ def delete_comment(
     db: Session = Depends(get_db),
     user=Depends(get_community_user),
 ):
+    """
+    댓글 삭제
+    """
     return services.delete_comment(db, user, comment_id)
+
+
+@router.post("/comments/{comment_id}/like", summary="댓글 좋아요 토글")
+def toggle_comment_like(
+    comment_id: int, db: Session = Depends(get_db), user=Depends(get_community_user)
+):
+    """
+    댓글에 좋아요를 누르거나 취소
+    """
+    return services.toggle_comment_like(db=db, user=user, comment_id=comment_id)

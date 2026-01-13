@@ -71,6 +71,9 @@ class CommentResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+    like_count: int = Field(0, description="좋아요 개수")
+    is_liked: bool = Field(False, description="내가 좋아요를 눌렀는지 여부")
+
     class Config:
         orm_mode = True
 
@@ -118,8 +121,7 @@ class PostResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    # 게시글에 달린 댓글까지 포함
-    comments: List[CommentResponse] = Field(default_factory=list)
+    comments_count: int
 
     class Config:
         orm_mode = True
