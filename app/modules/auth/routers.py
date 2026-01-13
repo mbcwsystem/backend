@@ -13,7 +13,7 @@ from .models import RefreshToken
 router = APIRouter()
 
 
-@router.post("/login", response_model=schemas.TokenResponse)
+@router.post("/login", response_model=schemas.TokenResponse, summary="로그인 시도")
 def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
     user = services.get_user_by_username(db, payload.username)
     if not user or not services.verify_password(payload.password, user.password):
@@ -44,12 +44,12 @@ def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
     }
 
 
-@router.get("/me", response_model=schemas.UserResponse)
+@router.get("/me", response_model=schemas.UserResponse, summary="유저 조회")
 def me(cuurent_user=Depends(get_current_user)):
     return cuurent_user
 
 
-@router.post("/refresh", response_model=schemas.RefreshRequest)
+@router.post("/refresh", response_model=schemas.RefreshRequest, summary="리프레쉬 토큰 재발급")
 def refresh(refresh_token: str, db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(
@@ -76,7 +76,7 @@ def refresh(refresh_token: str, db: Session = Depends(get_db)):
     return {"access_token": new_access_token, "token_type": "bearer"}
 
 
-@router.post("/logout")
+@router.post("/logout", summary="로그아웃 시도")
 def logout(
     refresh_token: str,
     db: Session = Depends(get_db),

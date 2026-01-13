@@ -92,7 +92,7 @@ def delete_user(
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.post("/holidays", status_code=status.HTTP_201_CREATED)
+@router.post("/holidays", status_code=status.HTTP_201_CREATED, summary="공휴일 자동으로 불러오기")
 def sync_holidays(
     year: int,
     db: Session = Depends(get_db),
@@ -154,7 +154,7 @@ def sync_holidays(
 
 @router.get(
     "/holidays",
-    response_model=list[schemas.HolidayOut],
+    response_model=list[schemas.HolidayOut],summary="공휴일 조회",
 )
 def list_holidays(
     year: int,
@@ -173,7 +173,7 @@ def list_holidays(
 
 @router.put(
     "/holidays/{holiday_id}",
-    response_model=schemas.HolidayOut,
+    response_model=schemas.HolidayOut,summary="공휴일 수정",
 )
 def update_holiday(
     holiday_id: int,
@@ -196,7 +196,7 @@ def update_holiday(
 
 @router.delete(
     "/holidays/{holiday_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_204_NO_CONTENT,summary="공휴일 삭제",
 )
 def delete_holiday(
     holiday_id: int,
@@ -214,6 +214,7 @@ def delete_holiday(
     "/insurance-rates",
     response_model=InsuranceRateResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="4대보험 요율 설정",
 )
 def create_insurance_rate(
     payload: InsuranceRateCreate,
@@ -237,6 +238,7 @@ def create_insurance_rate(
 @router.get(
     "/insurance-rates/{year}",
     response_model=InsuranceRateResponse,
+    summary="4대보험 요율 연도 조회",
 )
 def get_insurance_rate(
     year: int,
@@ -255,6 +257,7 @@ def get_insurance_rate(
 @router.get(
     "/insurance-rates",
     response_model=list[InsuranceRateResponse],
+    summary="4대보험 요율 전체 조회",
 )
 def list_insurance_rates(db: Session = Depends(get_db)):
     return db.query(InsuranceRate).order_by(InsuranceRate.year.desc()).all()
@@ -263,6 +266,7 @@ def list_insurance_rates(db: Session = Depends(get_db)):
 @router.put(
     "/insurance-rates/{year}",
     response_model=InsuranceRateResponse,
+    summary="4대보험 요율 수정",
 )
 def update_insurance_rate_full(
     year: int,
@@ -288,6 +292,7 @@ def update_insurance_rate_full(
 @router.delete(
     "/insurance-rates/{year}",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary="4대보험 요율 삭제",
 )
 def delete_insurance_rate(
     year: int,
