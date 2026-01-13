@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.modules.wage import models, schemas, services
 
-router = APIRouter(tags=["Wage"])
-admin_router = APIRouter(tags=["Admin"])
+router = APIRouter()
+admin_router = APIRouter()
 
 
 @router.post("/user", response_model=schemas.UserWageResponse)  # 유저 전용 시급 설정
