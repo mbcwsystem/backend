@@ -61,7 +61,7 @@ class Settings(BaseSettings):
     ADMIN_NAME: str
     ADMIN_EMAIL: str
 
-    # Holiyday config
+    # Holiday config
     HOLIDAY_API_KEY: str
 
     @property
