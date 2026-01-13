@@ -1,8 +1,18 @@
 from __future__ import annotations
 
 import enum
-
-from sqlalchemy import JSON, Boolean, Column, Date, Enum, Integer, String
+from datetime import datetime
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Column,
+    Date,
+    Enum,
+    Integer,
+    String,
+    ForeignKey,
+    DateTime,
+)
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -62,11 +72,14 @@ class User(Base):
     # 스케줄
     schedules = relationship("Schedule", back_populates="user", cascade="all, delete")
 
-    #토큰
-    refresh_token = relationship("RefreshToken", back_populates="user", cascade="all, delete")
+    # 토큰
+    refresh_token = relationship(
+        "RefreshToken", back_populates="user", cascade="all, delete"
+    )
 
     def __repr__(self):
         return f"<User(username={self.username}, position={self.position})>"
+
 
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
