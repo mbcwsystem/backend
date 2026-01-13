@@ -1,6 +1,6 @@
 import os
 import requests  # type: ignore
-from typing import List, Optional
+from typing import Optional
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
@@ -209,6 +209,7 @@ def delete_holiday(
     db.delete(holiday)
     db.commit()
 
+
 @router.post(
     "/insurance-rates",
     response_model=InsuranceRateResponse,
@@ -218,11 +219,7 @@ def create_insurance_rate(
     payload: InsuranceRateCreate,
     db: Session = Depends(get_db),
 ):
-    exists = (
-        db.query(InsuranceRate)
-        .filter(InsuranceRate.year == payload.year)
-        .first()
-    )
+    exists = db.query(InsuranceRate).filter(InsuranceRate.year == payload.year).first()
     if exists:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -236,6 +233,7 @@ def create_insurance_rate(
 
     return rate
 
+
 @router.get(
     "/insurance-rates/{year}",
     response_model=InsuranceRateResponse,
@@ -244,11 +242,7 @@ def get_insurance_rate(
     year: int,
     db: Session = Depends(get_db),
 ):
-    rate = (
-        db.query(InsuranceRate)
-        .filter(InsuranceRate.year == year)
-        .first()
-    )
+    rate = db.query(InsuranceRate).filter(InsuranceRate.year == year).first()
     if not rate:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -257,16 +251,14 @@ def get_insurance_rate(
 
     return rate
 
+
 @router.get(
     "/insurance-rates",
     response_model=list[InsuranceRateResponse],
 )
 def list_insurance_rates(db: Session = Depends(get_db)):
-    return (
-        db.query(InsuranceRate)
-        .order_by(InsuranceRate.year.desc())
-        .all()
-    )
+    return db.query(InsuranceRate).order_by(InsuranceRate.year.desc()).all()
+
 
 @router.put(
     "/insurance-rates/{year}",
@@ -277,11 +269,7 @@ def update_insurance_rate_full(
     payload: InsuranceRateCreate,
     db: Session = Depends(get_db),
 ):
-    rate = (
-        db.query(InsuranceRate)
-        .filter(InsuranceRate.year == year)
-        .first()
-    )
+    rate = db.query(InsuranceRate).filter(InsuranceRate.year == year).first()
     if not rate:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -296,6 +284,7 @@ def update_insurance_rate_full(
 
     return rate
 
+
 @router.delete(
     "/insurance-rates/{year}",
     status_code=status.HTTP_204_NO_CONTENT,
@@ -304,11 +293,7 @@ def delete_insurance_rate(
     year: int,
     db: Session = Depends(get_db),
 ):
-    rate = (
-        db.query(InsuranceRate)
-        .filter(InsuranceRate.year == year)
-        .first()
-    )
+    rate = db.query(InsuranceRate).filter(InsuranceRate.year == year).first()
     if not rate:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -1,19 +1,7 @@
 from __future__ import annotations
 
-import enum
-from datetime import date
 from decimal import Decimal
-from sqlalchemy import (
-    Column,
-    Integer,
-    Date,
-    Index,
-    Numeric,
-    String,
-    UniqueConstraint,
-    DECIMAL
-)
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Column, Integer, Date, String, UniqueConstraint, DECIMAL
 
 from app.core.config import TimeStampedMixin
 from app.core.database import Base
@@ -30,6 +18,7 @@ class Holiday(Base):
 
     __table_args__ = (UniqueConstraint("date", name="uq_holiday_date"),)
 
+
 class InsuranceRate(TimeStampedMixin, Base):
     """
     근로자 공제 보험 요율 (연 단위)
@@ -40,9 +29,7 @@ class InsuranceRate(TimeStampedMixin, Base):
     """
 
     __tablename__ = "insurance_rates"
-    __table_args__ = (
-        UniqueConstraint("year", name="uq_insurance_rates_year"),
-    )
+    __table_args__ = (UniqueConstraint("year", name="uq_insurance_rates_year"),)
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
@@ -54,19 +41,23 @@ class InsuranceRate(TimeStampedMixin, Base):
 
     # 요율은 % 그대로 저장 (예: 9.0000 = 9%)
     national_pension_rate = Column(
-        DECIMAL(8, 4), default=Decimal("0.00"),
+        DECIMAL(8, 4),
+        default=Decimal("0.00"),
     )
 
     health_insurance_rate = Column(
-        DECIMAL(8, 4), default=Decimal("0.00"),
+        DECIMAL(8, 4),
+        default=Decimal("0.00"),
     )
 
     long_term_care_rate = Column(
         DECIMAL(8, 4),
-        nullable=False, default=Decimal("0.00"),
+        nullable=False,
+        default=Decimal("0.00"),
     )
 
     employment_insurance_rate = Column(
         DECIMAL(8, 4),
-        nullable=False, default=Decimal("0.00"),
+        nullable=False,
+        default=Decimal("0.00"),
     )

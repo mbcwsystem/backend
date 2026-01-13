@@ -135,12 +135,14 @@ def get_insurance_rates(db: Session) -> list[InsuranceRate]:
     stmt = select(InsuranceRate).order_by(InsuranceRate.year.desc())
     return db.execute(stmt).scalars().all()
 
+
 def get_insurance_rate_by_year(
     db: Session,
     year: int,
 ) -> InsuranceRate | None:
     stmt = select(InsuranceRate).where(InsuranceRate.year == year)
     return db.execute(stmt).scalars().first()
+
 
 def create_insurance_rate(
     db: Session,
@@ -158,6 +160,7 @@ def create_insurance_rate(
     db.refresh(rate)
     return rate
 
+
 def update_insurance_rate_full(
     db: Session,
     rate: InsuranceRate,
@@ -172,6 +175,7 @@ def update_insurance_rate_full(
     db.refresh(rate)
     return rate
 
+
 def update_insurance_rate_partial(
     db: Session,
     rate: InsuranceRate,
@@ -183,6 +187,7 @@ def update_insurance_rate_partial(
     db.commit()
     db.refresh(rate)
     return
+
 
 def delete_insurance_rate(
     db: Session,
