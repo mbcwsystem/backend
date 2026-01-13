@@ -7,9 +7,7 @@ from app.core.database import get_db
 from app.core.security import get_current_admin
 from app.modules.admin import schemas, services
 
-router = APIRouter(
-    tags=["유저관리"]
-)
+router = APIRouter(tags=["유저관리"])
 
 
 @router.post(

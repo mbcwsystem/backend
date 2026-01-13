@@ -8,7 +8,7 @@ router = APIRouter()
 admin_router = APIRouter()
 
 
-@router.post("/user", response_model=schemas.UserWageResponse)  # 유저 전용 시급 설정
+@router.post("/user", response_model=schemas.UserWageResponse, summary="유저 전용 시급 설정")  #
 def create_user_wage(data: schemas.UserWageCreate, db: Session = Depends(get_db)):
     record = models.UserWage(**data.dict())
     db.add(record)
@@ -18,7 +18,7 @@ def create_user_wage(data: schemas.UserWageCreate, db: Session = Depends(get_db)
 
 
 @router.get(
-    "/user/{user_id}", response_model=list[schemas.UserWageResponse]
+    "/user/{user_id}", response_model=list[schemas.UserWageResponse],  summary="유저 전용 시급 조회"
 )  # 유저 전용 시급 조회
 def get_user_wage_list(user_id: int, db: Session = Depends(get_db)):
     records = db.query(models.UserWage).filter(models.UserWage.user_id == user_id).all()

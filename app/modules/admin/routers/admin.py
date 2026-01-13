@@ -12,9 +12,7 @@ from app.modules.admin import schemas, models
 from app.modules.admin.schemas import InsuranceRateCreate, InsuranceRateResponse
 from app.modules.admin.models import InsuranceRate
 
-router = APIRouter(
-    tags=["관리자"]
-)
+router = APIRouter(tags=["관리자"])
 
 load_dotenv()
 HOLIDAY_API_KEY = os.getenv("HOLIDAY_API_KEY")
@@ -24,6 +22,7 @@ if not HOLIDAY_API_KEY:
 
 
 # ---------- 공휴일 ----------
+
 
 @router.post(
     "/holidays",
@@ -35,7 +34,9 @@ def sync_holidays(
     db: Session = Depends(get_db),
     _admin=Depends(get_current_admin),
 ):
-    url = "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
+    url = (
+        "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
+    )
     params = {
         "serviceKey": HOLIDAY_API_KEY,
         "solYear": year,
@@ -136,6 +137,7 @@ def delete_holiday(
 
 
 # ---------- 4대보험 ----------
+
 
 @router.post(
     "/insurance-rates",
