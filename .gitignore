@@ -26,6 +26,7 @@ venv.bak/
 .idea/
 *.swp
 *.swo
+*.sh
 
 # ▶️ OS & Misc
 .DS_Store
@@ -96,7 +97,6 @@ yarn-error.log*
 # ▶️ YAML config files
 *.yml
 *.yaml
-tools/
 
 # ============================================
 # End of .gitignore
