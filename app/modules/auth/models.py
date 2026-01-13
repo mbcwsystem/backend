@@ -73,7 +73,7 @@ class User(Base):
     schedules = relationship("Schedule", back_populates="user", cascade="all, delete")
 
     # 토큰
-    refresh_token = relationship(
+    refresh_tokens = relationship(
         "RefreshToken", back_populates="user", cascade="all, delete"
     )
 
@@ -84,7 +84,9 @@ class User(Base):
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), ondelete="CASCADE")
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     token = Column(String(255), unique=True, nullable=False)
     expires_at = Column(DateTime, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="refresh_tokens")
