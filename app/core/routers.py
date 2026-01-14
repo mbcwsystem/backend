@@ -45,6 +45,6 @@ api_router.include_router(
 
 api_router.include_router(
     holiday_router,
-prefix="/admin",
+    prefix="/admin",
     tags=["공휴일관리"],
 )
