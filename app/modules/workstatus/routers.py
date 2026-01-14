@@ -311,10 +311,10 @@ class AttendanceAllInOneInput(BaseModel):
                 "username": "user",
                 "password": "user",
                 "work_date": "2026-01-01",
-                "check_in": "09:00:00",
-                "break_start": "12:00:00",
-                "break_end": "13:00:00",
-                "check_out": "18:00:00",
+                "check_in": "14:00:00",
+                "break_start": "15:00:00",
+                "break_end": "16:00:00",
+                "check_out": "23:00:00",
             }
         }
 
