@@ -115,14 +115,17 @@ class PayrollService:
 
     # 일반 사용자 Response
     @staticmethod
-    def _to_user_pay_response(payroll: Payroll,db: Session,) -> PayrollPayResponse:
+    def _to_user_pay_response(
+        payroll: Payroll,
+        db: Session,
+    ) -> PayrollPayResponse:
         user = payroll.user
         pay_date = get_pay_date(db, payroll.year, payroll.month)
 
         day_pay = int(payroll.wage * float(payroll.day_hours))
         night_pay = int(payroll.wage * (float(payroll.night_hours) * 1.5))
         weekly_allowance_pay = int(payroll.wage * float(payroll.weekly_allowance_hours))
-        annual_leave_pay = 0
+        annual_leave_pay = int(payroll.wage * float(user.annual_leave_hours))
         holiday_pay = int(payroll.wage * (float(payroll.holiday_hours) * 1.5))
         gross_pay = (
             day_pay + night_pay + weekly_allowance_pay + annual_leave_pay + holiday_pay
@@ -166,7 +169,7 @@ class PayrollService:
             day_wage=day_pay,  # 주간
             night_wage=night_pay,  # 야간
             weekly_allowance_pay=weekly_allowance_pay,  # 주휴
-            annual_leave_pay=0,  # 연차
+            annual_leave_pay=annual_leave_pay,  # 연차
             holiday_pay=holiday_pay,  # 공휴일
             # extra_pay=0, 기타수당 제거예쩡
             gross_pay=gross_pay,  # 급여 총계
@@ -188,6 +191,7 @@ def get_insurance_rate_year(year: int, month: int) -> int:
 
 def get_insurance_rate(db: Session, rate_year: int):
     return db.query(InsuranceRate).filter(InsuranceRate.year == rate_year).first()
+
 
 def get_pay_date(db: Session, year: int, month: int):
     pay_date = (
