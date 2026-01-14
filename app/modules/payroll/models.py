@@ -43,32 +43,6 @@ class Payroll(Base):
     user = relationship("User", back_populates="payrolls")
 
 
-class PayrollWeeklyAllowanceHours(Base):
-    __tablename__ = "weekly_allowance_hours"
-    __table_args__ = (
-        UniqueConstraint(
-            "user_id",
-            "iso_year",
-            "iso_week",
-            name="uq_user_iso_year_week",
-        ),
-    )
-
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-
-    # 주차
-    iso_year = Column(Integer, nullable=False)
-    iso_week = Column(Integer, nullable=False)
-
-    # 주휴시간
-    allowance_hours = Column(
-        DECIMAL(5, 2),
-        nullable=False,
-        default=Decimal("0.00"),
-    )
-
-
 class PayrollPayDate(Base):
     """
     연/월 기준 급여 지급일 관리 테이블
