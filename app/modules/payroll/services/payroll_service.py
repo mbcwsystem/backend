@@ -9,7 +9,9 @@ from app.modules.payroll.schemas import (
     PayrollPayResponse,
     PayrollResponse,
 )
+from datetime import timedelta, date
 from app.utils.permission_utils import is_admin
+from app.modules.workstatus.models import Attendance
 
 
 class PayrollService:
@@ -44,7 +46,7 @@ class PayrollService:
                 query = query.filter(Payroll.month == month)
 
             payrolls = query.all()
-            return [PayrollService._to_admin_response(p) for p in payrolls]
+            return [PayrollService._to_admin_response(p, db) for p in payrolls]
 
         # 사용자: 본인 급여 조회
         payroll = (
@@ -64,23 +66,63 @@ class PayrollService:
 
     # 관리자 Response
     @staticmethod
-    def _to_admin_response(payroll: Payroll) -> PayrollResponse:
+    def _to_admin_response(payroll: Payroll, db: Session) -> PayrollResponse:
         user = payroll.user
 
-        total_work_hours = (
-            float(payroll.day_hours)
-            + float(payroll.night_hours)
-            + float(payroll.weekly_allowance_hours)
-            + float(payroll.holiday_hours)
-        )
+        day_wage = int(payroll.wage * float(payroll.day_hours))
+        night_wage = int(payroll.wage * float(payroll.night_hours) * 1.5)
+        weekly_allowance_pay = int(payroll.wage * float(payroll.weekly_allowance_hours))
+        holiday_pay = int(payroll.wage * float(payroll.holiday_hours) * 1.5)
+        annual_leave_pay = payroll.wage * float(user.annual_leave_hours)
+
+        gross_pay = day_wage + night_wage + weekly_allowance_pay + holiday_pay
+
+        total_work_hours = float(payroll.day_hours) + float(payroll.night_hours)
 
         gross_pay = int(total_work_hours * payroll.wage)
 
-        total_deduction = (
-            payroll.insurance_health
-            + payroll.insurance_care
-            + payroll.insurance_employment
-            + payroll.insurance_pension
+        rate_year = get_insurance_rate_year(payroll.year, payroll.month)
+        rate = get_insurance_rate(db, rate_year)
+
+        gross_pay_decimal = Decimal(gross_pay)
+
+        health = Decimal(payroll.insurance_health)
+        care = Decimal(payroll.insurance_care)
+        employment = Decimal(payroll.insurance_employment)
+        pension = Decimal(payroll.insurance_pension)
+
+        if rate:
+            if health == 0:
+                health = (
+                    gross_pay_decimal * rate.health_insurance_rate / Decimal("100")
+                ).quantize(Decimal("1E1"), rounding=ROUND_DOWN)
+            if care == 0:
+                care = (health * rate.long_term_care_rate / Decimal("100")).quantize(
+                    Decimal("1E1"), rounding=ROUND_DOWN
+                )
+            if employment == 0:
+                employment = (
+                    gross_pay_decimal * rate.employment_insurance_rate / Decimal("100")
+                ).quantize(Decimal("1E1"), rounding=ROUND_DOWN)
+            if pension == 0:
+                pension = (
+                    gross_pay_decimal * rate.national_pension_rate / Decimal("100")
+                ).quantize(Decimal("1E1"), rounding=ROUND_DOWN)
+
+        total_deduction = health + care + employment + pension
+
+        total_work_days = (
+            db.query(Attendance.work_date)
+            .filter(
+                Attendance.user_id == payroll.user_id,
+                Attendance.work_date >= date(payroll.year, payroll.month, 1),
+                Attendance.work_date < (
+                        date(payroll.year, payroll.month, 1) + timedelta(days=32)
+                ).replace(day=1),
+                Attendance.check_out.isnot(None),
+            )
+            .distinct()
+            .count()
         )
 
         return PayrollResponse(
@@ -91,27 +133,37 @@ class PayrollService:
             rrn=user.ssn,
             join_date=user.hire_date,
             resign_date=user.retire_date,
-            email=user.email,
+            last_work_day=payroll.last_work_day,
             bank_name=user.bank_name,
             bank_account=user.account_number,
+            email=user.email,
+            total_work_days=total_work_days,
+
             # 근무 요약
             total_work_hours=total_work_hours,
-            avg_daily_hours=(total_work_hours / 20 if total_work_hours else None),
+            avg_daily_hours=float(total_work_hours / total_work_days),
             # 근무 시간
             day_hours=float(payroll.day_hours),
             night_hours=float(payroll.night_hours),
             weekly_allowance_hours=float(payroll.weekly_allowance_hours),
+            annual_leave_hours=float(user.annual_leave_hours or 0),
             holiday_hours=float(payroll.holiday_hours),
+            day_wage=day_wage,
+            night_wage=night_wage,
+            weekly_allowance_pay=weekly_allowance_pay,
+            annual_leave_pay=int(annual_leave_pay),
+            holiday_pay=holiday_pay,
             # 급여
             gross_pay=gross_pay,
             # 공제
-            insurance_health=payroll.insurance_health,
-            insurance_care=payroll.insurance_care,
-            insurance_employment=payroll.insurance_employment,
-            insurance_pension=payroll.insurance_pension,
+            insurance_health=int(health),
+            insurance_care=int(care),
+            insurance_employment=int(employment),
+            insurance_pension=int(pension),
             total_deduction=total_deduction,
             net_pay=gross_pay - total_deduction,
         )
+
 
     # 일반 사용자 Response
     @staticmethod
