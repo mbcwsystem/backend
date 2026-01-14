@@ -12,7 +12,9 @@ from app.modules.admin import schemas, models
 from app.modules.admin.schemas import InsuranceRateCreate, InsuranceRateResponse
 from app.modules.admin.models import InsuranceRate
 
-router = APIRouter(tags=["관리자"])
+router = APIRouter()
+holiday_router = APIRouter()
+
 
 load_dotenv()
 HOLIDAY_API_KEY = os.getenv("HOLIDAY_API_KEY")
@@ -24,7 +26,7 @@ if not HOLIDAY_API_KEY:
 # ---------- 공휴일 ----------
 
 
-@router.post(
+@holiday_router.post(
     "/holidays",
     status_code=status.HTTP_201_CREATED,
     summary="공휴일 자동 등록",
@@ -73,7 +75,7 @@ def sync_holidays(
     return {"year": year, "saved": saved}
 
 
-@router.get(
+@holiday_router.get(
     "/holidays",
     response_model=list[schemas.HolidayOut],
     summary="공휴일 조회",
@@ -93,7 +95,7 @@ def list_holidays(
     )
 
 
-@router.put(
+@holiday_router.put(
     "/holidays/{holiday_id}",
     response_model=schemas.HolidayOut,
     summary="공휴일 수정",
@@ -118,7 +120,7 @@ def update_holiday(
     return holiday
 
 
-@router.delete(
+@holiday_router.delete(
     "/holidays/{holiday_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="공휴일 삭제",
