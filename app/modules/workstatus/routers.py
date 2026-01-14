@@ -375,6 +375,8 @@ def submit_attendance_all_in_one(
             status_code=400,
             detail="근무 시간이 0보다 작을 수 없습니다. 시간 입력을 확인하세요.",
         )
+    db.commit()
+    db.refresh(record)
 
     # 여기서 퇴근 처리 + Payroll 반영
     AttendanceService.handle_check_out(

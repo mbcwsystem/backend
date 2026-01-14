@@ -125,8 +125,6 @@ class AttendanceService:
         db: Session,
         record: models.Attendance,
     ) -> models.Attendance:
-        if record.is_payroll_applied:
-            return record
         day_minutes, night_minutes, break_minutes = AttendanceService.calc_work_minutes(
             record
         )
@@ -145,6 +143,8 @@ class AttendanceService:
             payroll.night_hours = Decimal("0.00")
         if payroll.break_hours is None:
             payroll.break_hours = Decimal("0.00")
+        if payroll.holiday_hours is None:
+            payroll.holiday_hours = Decimal("0.00")
 
         # 누적
         payroll.day_hours += AttendanceService.minutes_to_hours(day_minutes)
@@ -157,6 +157,123 @@ class AttendanceService:
             )
 
         payroll.last_work_day = record.work_date
+
+        # =========================
+        # ISO 주 기준 정보
+        # =========================
+        work_date = record.work_date
+        iso_year, iso_week, iso_weekday = work_date.isocalendar()
+
+        # =========================
+        # 해당 ISO 주 누적 근무시간 계산
+        # =========================
+        weekly_total_minutes = 0
+
+        week_start = work_date - timedelta(days=iso_weekday - 1)
+
+        # ISO 주 끝 (일요일)
+        week_end = week_start + timedelta(days=6)
+
+        weekly_records = (
+            db.query(models.Attendance)
+            .filter(
+                models.Attendance.user_id == record.user_id,
+                models.Attendance.check_out.isnot(None),
+                models.Attendance.work_date >= week_start,
+                models.Attendance.work_date <= week_end,
+            )
+            .all()
+        )
+
+        weekly_work_days = set()
+
+        for r in weekly_records:
+            weekly_work_days.add(r.work_date)
+            weekly_total_minutes += r.total_work_minutes
+
+        weekly_total_hours = (Decimal(weekly_total_minutes) / Decimal("60")).quantize(
+            Decimal("0.01")
+        )
+
+        # =========================
+        # 주휴 발생 조건: 주 15시간 이상
+        # =========================
+        if weekly_total_hours < Decimal("15.00"):
+            db.flush()
+            record.is_payroll_applied = True
+            return record
+
+        # =========================
+        # Recalculate MONTHLY weekly allowance (overwrite)
+        # =========================
+
+        # Get current payroll (month based)
+        current_payroll = AttendanceService.get_or_create_payroll(
+            db=db,
+            user_id=record.user_id,
+            work_date=record.work_date,
+        )
+
+        monthly_weekly_allowance_hours = Decimal("0.00")
+
+        # Fetch all attendance records in the same month
+        monthly_records = (
+            db.query(models.Attendance)
+            .filter(
+                models.Attendance.user_id == record.user_id,
+                models.Attendance.check_out.isnot(None),
+                models.Attendance.work_date
+                >= date(current_payroll.year, current_payroll.month, 1),
+                models.Attendance.work_date
+                < (
+                    date(current_payroll.year, current_payroll.month, 1)
+                    + timedelta(days=32)
+                ).replace(day=1),
+            )
+            .all()
+        )
+
+        # Group by ISO week
+        weeks = {}
+
+        for r in monthly_records:
+            y, w, _ = r.work_date.isocalendar()
+            weeks.setdefault((y, w), []).append(r)
+
+        for (y, w), records in weeks.items():
+            week_start = min(r.work_date for r in records)
+            week_end = week_start + timedelta(days=6)
+
+            # 주 종료일이 현재 Payroll 월이 아니면 제외
+            if week_end.month != current_payroll.month:
+                continue
+
+            total_minutes = 0
+            work_days = set()
+
+            for r in records:
+                total_minutes += r.total_work_minutes
+                work_days.add(r.work_date)
+            if not work_days:
+                continue
+
+            total_hours = (Decimal(total_minutes) / Decimal("60")).quantize(
+                Decimal("0.01")
+            )
+
+            if total_hours < Decimal("15.00"):
+                continue
+
+            weekly_allowance = (total_hours / Decimal(len(work_days))).quantize(
+                Decimal("0.01")
+            )
+
+            monthly_weekly_allowance_hours += weekly_allowance
+
+        # 🔥 OVERWRITE (not +=)
+        current_payroll.weekly_allowance_hours = monthly_weekly_allowance_hours
+
+        db.flush()
         record.is_payroll_applied = True
 
         return record
