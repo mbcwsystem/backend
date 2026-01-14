@@ -12,9 +12,10 @@ from sqlalchemy import (
     String,
     ForeignKey,
     DateTime,
+    DECIMAL,
 )
 from sqlalchemy.orm import relationship
-
+from decimal import Decimal
 from app.core.database import Base
 
 
@@ -52,6 +53,9 @@ class User(Base):
     retire_date = Column(Date, nullable=True, comment="퇴사일")
     unavailable_days = Column(JSON, nullable=True, comment="고정 불가 요일 리스트")
     health_cert_expire = Column(Date, nullable=True, comment="보건증 만료일")
+    annual_leave_hours = Column(
+        DECIMAL(3, 1), default=Decimal("5.5"), comment="연차 시간"
+    )
     is_active = Column(Boolean, default=True, comment="재직 상태")
 
     # 문자열로 충분. 이 라인이 매퍼 구성 시점에 Payroll을 필요로 함

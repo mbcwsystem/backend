@@ -311,10 +311,10 @@ class AttendanceAllInOneInput(BaseModel):
                 "username": "user",
                 "password": "user",
                 "work_date": "2026-01-01",
-                "check_in": "09:00:00",
-                "break_start": "12:00:00",
-                "break_end": "13:00:00",
-                "check_out": "18:00:00",
+                "check_in": "14:00:00",
+                "break_start": "15:00:00",
+                "break_end": "16:00:00",
+                "check_out": "23:00:00",
             }
         }
 
@@ -375,6 +375,8 @@ def submit_attendance_all_in_one(
             status_code=400,
             detail="근무 시간이 0보다 작을 수 없습니다. 시간 입력을 확인하세요.",
         )
+    db.commit()
+    db.refresh(record)
 
     # 여기서 퇴근 처리 + Payroll 반영
     AttendanceService.handle_check_out(

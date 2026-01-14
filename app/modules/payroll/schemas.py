@@ -104,7 +104,7 @@ class PayrollPayResponse(BaseModel):
     weekly_allowance_pay: Optional[int] = None  # 주휴수당
     annual_leave_pay: Optional[int] = None  # 연차수당
     holiday_pay: Optional[int] = None  # 법정공휴일수당
-    extra_pay: Optional[int] = None  # 기타수당
+    # extra_pay: Optional[int] = None  # 기타수당
 
     gross_pay: Optional[int] = None  # 급여총액
 
