@@ -1,9 +1,10 @@
 from typing import List, Optional, Union
-
+from decimal import Decimal, ROUND_DOWN
 from sqlalchemy.orm import Session
 
+from app.modules.admin.models import InsuranceRate
 from app.modules.auth.models import User
-from app.modules.payroll.models import Payroll
+from app.modules.payroll.models import Payroll, PayrollPayDate
 from app.modules.payroll.schemas import (
     PayrollPayResponse,
     PayrollResponse,
@@ -59,7 +60,7 @@ class PayrollService:
         if not payroll:
             return PayrollPayResponse()
 
-        return PayrollService._to_user_pay_response(payroll)
+        return PayrollService._to_user_pay_response(payroll, db)
 
     # 관리자 Response
     @staticmethod
@@ -114,41 +115,87 @@ class PayrollService:
 
     # 일반 사용자 Response
     @staticmethod
-    def _to_user_pay_response(payroll: Payroll) -> PayrollPayResponse:
+    def _to_user_pay_response(payroll: Payroll,db: Session,) -> PayrollPayResponse:
         user = payroll.user
+        pay_date = get_pay_date(db, payroll.year, payroll.month)
 
         day_pay = int(payroll.wage * float(payroll.day_hours))
         night_pay = int(payroll.wage * (float(payroll.night_hours) * 1.5))
         weekly_allowance_pay = int(payroll.wage * float(payroll.weekly_allowance_hours))
+        annual_leave_pay = 0
         holiday_pay = int(payroll.wage * (float(payroll.holiday_hours) * 1.5))
-        gross_pay = day_pay + night_pay + weekly_allowance_pay
-
-        total_deduction = (
-            payroll.insurance_health
-            + payroll.insurance_care
-            + payroll.insurance_employment
-            + payroll.insurance_pension
+        gross_pay = (
+            day_pay + night_pay + weekly_allowance_pay + annual_leave_pay + holiday_pay
         )
+        rate_year = get_insurance_rate_year(payroll.year, payroll.month)
+        rate = get_insurance_rate(db, rate_year)
+
+        gross_pay_decimal = Decimal(gross_pay)
+
+        health = Decimal(payroll.insurance_health)
+        care = Decimal(payroll.insurance_care)
+        employment = Decimal(payroll.insurance_employment)
+        pension = Decimal(payroll.insurance_pension)
+
+        if rate:
+            if health == 0:
+                health = (
+                    gross_pay_decimal * rate.health_insurance_rate / Decimal("100")
+                ).quantize(Decimal("1E1"), rounding=ROUND_DOWN)
+            if care == 0:
+                care = (health * rate.long_term_care_rate / Decimal("100")).quantize(
+                    Decimal("1E1"), rounding=ROUND_DOWN
+                )
+            if employment == 0:
+                employment = (
+                    gross_pay_decimal * rate.employment_insurance_rate / Decimal("100")
+                ).quantize(Decimal("1E1"), rounding=ROUND_DOWN)
+            if pension == 0:
+                pension = (
+                    gross_pay_decimal * rate.national_pension_rate / Decimal("100")
+                ).quantize(Decimal("1E1"), rounding=ROUND_DOWN)
+
+        total_deduction = health + care + employment + pension
 
         return PayrollPayResponse(
             # 기본 정보
             name=user.name,
             birth_date=user.birth_date,
-            pay_date=None,  # TODO: 지급일 컬럼/테이블 추가 시 연결
+            pay_date=pay_date,
             # 급여 항목
-            day_wage=day_pay,
-            night_wage=night_pay,
-            weekly_allowance_pay=weekly_allowance_pay,
-            annual_leave_pay=0,
-            holiday_pay=holiday_pay,
-            extra_pay=0,
-            gross_pay=gross_pay,
+            day_wage=day_pay,  # 주간
+            night_wage=night_pay,  # 야간
+            weekly_allowance_pay=weekly_allowance_pay,  # 주휴
+            annual_leave_pay=0,  # 연차
+            holiday_pay=holiday_pay,  # 공휴일
+            # extra_pay=0, 기타수당 제거예쩡
+            gross_pay=gross_pay,  # 급여 총계
             # 공제
-            insurance_health=payroll.insurance_health,
-            insurance_care=payroll.insurance_care,
-            insurance_employment=payroll.insurance_employment,
-            insurance_pension=payroll.insurance_pension,
-            total_deduction=total_deduction,
+            insurance_health=int(health),  # 건강
+            insurance_care=int(care),  # 요양
+            insurance_employment=int(employment),  # 고용
+            insurance_pension=int(pension),  # 국민
+            total_deduction=int(total_deduction),  # 공제계
             # 실지급액
-            net_pay=gross_pay - total_deduction,
+            net_pay=gross_pay - int(total_deduction),
         )
+
+
+def get_insurance_rate_year(year: int, month: int) -> int:
+    # 1~6월: 전년도 보험료율, 7~12월: 해당 연도 보험료율
+    return year if month >= 7 else year - 1
+
+
+def get_insurance_rate(db: Session, rate_year: int):
+    return db.query(InsuranceRate).filter(InsuranceRate.year == rate_year).first()
+
+def get_pay_date(db: Session, year: int, month: int):
+    pay_date = (
+        db.query(PayrollPayDate)
+        .filter(
+            PayrollPayDate.year == year,
+            PayrollPayDate.month == month,
+        )
+        .first()
+    )
+    return pay_date.pay_date if pay_date else None

@@ -74,10 +74,21 @@ class HolidayOut(BaseModel):
 class InsuranceRateCreate(BaseModel):
     year: int
 
-    national_pension_rate: Decimal
-    health_insurance_rate: Decimal
-    long_term_care_rate: Decimal
-    employment_insurance_rate: Decimal
+    national_pension_rate: Decimal  # 국민연금
+    health_insurance_rate: Decimal  # 건강보험
+    long_term_care_rate: Decimal  # 요양보험
+    employment_insurance_rate: Decimal  # 고용보험
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "year": "2025",
+                "national_pension_rate": "4.75",
+                "health_insurance_rate": "3.595",
+                "long_term_care_rate": "12.95",
+                "employment_insurance_rate": "0.9",
+            }
+        }
 
 
 class InsuranceRateUpdate(BaseModel):
