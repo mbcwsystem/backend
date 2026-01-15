@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import get_current_admin
 from app.modules.wage import models, schemas, services
 
 router = APIRouter()
@@ -11,7 +12,7 @@ admin_router = APIRouter()
 @router.post(
     "/user", response_model=schemas.UserWageResponse, summary="유저 전용 시급 설정"
 )  #
-def create_user_wage(data: schemas.UserWageCreate, db: Session = Depends(get_db)):
+def create_user_wage(data: schemas.UserWageCreate, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     record = models.UserWage(**data.dict())
     db.add(record)
     db.commit()
@@ -24,7 +25,7 @@ def create_user_wage(data: schemas.UserWageCreate, db: Session = Depends(get_db)
     response_model=list[schemas.UserWageResponse],
     summary="유저 전용 시급 조회",
 )  # 유저 전용 시급 조회
-def get_user_wage_list(user_id: int, db: Session = Depends(get_db)):
+def get_user_wage_list(user_id: int, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     records = db.query(models.UserWage).filter(models.UserWage.user_id == user_id).all()
     return records
 
@@ -37,7 +38,7 @@ def get_user_wage_list(user_id: int, db: Session = Depends(get_db)):
 )
 def sync_default_wage(
     year: int,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db), admin=Depends(get_current_admin)
 ):
     """
     연도만 입력하면
@@ -70,7 +71,7 @@ def sync_default_wage(
     response_model=list[schemas.DefaultWageResponse],
     summary="연도별 최저임금 조회",
 )  # 연도별 최저임금 조회
-def list_default_wages(db: Session = Depends(get_db)):
+def list_default_wages(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     return db.query(models.DefaultWage).order_by(models.DefaultWage.year.desc()).all()
 
 
@@ -79,7 +80,7 @@ def list_default_wages(db: Session = Depends(get_db)):
     status_code=status.HTTP_201_CREATED,
     summary="최저임금 불러오기",
 )
-def sync_all_default_wages(db: Session = Depends(get_db)):
+def sync_all_default_wages(db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     """
     최저임금위원회 사이트 기준
     존재하는 모든 연도 최저임금 DB에 등록
