@@ -60,16 +60,13 @@ def on_startup():
     db = SessionLocal()
 
     try:
-        admin = db.query(User).filter_by(
-            username=settings.ADMIN_USERNAME
-        ).first()
+        admin = db.query(User).filter_by(username=settings.ADMIN_USERNAME).first()
 
         if not admin:
-
             admin = User(
                 username=settings.ADMIN_USERNAME,
                 password=hash_password(settings.ADMIN_PASSWORD),
-                birth_date=date(1998,2,4),
+                birth_date=date(1998, 2, 4),
                 name=settings.ADMIN_NAME,
                 position=PositionEnum.manager,
                 gender=GenderEnum.male,
@@ -112,7 +109,7 @@ def on_startup():
                     User(
                         username=u["username"],
                         password=hash_password(u["password"]),
-                        birth_date=date(1998,2,4),
+                        birth_date=date(1998, 2, 4),
                         name=u["name"],
                         position=u["position"],
                         gender=u["gender"],
