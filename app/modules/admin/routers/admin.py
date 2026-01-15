@@ -81,8 +81,7 @@ def sync_holidays(
     summary="공휴일 조회",
 )
 def list_holidays(
-    year: int,
-    db: Session = Depends(get_db), admin=Depends(get_current_admin)
+    year: int, db: Session = Depends(get_db), admin=Depends(get_current_admin)
 ):
     start = date(year, 1, 1)
     end = date(year, 12, 31)
@@ -169,8 +168,7 @@ def create_insurance_rate(
     summary="4대보험 요율 연도 조회",
 )
 def get_insurance_rate(
-    year: int,
-    db: Session = Depends(get_db), _admin=Depends(get_current_admin)
+    year: int, db: Session = Depends(get_db), _admin=Depends(get_current_admin)
 ):
     rate = db.query(InsuranceRate).filter_by(year=year).first()
     if not rate:
