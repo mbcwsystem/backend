@@ -171,8 +171,8 @@ class PayrollService:
             insurance_care=int(care),
             insurance_employment=int(employment),
             insurance_pension=int(pension),
-            total_deduction=total_deduction,
-            net_pay=gross_pay - total_deduction,
+            total_deduction=int(total_deduction),
+            net_pay=gross_pay - int(total_deduction),
         )
 
     # 일반 사용자 Response
