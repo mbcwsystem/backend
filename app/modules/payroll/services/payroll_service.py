@@ -1,5 +1,6 @@
+from decimal import ROUND_DOWN, Decimal
 from typing import List, Optional, Union
-from decimal import Decimal, ROUND_DOWN
+
 from sqlalchemy.orm import Session
 
 from app.modules.admin.models import InsuranceRate

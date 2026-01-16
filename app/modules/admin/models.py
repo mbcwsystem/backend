@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from sqlalchemy import Column, Integer, Date, String, UniqueConstraint, DECIMAL
+
+from sqlalchemy import DECIMAL, Column, Date, Integer, String, UniqueConstraint
 
 from app.core.config import TimeStampedMixin
 from app.core.database import Base

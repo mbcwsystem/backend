@@ -1,9 +1,9 @@
-import requests
 import re
-from bs4 import BeautifulSoup
-from fastapi import HTTPException
 from datetime import date
 
+import requests
+from bs4 import BeautifulSoup
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.modules.wage.models import DefaultWage, UserWage

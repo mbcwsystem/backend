@@ -2,20 +2,22 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime
+from decimal import Decimal
+
 from sqlalchemy import (
+    DECIMAL,
     JSON,
     Boolean,
     Column,
     Date,
+    DateTime,
     Enum,
+    ForeignKey,
     Integer,
     String,
-    ForeignKey,
-    DateTime,
-    DECIMAL,
 )
 from sqlalchemy.orm import relationship
-from decimal import Decimal
+
 from app.core.database import Base
 
 

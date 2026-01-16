@@ -1,4 +1,4 @@
-from datetime import date, timedelta, datetime, time
+from datetime import date, datetime, time, timedelta
 
 from fastapi import HTTPException
 
@@ -20,15 +20,8 @@ def apply_day_off(db, user, data) -> DayOffRequest:
     if req_start_date != req_end_date:
         raise HTTPException(400, detail="휴무는 하루 단위로 신청할 수 있습니다.")
 
-
     # 신청 전에 내가 신청하는 날이 휴무인지 확인
-    holiday = (
-        db.query(Holiday)
-        .filter(
-            Holiday.date == req_start_date
-        )
-        .first()
-    )
+    holiday = db.query(Holiday).filter(Holiday.date == req_start_date).first()
 
     # 기본값: 프론트에서 보낸 값
     is_holiday = data.is_holiday
@@ -52,10 +45,10 @@ def apply_day_off(db, user, data) -> DayOffRequest:
             .count()
         )
 
-
         if count >= 2:
             raise HTTPException(
-                409, detail="해당 달에 공휴일/주말 휴무는 최대 2회까지 신청할 수 있습니다."
+                409,
+                detail="해당 달에 공휴일/주말 휴무는 최대 2회까지 신청할 수 있습니다.",
             )
 
     # 스케줄 겹침 체크도 하루 범위로 잡는 게 안전

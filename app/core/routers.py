@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.modules.admin.routers import users_router, admin_router
+from app.modules.admin.routers import admin_router, users_router
 from app.modules.admin.routers.admin import holiday_router
 from app.modules.wage.routers import admin_router as wage_admin_router
 

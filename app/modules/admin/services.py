@@ -7,12 +7,12 @@ from sqlalchemy.orm import Session
 
 from app.modules.admin import schemas
 from app.modules.admin.models import Holiday, InsuranceRate
-from app.modules.auth.models import User
-from app.modules.auth.services import hash_password
 from app.modules.admin.schemas import (
     InsuranceRateCreate,
     InsuranceRateUpdate,
 )
+from app.modules.auth.models import User
+from app.modules.auth.services import hash_password
 
 
 # --------- Users ----------
