@@ -10,8 +10,7 @@ from app.modules.schedule.schemas import (
     ScheduleResponse,
     ScheduleUpdateRequest,
 )
-from app.utils.permission_utils import is_admin, is_system
-
+from app.utils.permission_utils import is_admin
 
 def _build_schedule_response(schedule: Schedule) -> ScheduleResponse:
     return ScheduleResponse(

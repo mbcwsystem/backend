@@ -40,7 +40,7 @@ def apply_day_off(db, user, data) -> DayOffRequest:
                 DayOffRequest.start_date >= month_start,
                 DayOffRequest.start_date <= month_end,
                 DayOffRequest.status.in_([Status.pending, Status.approved]),
-                DayOffRequest.is_holiday == True,
+                DayOffRequest.is_holiday.is_(True),
             )
             .count()
         )
