@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -11,7 +12,7 @@ class DayOffApplyRequest(BaseModel):
     start_date: datetime
     end_date: datetime
     reason: str
-    is_holiday: bool
+    is_holiday: bool = False
 
     class Config:
         orm_mode = True
