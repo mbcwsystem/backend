@@ -39,6 +39,7 @@ def sync_holidays(
     url = (
         "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
     )
+
     params = {
         "serviceKey": HOLIDAY_API_KEY,
         "solYear": year,
