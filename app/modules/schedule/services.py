@@ -12,6 +12,7 @@ from app.modules.schedule.schemas import (
 )
 from app.utils.permission_utils import is_admin
 
+
 def _build_schedule_response(schedule: Schedule) -> ScheduleResponse:
     return ScheduleResponse(
         id=schedule.id,
