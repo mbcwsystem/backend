@@ -42,7 +42,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, nullable=False, comment="로그인 ID")
     password = Column(String(255), nullable=False, comment="비밀번호(해시 저장)")
-    name = Column(String(50), nullable=False, comment="이름")
+    name = Column(String(10), nullable=False, comment="이름")
     position = Column(Enum(PositionEnum), nullable=False, comment="직급")
     gender = Column(Enum(GenderEnum), nullable=True, comment="성별")
     birth_date = Column(Date, nullable=True, comment="생년월일")
