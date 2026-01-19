@@ -65,6 +65,9 @@ class Settings(BaseSettings):
     # Holiday config
     HOLIDAY_API_KEY: str
 
+    # ssn
+    SSN_SECRET_KEY: str
+
     @property
     def DATABASE_URL(self) -> str:
         return (

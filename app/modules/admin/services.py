@@ -1,10 +1,10 @@
+# app/modules/admin/services.py
 from datetime import date
 from typing import List, Optional, Tuple
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-
 from app.modules.admin import schemas
 from app.modules.admin.models import Holiday, InsuranceRate
 from app.modules.admin.schemas import (
@@ -12,27 +12,50 @@ from app.modules.admin.schemas import (
     InsuranceRateUpdate,
 )
 from app.modules.auth.models import User
-from app.modules.auth.services import hash_password
+from app.modules.auth.services import hash_password, encrypt_ssn, decrypt_ssn
 
 
 # --------- Users ----------
 def create_user(db: Session, data: schemas.UserCreate) -> User:
     user = User(
         username=data.username,
-        password=hash_password(data.password),  # ← 해시 저장
+        password=hash_password(data.password),
         name=data.name,
         position=data.position,
         gender=data.gender,
+        birth_date=data.birth_date,
+        ssn=encrypt_ssn(data.ssn) if data.ssn else None,
         phone=data.phone,
-        email=data.email,
+        email=str(data.email) if data.email else None,
+        bank_name=data.bank_name,
+        account_number=data.account_number,
+        hire_date=data.hire_date,
+        retire_date=data.retire_date,
+        unavailable_days=data.unavailable_days,
+        health_cert_expire=data.health_cert_expire,
         is_active=data.is_active,
     )
+
     db.add(user)
+
     try:
         db.flush()
     except IntegrityError:
         db.rollback()
         raise ValueError("이미 사용 중인 username 입니다.")
+
+    return user
+
+
+def get_user_detail(db: Session, memberId: int) -> User:
+    user = db.get(User, memberId)
+    if not user:
+        raise LookupError("사용자를 찾을 수 없습니다.")
+
+    # 관리자만 복호화
+    if user.ssn:
+        user.ssn = decrypt_ssn(user.ssn)
+
     return user
 
 

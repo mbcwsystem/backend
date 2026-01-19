@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-
 import jwt
 from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from cryptography.fernet import Fernet
 
 from app.core.config import settings
 from app.modules.auth.models import PositionEnum, User
@@ -73,3 +73,14 @@ def create_refresh_token(*, sub: str) -> tuple[str, datetime]:
         algorithm=settings.JWT_ALGORITHM,
     )
     return token, exp
+
+
+fernet = Fernet(settings.SSN_SECRET_KEY)
+
+
+def encrypt_ssn(ssn: str) -> str:
+    return fernet.encrypt(ssn.encode()).decode()
+
+
+def decrypt_ssn(token: str) -> str:
+    return fernet.decrypt(token.encode()).decode()
