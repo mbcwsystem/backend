@@ -24,6 +24,7 @@ def create_user(db: Session, data: schemas.UserCreate) -> User:
         name=data.name,
         position=data.position,
         gender=data.gender,
+        birth_date=data.birth_date,
         ssn=encrypt_ssn(data.ssn) if data.ssn else None,
         phone=data.phone,
         email=str(data.email) if data.email else None,

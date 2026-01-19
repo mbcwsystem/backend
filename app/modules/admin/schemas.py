@@ -18,6 +18,7 @@ class UserCreate(BaseModel):
     name: str = Field(min_length=2, max_length=10)
     position: PositionEnum
     gender: GenderEnum
+    birth_date: Optional[date] = None
     ssn: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[EmailStr] = None
