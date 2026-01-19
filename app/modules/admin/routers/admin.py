@@ -74,6 +74,7 @@ def sync_holidays(
     db.commit()
     return {"year": year, "saved": saved}
 
+
 @holiday_router.post(
     "/holidays",
     response_model=schemas.HolidayOut,
@@ -86,9 +87,7 @@ def create_holiday_manual(
     _admin=Depends(get_current_admin),
 ):
     exists = (
-        db.query(models.Holiday)
-        .filter(models.Holiday.date == payload.date)
-        .first()
+        db.query(models.Holiday).filter(models.Holiday.date == payload.date).first()
     )
     if exists:
         raise HTTPException(status_code=409, detail="이미 존재하는 공휴일입니다")
@@ -98,6 +97,7 @@ def create_holiday_manual(
     db.commit()
     db.refresh(holiday)
     return holiday
+
 
 @holiday_router.get(
     "/holidays",
