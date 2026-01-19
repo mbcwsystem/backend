@@ -5,7 +5,6 @@ from typing import List, Optional, Tuple
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-
 from app.modules.admin import schemas
 from app.modules.admin.models import Holiday, InsuranceRate
 from app.modules.admin.schemas import (
@@ -13,7 +12,7 @@ from app.modules.admin.schemas import (
     InsuranceRateUpdate,
 )
 from app.modules.auth.models import User
-from app.modules.auth.services import hash_password, encrypt_ssn
+from app.modules.auth.services import hash_password, encrypt_ssn, decrypt_ssn
 
 
 # --------- Users ----------
@@ -44,6 +43,17 @@ def create_user(db: Session, data: schemas.UserCreate) -> User:
     except IntegrityError:
         db.rollback()
         raise ValueError("이미 사용 중인 username 입니다.")
+
+    return user
+
+def get_user_detail(db: Session, memberId: int) -> User:
+    user = db.get(User, memberId)
+    if not user:
+        raise LookupError("사용자를 찾을 수 없습니다.")
+
+    # 관리자만 복호화
+    if user.ssn:
+        user.ssn = decrypt_ssn(user.ssn)
 
     return user
 

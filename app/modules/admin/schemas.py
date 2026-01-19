@@ -53,6 +53,15 @@ class UserOut(BaseModel):
     class Config:
         from_attributes = True
 
+class UserDetailOut(UserOut):
+    ssn: Optional[str]
+    bank_name: Optional[str]
+    account_number: Optional[str]
+    hire_date: Optional[date]
+    retire_date: Optional[date]
+    unavailable_days: Optional[list[int]]
+    health_cert_expire: Optional[date]
+
 
 class PaginatedUsers(BaseModel):
     total: int
