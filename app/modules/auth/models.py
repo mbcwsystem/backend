@@ -46,7 +46,7 @@ class User(Base):
     position = Column(Enum(PositionEnum), nullable=False, comment="직급")
     gender = Column(Enum(GenderEnum), nullable=True, comment="성별")
     birth_date = Column(Date, nullable=True, comment="생년월일")
-    ssn = Column(String(20), nullable=True, comment="주민등록번호(암호화/마스킹)")
+    ssn = Column(String(255), nullable=True, comment="주민등록번호(암호화/마스킹)")
     phone = Column(String(20), nullable=True, comment="휴대폰번호")
     email = Column(String(100), nullable=True, comment="이메일")
     bank_name = Column(String(50), nullable=True, comment="은행명")
