@@ -27,7 +27,7 @@ if not HOLIDAY_API_KEY:
 
 
 @holiday_router.post(
-    "/holidays",
+    "/holidays/all",
     status_code=status.HTTP_201_CREATED,
     summary="공휴일 자동 등록",
 )
@@ -74,6 +74,30 @@ def sync_holidays(
     db.commit()
     return {"year": year, "saved": saved}
 
+@holiday_router.post(
+    "/holidays",
+    response_model=schemas.HolidayOut,
+    status_code=status.HTTP_201_CREATED,
+    summary="공휴일 수동 등록",
+)
+def create_holiday_manual(
+    payload: schemas.HolidayCreate,
+    db: Session = Depends(get_db),
+    _admin=Depends(get_current_admin),
+):
+    exists = (
+        db.query(models.Holiday)
+        .filter(models.Holiday.date == payload.date)
+        .first()
+    )
+    if exists:
+        raise HTTPException(status_code=409, detail="이미 존재하는 공휴일입니다")
+
+    holiday = models.Holiday(**payload.dict())
+    db.add(holiday)
+    db.commit()
+    db.refresh(holiday)
+    return holiday
 
 @holiday_router.get(
     "/holidays",
