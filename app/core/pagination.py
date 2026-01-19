@@ -1,5 +1,5 @@
 import math
-from typing import Callable, Any, TypeVar
+from typing import Any, Callable, TypeVar
 
 from sqlalchemy.orm import Query
 

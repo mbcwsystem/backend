@@ -46,7 +46,6 @@ class ScheduleResponse(BaseModel):
     week_number: int
     year: int
     month: int | None  # 월 스냅샷 (표시용)
-    is_holiday: bool
 
     class Config:
         from_attributes = True

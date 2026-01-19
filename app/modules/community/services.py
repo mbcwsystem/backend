@@ -1,12 +1,12 @@
 from datetime import date, datetime
 
 from fastapi import HTTPException
-from sqlalchemy import func, exists, and_
+from sqlalchemy import and_, exists, func
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.pagination import paginate
 from app.modules.auth.models import User
-from app.modules.community.models import CategoryEnum, Comment, Post, CommentLike
+from app.modules.community.models import CategoryEnum, Comment, CommentLike, Post
 from app.modules.community.permissions import (
     can_delete_comment,
     can_delete_post,
@@ -19,11 +19,11 @@ from app.modules.community.schemas import (
     CommentCreate,
     CommentResponse,
     CommentUpdate,
+    PaginatedResponse,
     PostCreate,
+    PostListResponse,
     PostResponse,
     PostUpdate,
-    PaginatedResponse,
-    PostListResponse,
 )
 
 

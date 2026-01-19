@@ -1,16 +1,17 @@
 import os
-import requests
 from datetime import date
+
+import requests
+from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from dotenv import load_dotenv
 
 from app.core.database import get_db
 from app.core.security import get_current_admin
-from app.modules.admin import schemas, models
-from app.modules.admin.schemas import InsuranceRateCreate, InsuranceRateResponse
+from app.modules.admin import models, schemas
 from app.modules.admin.models import InsuranceRate
+from app.modules.admin.schemas import InsuranceRateCreate, InsuranceRateResponse
 
 router = APIRouter()
 holiday_router = APIRouter()
@@ -39,6 +40,7 @@ def sync_holidays(
     url = (
         "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
     )
+
     params = {
         "serviceKey": HOLIDAY_API_KEY,
         "solYear": year,

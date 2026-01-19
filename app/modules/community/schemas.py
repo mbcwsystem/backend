@@ -1,12 +1,11 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Generic, TypeVar
+from typing import Generic, List, Optional, TypeVar
 
 from pydantic import BaseModel, Field
 
 from app.modules.auth.models import PositionEnum
 from app.modules.community.models import CategoryEnum
-
 
 T = TypeVar("T")
 

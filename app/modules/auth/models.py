@@ -2,20 +2,22 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime
+from decimal import Decimal
+
 from sqlalchemy import (
+    DECIMAL,
     JSON,
     Boolean,
     Column,
     Date,
+    DateTime,
     Enum,
+    ForeignKey,
     Integer,
     String,
-    ForeignKey,
-    DateTime,
-    DECIMAL,
 )
 from sqlalchemy.orm import relationship
-from decimal import Decimal
+
 from app.core.database import Base
 
 
@@ -75,6 +77,22 @@ class User(Base):
 
     # 스케줄
     schedules = relationship("Schedule", back_populates="user", cascade="all, delete")
+
+    # 휴무 신청
+    day_off_requests = relationship(
+        "DayOffRequest",
+        foreign_keys="DayOffRequest.user_id",
+        back_populates="user",
+        cascade="all, delete",
+    )
+
+    # 휴무 승인
+    approved_day_off_requests = relationship(
+        "DayOffRequest",
+        foreign_keys="DayOffRequest.approved_by",
+        back_populates="approver",
+        cascade="all, delete",
+    )
 
     # 토큰
     refresh_tokens = relationship(
