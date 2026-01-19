@@ -15,11 +15,18 @@ class UserCreate(BaseModel):
     password: str = Field(
         min_length=4, max_length=255
     )  # 해시 대상(서비스에서 해시하도록)
-    name: str
+    name: str = Field(min_length=2, max_length=10)
     position: PositionEnum
     gender: GenderEnum
+    ssn: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[EmailStr] = None
+    bank_name: Optional[str] = None
+    account_number: Optional[str] = None
+    hire_date: Optional[date] = None
+    retire_date: Optional[date] = None
+    unavailable_days: Optional[list[int]] = None
+    health_cert_expire: Optional[date] = None
     is_active: bool = True
 
 
