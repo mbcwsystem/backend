@@ -28,7 +28,7 @@ if not HOLIDAY_API_KEY:
 
 
 @holiday_router.post(
-    "/holidays",
+    "/holidays/all",
     status_code=status.HTTP_201_CREATED,
     summary="공휴일 자동 등록",
 )
@@ -77,14 +77,37 @@ def sync_holidays(
     return {"year": year, "saved": saved}
 
 
+@holiday_router.post(
+    "/holidays",
+    response_model=schemas.HolidayOut,
+    status_code=status.HTTP_201_CREATED,
+    summary="공휴일 수동 등록",
+)
+def create_holiday_manual(
+    payload: schemas.HolidayCreate,
+    db: Session = Depends(get_db),
+    _admin=Depends(get_current_admin),
+):
+    exists = (
+        db.query(models.Holiday).filter(models.Holiday.date == payload.date).first()
+    )
+    if exists:
+        raise HTTPException(status_code=409, detail="이미 존재하는 공휴일입니다")
+
+    holiday = models.Holiday(**payload.dict())
+    db.add(holiday)
+    db.commit()
+    db.refresh(holiday)
+    return holiday
+
+
 @holiday_router.get(
     "/holidays",
     response_model=list[schemas.HolidayOut],
     summary="공휴일 조회",
 )
 def list_holidays(
-    year: int,
-    db: Session = Depends(get_db),
+    year: int, db: Session = Depends(get_db), admin=Depends(get_current_admin)
 ):
     start = date(year, 1, 1)
     end = date(year, 12, 31)
@@ -171,8 +194,7 @@ def create_insurance_rate(
     summary="4대보험 요율 연도 조회",
 )
 def get_insurance_rate(
-    year: int,
-    db: Session = Depends(get_db),
+    year: int, db: Session = Depends(get_db), _admin=Depends(get_current_admin)
 ):
     rate = db.query(InsuranceRate).filter_by(year=year).first()
     if not rate:
@@ -186,7 +208,7 @@ def get_insurance_rate(
     summary="4대보험 요율 전체 조회",
 )
 def list_insurance_rates(
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db), _admin=Depends(get_current_admin)
 ):
     return db.query(InsuranceRate).order_by(InsuranceRate.year.desc()).all()
 

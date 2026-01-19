@@ -35,7 +35,6 @@ class PayrollResponse(BaseModel):
     weekly_allowance_hours: Optional[float] = None  # 주휴시간
     annual_leave_hours: Optional[float] = None  # 연차시간
     holiday_hours: Optional[float] = None  # 공휴일 근무시간
-    labor_day_hours: Optional[float] = None  # 근로자의 날 근무시간
 
     # 급여
     day_wage: Optional[int] = None  # 주간급여
@@ -43,7 +42,6 @@ class PayrollResponse(BaseModel):
     weekly_allowance_pay: Optional[int] = None  # 주휴수당
     annual_leave_pay: Optional[int] = None  # 연차수당
     holiday_pay: Optional[int] = None  # 공휴일 근무수당
-    labor_day_pay: Optional[int] = None  # 근로자의 날 수당
 
     gross_pay: Optional[int] = None  # 급여총액
 
@@ -64,7 +62,6 @@ class PayrollResponse(BaseModel):
         "weekly_allowance_hours",
         "annual_leave_hours",
         "holiday_hours",
-        "labor_day_hours",
         when_used="json",
     )
     def round_two_decimal(self, value):
