@@ -34,6 +34,7 @@ def create_user(
         db.rollback()
         raise HTTPException(status_code=500, detail="DB error")
 
+
 @router.get(
     "/users",
     response_model=schemas.PaginatedUsers,
@@ -49,16 +50,22 @@ def list_users(
     total, items = services.list_users(db, q, limit, offset)
     return {"total": total, "items": items}
 
-@router.get("/users/{memberId}", response_model=schemas.UserDetailOut, summary="유저 단일조회",)
+
+@router.get(
+    "/users/{memberId}",
+    response_model=schemas.UserDetailOut,
+    summary="유저 단일조회",
+)
 def get_user_detail(
-        memberId: int = Path(..., ge=1),
-        db: Session = Depends(get_db),
-        _admin=Depends(get_current_admin),
+    memberId: int = Path(..., ge=1),
+    db: Session = Depends(get_db),
+    _admin=Depends(get_current_admin),
 ):
     try:
         return services.get_user_detail(db, memberId)
     except LookupError as e:
         raise HTTPException(status_code=404, detail=str(e))
+
 
 @router.patch(
     "/users/{memberId}",

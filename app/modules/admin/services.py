@@ -46,6 +46,7 @@ def create_user(db: Session, data: schemas.UserCreate) -> User:
 
     return user
 
+
 def get_user_detail(db: Session, memberId: int) -> User:
     user = db.get(User, memberId)
     if not user:
