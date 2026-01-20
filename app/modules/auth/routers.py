@@ -50,20 +50,26 @@ def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
 def me(cuurent_user=Depends(get_current_user)):
     return cuurent_user
 
-@router.get("/staff", response_model=list[schemas.StaffResponse], summary="재직중인 리더/크루 목록 조회")
-def staff(db: Session = Depends(get_db),current_user=Depends(get_current_user)):
+
+@router.get(
+    "/staff",
+    response_model=list[schemas.StaffResponse],
+    summary="재직중인 리더/크루 목록 조회",
+)
+def staff(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     if is_system(current_user):
         raise HTTPException(status_code=403, detail="시스템 계정은 조회할 수 없습니다.")
     staff = (
         db.query(User)
         .filter(
-            User.is_active == True,
+            User.is_active.is_(True),
             User.position.in_([PositionEnum.leader, PositionEnum.crew]),
             User.id != current_user.id,
         )
         .all()
     )
     return staff
+
 
 @router.post(
     "/refresh", response_model=schemas.RefreshRequest, summary="리프레쉬 토큰 재발급"
