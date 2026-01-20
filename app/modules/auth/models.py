@@ -87,7 +87,7 @@ class User(Base):
     targeted_schedules = relationship(
         "Schedule",
         foreign_keys="Schedule.target_id",
-        back_populates="user",
+        back_populates="target",
         cascade="all, delete",
     )
 
