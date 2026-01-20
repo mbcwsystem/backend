@@ -39,6 +39,7 @@ def create_schedule(db: Session, user: User, data: ScheduleCreateRequest) -> Sch
 
     schedule = Schedule(
         user_id=user.id,
+        target_id=data.target_id,
         start_date=data.start_date,
         end_date=data.end_date,
         week_number=data.week_number,
