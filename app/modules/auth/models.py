@@ -75,8 +75,18 @@ class User(Base):
         "Comment", back_populates="author", cascade="all, delete-orphan"
     )
 
-    # 스케줄
-    schedules = relationship("Schedule", back_populates="user", cascade="all, delete")
+    # 내가 만든 스케줄들 (관리자/바이저)
+    created_schedules = relationship(
+        "Schedule",
+        foreign_keys="Schedule.user_id",
+        back_populates="creator",
+        cascade="all, delete"
+    )
+
+    # 내가 대상이 된 스케줄들 (직원)
+    targeted_schedules = relationship("Schedule",
+                                      foreign_keys="Schedule.target_id",
+                                      back_populates="user", cascade="all, delete")
 
     # 휴무 신청
     day_off_requests = relationship(

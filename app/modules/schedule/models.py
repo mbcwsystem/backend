@@ -15,7 +15,13 @@ class Schedule(Base):
     __tablename__ = "schedule"
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    # 스케줄 대상 사용자 ID
+    # - 일반 직원: 본인 ID
+    # - 관리자/바이저: 스케줄을 생성/수정할 대상 직원 ID
+    target_id = Column(Integer, ForeignKey("users.id"), nullable=False, comment="스케줄 대상 사용자 ID (본인 또는 관리자가 지정한 직원)")
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, comment="스케줄을 생성/수정한 사용자 ID")
     user = relationship("User", back_populates="schedules")
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
