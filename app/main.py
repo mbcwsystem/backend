@@ -1,8 +1,5 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import configure_mappers
 from datetime import date
 from app.core.config import settings
@@ -27,31 +24,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# 테스트코드
-templates = Jinja2Templates(directory="app/templates")
-# 테스트코드
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-
-
-@app.get("/", tags=["홈페이지"])
-def index(request: Request):
-    return templates.TemplateResponse("login_signup.html", {"request": request})
-
-
-@app.get("/main", response_class=HTMLResponse, tags=["홈페이지"])
-def render_main_page(request: Request):
-    return templates.TemplateResponse("main.html", {"request": request})
-
-
-@app.get("/schedule", response_class=HTMLResponse, tags=["홈페이지"])
-def render_schedule_page(request: Request):
-    return templates.TemplateResponse("schedule.html", {"request": request})
-
-
-@app.get("/community", response_class=HTMLResponse, tags=["홈페이지"])
-def render_community_page(request: Request):
-    return templates.TemplateResponse("community.html", {"request": request})
 
 
 @app.on_event("startup")
