@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+
 import jwt
+from cryptography.fernet import Fernet
 from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from cryptography.fernet import Fernet
 
 from app.core.config import settings
 from app.modules.auth.models import PositionEnum, User

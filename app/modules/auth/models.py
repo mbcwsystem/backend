@@ -80,13 +80,16 @@ class User(Base):
         "Schedule",
         foreign_keys="Schedule.user_id",
         back_populates="creator",
-        cascade="all, delete"
+        cascade="all, delete",
     )
 
     # 내가 대상이 된 스케줄들 (직원)
-    targeted_schedules = relationship("Schedule",
-                                      foreign_keys="Schedule.target_id",
-                                      back_populates="user", cascade="all, delete")
+    targeted_schedules = relationship(
+        "Schedule",
+        foreign_keys="Schedule.target_id",
+        back_populates="user",
+        cascade="all, delete",
+    )
 
     # 휴무 신청
     day_off_requests = relationship(
