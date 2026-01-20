@@ -85,3 +85,14 @@ def apply_day_off(db, user, data) -> DayOffRequest:
     db.refresh(day_off)
 
     return day_off
+
+
+def approve_day_off(db, day_off_id, user):
+    """
+    휴무 승인
+    :param db:
+    :param day_off_id:
+    :param user:
+    :return:
+    """
+    return None
