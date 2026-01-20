@@ -6,6 +6,8 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.utils.permission_utils import is_system
+from app.modules.auth.models import User, PositionEnum
+
 
 from . import schemas, services
 from .models import RefreshToken
@@ -47,6 +49,26 @@ def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
 @router.get("/me", response_model=schemas.UserResponse, summary="유저 조회")
 def me(cuurent_user=Depends(get_current_user)):
     return cuurent_user
+
+
+@router.get(
+    "/staff",
+    response_model=list[schemas.StaffResponse],
+    summary="재직중인 리더/크루 목록 조회",
+)
+def staff(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    if is_system(current_user):
+        raise HTTPException(status_code=403, detail="시스템 계정은 조회할 수 없습니다.")
+    staff = (
+        db.query(User)
+        .filter(
+            User.is_active.is_(True),
+            User.position.in_([PositionEnum.leader, PositionEnum.crew]),
+            User.id != current_user.id,
+        )
+        .all()
+    )
+    return staff
 
 
 @router.post(

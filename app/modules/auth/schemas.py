@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from app.modules.auth.models import PositionEnum
 
 
 class LoginRequest(BaseModel):
@@ -27,3 +28,12 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class StaffResponse(BaseModel):
+    id: int
+    name: str
+    position: PositionEnum
+
+    class Config:
+        orm_mode = True
