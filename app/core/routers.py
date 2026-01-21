@@ -8,9 +8,7 @@ api_router = APIRouter()
 
 routers = [
     ("/auth", "로그인관리", "app.modules.auth.routers"),
-    ("/schedule", "스케줄관리", "app.modules.schedule.routers"),
-    ("/shift", "스케줄관리", "app.modules.shift.routers"),
-    ("/dayoff", "스케줄관리", "app.modules.dayoff.routers"),
+    ("/schedule", "스케줄관리", "app.modules.schedule.routers.schedule_router"),
     ("/payroll", "급여관리", "app.modules.payroll.router.routers"),
     ("/workstatus", "근태관리", "app.modules.workstatus.routers"),
     ("/community", "커뮤니티관리", "app.modules.community.routers"),

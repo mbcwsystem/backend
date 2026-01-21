@@ -4,8 +4,8 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.modules.auth.models import User
-from app.modules.schedule.models import Schedule
-from app.modules.schedule.schemas import (
+from app.modules.schedule.models.schedule_models import Schedule
+from app.modules.schedule.schemas.schedule_schemas import (
     ScheduleCreateRequest,
     ScheduleResponse,
     ScheduleUpdateRequest,

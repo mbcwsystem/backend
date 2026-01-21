@@ -8,7 +8,9 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.modules.auth.models import User
 from app.modules.schedule import services
-from app.modules.schedule.schemas import (
+from app.modules.schedule.routers.shift_router import router as shift_router
+from app.modules.schedule.routers.dayoff_router import router as dayoff_router
+from app.modules.schedule.schemas.schedule_schemas import (
     ScheduleCreateRequest,
     ScheduleCreateResponse,
     ScheduleResponse,
@@ -24,6 +26,17 @@ def block_system_user(user: User = Depends(get_current_user)) -> User:
 
 
 router = APIRouter(dependencies=[Depends(block_system_user)])
+router.include_router(
+    shift_router,
+    prefix="/shift",
+    tags=["스케줄관리"],
+)
+
+router.include_router(
+    dayoff_router,
+    prefix="/dayoff",
+    tags=["스케줄관리"],
+)
 
 
 # 스케줄 생성 API
