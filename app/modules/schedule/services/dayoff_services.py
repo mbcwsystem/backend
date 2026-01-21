@@ -3,8 +3,8 @@ from datetime import datetime, time
 from fastapi import HTTPException
 
 from app.modules.admin.models import Holiday
-from app.modules.schedule.dayoff.models import DayOffRequest, Status
-from app.modules.schedule.models import Schedule
+from app.modules.schedule.models.dayoff_models import DayOffRequest, Status
+from app.modules.schedule.models.schedule_models import Schedule
 from app.utils.date_utils import get_month_range
 from app.utils.permission_utils import is_admin
 

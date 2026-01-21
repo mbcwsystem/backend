@@ -4,8 +4,11 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.modules.auth.models import User
-from app.modules.schedule.dayoff import services
-from app.modules.schedule.dayoff.schemas import DayOffApplyRequest, DayOffApplyResponse
+from app.modules.schedule import services
+from app.modules.schedule.schemas.dayoff_schemas import (
+    DayOffApplyRequest,
+    DayOffApplyResponse,
+)
 from app.utils.permission_utils import is_system
 
 
