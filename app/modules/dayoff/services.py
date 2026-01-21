@@ -6,6 +6,7 @@ from app.modules.admin.models import Holiday
 from app.modules.dayoff.models import DayOffRequest, Status
 from app.modules.schedule.models import Schedule
 from app.utils.date_utils import get_month_range
+from app.utils.permission_utils import is_admin
 
 
 def apply_day_off(db, user, data) -> DayOffRequest:
@@ -90,9 +91,30 @@ def apply_day_off(db, user, data) -> DayOffRequest:
 def approve_day_off(db, day_off_id, user):
     """
     휴무 승인
-    :param db:
-    :param day_off_id:
-    :param user:
-    :return:
     """
-    return None
+
+    # 권한 체크
+    if not is_admin(user):
+        raise HTTPException(403, "휴무 승인 권한이 없습니다.")
+
+
+    day_off = db.query(DayOffRequest).filter(DayOffRequest.id == day_off_id).first()
+
+    if day_off is None:
+        raise HTTPException(404,
+                            detail="존재하지 않는 휴무 신청입니다.")
+
+    # 이미 처리된 휴무
+    if day_off.status in (Status.approved, Status.rejected):
+        raise HTTPException(
+            status_code=409,
+            detail="이미 처리된 휴무입니다."
+        )
+
+    day_off.status = Status.approved
+
+    db.commit()
+    db.refresh(day_off)
+
+
+    return day_off
