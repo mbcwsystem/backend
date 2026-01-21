@@ -97,24 +97,18 @@ def approve_day_off(db, day_off_id, user):
     if not is_admin(user):
         raise HTTPException(403, "휴무 승인 권한이 없습니다.")
 
-
     day_off = db.query(DayOffRequest).filter(DayOffRequest.id == day_off_id).first()
 
     if day_off is None:
-        raise HTTPException(404,
-                            detail="존재하지 않는 휴무 신청입니다.")
+        raise HTTPException(404, detail="존재하지 않는 휴무 신청입니다.")
 
     # 이미 처리된 휴무
     if day_off.status in (Status.approved, Status.rejected):
-        raise HTTPException(
-            status_code=409,
-            detail="이미 처리된 휴무입니다."
-        )
+        raise HTTPException(status_code=409, detail="이미 처리된 휴무입니다.")
 
     day_off.status = Status.approved
 
     db.commit()
     db.refresh(day_off)
-
 
     return day_off
