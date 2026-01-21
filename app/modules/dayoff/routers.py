@@ -33,3 +33,13 @@ def apply_day_off(
     user: User = Depends(get_current_user),
 ):
     return services.apply_day_off(db, user, data)
+
+
+# 휴무 승인 API
+@router.patch("/{day_off_id}", status_code=status.HTTP_200_OK, summary="휴무 승인")
+def approve_day_off(
+    day_off_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    return services.approve_day_off(db, day_off_id, user)
