@@ -1,7 +1,9 @@
+from datetime import date
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import configure_mappers
-from datetime import date
+
 from app.core.config import settings
 from app.core.database import Base, SessionLocal, engine
 from app.core.routers import api_router

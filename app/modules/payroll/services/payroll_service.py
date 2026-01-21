@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from decimal import ROUND_DOWN, Decimal
 from typing import List, Optional, Union
 
@@ -10,9 +11,8 @@ from app.modules.payroll.schemas import (
     PayrollPayResponse,
     PayrollResponse,
 )
-from datetime import timedelta, date
-from app.utils.permission_utils import is_admin
 from app.modules.workstatus.models import Attendance
+from app.utils.permission_utils import is_admin
 
 
 class PayrollService:

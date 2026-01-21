@@ -5,6 +5,7 @@ from typing import List, Optional, Tuple
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+
 from app.modules.admin import schemas
 from app.modules.admin.models import Holiday, InsuranceRate
 from app.modules.admin.schemas import (
@@ -12,7 +13,7 @@ from app.modules.admin.schemas import (
     InsuranceRateUpdate,
 )
 from app.modules.auth.models import User
-from app.modules.auth.services import hash_password, encrypt_ssn, decrypt_ssn
+from app.modules.auth.services import decrypt_ssn, encrypt_ssn, hash_password
 
 
 # --------- Users ----------

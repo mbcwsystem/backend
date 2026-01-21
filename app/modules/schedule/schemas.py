@@ -11,6 +11,7 @@ class ScheduleCreateRequest(BaseModel):
     start_date: datetime
     end_date: datetime
 
+    target_id: int
     week_number: int
     year: int
     month: int
@@ -23,6 +24,7 @@ class ScheduleCreateResponse(BaseModel):
 
     id: int
     user_id: int
+    target_id: int
     start_date: datetime
     end_date: datetime
     week_number: int

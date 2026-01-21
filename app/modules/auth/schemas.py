@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+
 from app.modules.auth.models import PositionEnum
 
 

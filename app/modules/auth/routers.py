@@ -5,9 +5,8 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import get_current_user
+from app.modules.auth.models import PositionEnum, User
 from app.utils.permission_utils import is_system
-from app.modules.auth.models import User, PositionEnum
-
 
 from . import schemas, services
 from .models import RefreshToken
