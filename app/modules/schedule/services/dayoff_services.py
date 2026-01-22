@@ -93,9 +93,39 @@ def approve_day_off(db, day_off_id, user):
     휴무 승인
     """
 
+    day_off = get_pending_day_off_or_raise(db, day_off_id, user)
+
+    day_off.status = Status.approved
+    day_off.processed_by = user.id
+
+    db.commit()
+    db.refresh(day_off)
+
+    print("ddd",day_off.__dict__)
+    return day_off
+
+
+def reject_day_off(db, day_off_id, user):
+    """
+    휴무 거절
+    """
+
+    day_off = get_pending_day_off_or_raise(db, day_off_id, user)
+
+    day_off.status = Status.rejected
+    day_off.processed_by = user.id
+
+    db.commit()
+    db.refresh(day_off)
+
+    print("dddd",day_off.__dict__)
+
+    return day_off
+
+def get_pending_day_off_or_raise(db, day_off_id, user):
     # 권한 체크
     if not is_admin(user):
-        raise HTTPException(403, "휴무 승인 권한이 없습니다.")
+        raise HTTPException(403, "휴무 거절 권한이 없습니다.")
 
     day_off = db.query(DayOffRequest).filter(DayOffRequest.id == day_off_id).first()
 
@@ -105,10 +135,5 @@ def approve_day_off(db, day_off_id, user):
     # 이미 처리된 휴무
     if day_off.status in (Status.approved, Status.rejected):
         raise HTTPException(status_code=409, detail="이미 처리된 휴무입니다.")
-
-    day_off.status = Status.approved
-
-    db.commit()
-    db.refresh(day_off)
 
     return day_off

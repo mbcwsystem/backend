@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.modules.auth.models import User
-from app.modules.schedule import services
+from app.modules.schedule.services import dayoff_services
 from app.modules.schedule.schemas.dayoff_schemas import (
     DayOffApplyRequest,
     DayOffApplyResponse,
@@ -35,14 +35,29 @@ def apply_day_off(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    return services.apply_day_off(db, user, data)
+    return dayoff_services.apply_day_off(db, user, data)
 
 
 # 휴무 승인 API
-@router.patch("/{day_off_id}", status_code=status.HTTP_200_OK, summary="휴무 승인")
+@router.patch("/{day_off_id}/approved",
+              status_code=status.HTTP_200_OK,
+              summary="휴무 승인")
 def approve_day_off(
     day_off_id: int,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    return services.approve_day_off(db, day_off_id, user)
+    return dayoff_services.approve_day_off(db, day_off_id, user)
+
+# 휴무 거절 API
+@router.patch(
+    "/{day_off_id}/rejected",
+    status_code=status.HTTP_200_OK,
+    summary="휴무 거절"
+)
+def reject_day_off(
+    day_off_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    return dayoff_services.reject_day_off(db, day_off_id, user)

@@ -100,10 +100,10 @@ class User(Base):
     )
 
     # 휴무 승인
-    approved_day_off_requests = relationship(
+    processed_day_off_requests = relationship(
         "DayOffRequest",
-        foreign_keys="DayOffRequest.approved_by",
-        back_populates="approver",
+        foreign_keys="DayOffRequest.processed_by",
+        back_populates="processor",
         cascade="all, delete",
     )
 
