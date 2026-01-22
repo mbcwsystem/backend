@@ -17,6 +17,19 @@ def apply_day_off(db, user, data) -> DayOffRequest:
     req_start_date = data.start_date.date()
     req_end_date = data.end_date.date()
 
+    # 신청한 날이 있는지 체크
+    exists = (
+        db.query(DayOffRequest)
+        .filter(
+            DayOffRequest.user_id == user.id,
+            DayOffRequest.start_date == req_start_date,
+            DayOffRequest.end_date == req_end_date)
+    .first()
+    )
+
+    if exists:
+        raise HTTPException(409,"이미 해당 기간에 휴무가 존재합니다.")
+
     # 휴무 하루 단위인지 체크
     if req_start_date != req_end_date:
         raise HTTPException(400, detail="휴무는 하루 단위로 신청할 수 있습니다.")
@@ -101,7 +114,6 @@ def approve_day_off(db, day_off_id, user):
     db.commit()
     db.refresh(day_off)
 
-    print("ddd",day_off.__dict__)
     return day_off
 
 
@@ -118,10 +130,10 @@ def reject_day_off(db, day_off_id, user):
     db.commit()
     db.refresh(day_off)
 
-    print("dddd",day_off.__dict__)
-
     return day_off
 
+
+# 휴무 공통 권한 체크
 def get_pending_day_off_or_raise(db, day_off_id, user):
     # 권한 체크
     if not is_admin(user):
