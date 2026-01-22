@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from app.modules.admin.models import Holiday
 from app.modules.schedule.models.dayoff_models import DayOffRequest, Status
 from app.modules.schedule.models.schedule_models import Schedule
+from app.modules.schedule.schemas.dayoff_schemas import DayOffStatus
 from app.utils.date_utils import get_month_range
 from app.utils.permission_utils import is_admin
 
@@ -101,40 +102,11 @@ def apply_day_off(db, user, data) -> DayOffRequest:
     return day_off
 
 
-def approve_day_off(db, day_off_id, user):
+def decision_day_off(data, db, day_off_id, user):
     """
-    휴무 승인
-    """
-
-    day_off = get_pending_day_off_or_raise(db, day_off_id, user)
-
-    day_off.status = Status.approved
-    day_off.processed_by = user.id
-
-    db.commit()
-    db.refresh(day_off)
-
-    return day_off
-
-
-def reject_day_off(db, day_off_id, user):
-    """
-    휴무 거절
+    휴무 승인 및 거절
     """
 
-    day_off = get_pending_day_off_or_raise(db, day_off_id, user)
-
-    day_off.status = Status.rejected
-    day_off.processed_by = user.id
-
-    db.commit()
-    db.refresh(day_off)
-
-    return day_off
-
-
-# 휴무 공통 권한 체크
-def get_pending_day_off_or_raise(db, day_off_id, user):
     # 권한 체크
     if not is_admin(user):
         raise HTTPException(403, "휴무 거절 권한이 없습니다.")
@@ -147,5 +119,15 @@ def get_pending_day_off_or_raise(db, day_off_id, user):
     # 이미 처리된 휴무
     if day_off.status in (Status.approved, Status.rejected):
         raise HTTPException(status_code=409, detail="이미 처리된 휴무입니다.")
+
+    if data.decision == DayOffStatus.approved:
+        day_off.status = Status.approved
+    elif data.decision == DayOffStatus.rejected:
+        day_off.status = Status.rejected
+
+    day_off.processed_by = user.id
+
+    db.commit()
+    db.refresh(day_off)
 
     return day_off

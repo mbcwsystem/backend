@@ -7,7 +7,7 @@ from app.modules.auth.models import User
 from app.modules.schedule.services import dayoff_services
 from app.modules.schedule.schemas.dayoff_schemas import (
     DayOffApplyRequest,
-    DayOffApplyResponse,
+    DayOffApplyResponse, DayOffDecisionRequest,
 )
 from app.utils.permission_utils import is_system
 
@@ -38,26 +38,14 @@ def apply_day_off(
     return dayoff_services.apply_day_off(db, user, data)
 
 
-# 휴무 승인 API
-@router.patch("/{day_off_id}/approved",
+# 휴무 승인 및 거절 API
+@router.patch("/{day_off_id}",
               status_code=status.HTTP_200_OK,
-              summary="휴무 승인")
-def approve_day_off(
+              summary="휴무 승인 및 거절")
+def decision_day_off(
     day_off_id: int,
+    data: DayOffDecisionRequest,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    return dayoff_services.approve_day_off(db, day_off_id, user)
-
-# 휴무 거절 API
-@router.patch(
-    "/{day_off_id}/rejected",
-    status_code=status.HTTP_200_OK,
-    summary="휴무 거절"
-)
-def reject_day_off(
-    day_off_id: int,
-    db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
-):
-    return dayoff_services.reject_day_off(db, day_off_id, user)
+    return dayoff_services.decision_day_off(data, db, day_off_id, user)
