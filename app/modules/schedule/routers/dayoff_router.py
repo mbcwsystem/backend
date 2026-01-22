@@ -50,3 +50,16 @@ def decision_day_off(
     user: User = Depends(get_current_user),
 ):
     return dayoff_services.decision_day_off(data, db, day_off_id, user)
+
+# 휴무 삭제 API
+@router.delete(
+    "/{day_off_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="휴무 삭제"
+)
+def delete_day_off(
+        day_off_id: int,
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user),
+):
+    return dayoff_services.delete_day_off(db, day_off_id, user)

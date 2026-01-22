@@ -132,3 +132,22 @@ def decision_day_off(data, db, day_off_id, user):
     db.refresh(day_off)
 
     return day_off
+
+
+def delete_day_off(db, day_off_id, user):
+    """
+    휴무 삭제
+    """
+    # 권한 체크
+    if not is_admin(user):
+        raise HTTPException(403, "휴무 삭제 권한이 없습니다.")
+
+    day_off = db.query(DayOffRequest).filter(DayOffRequest.id == day_off_id).first()
+
+    if day_off is None:
+        raise HTTPException(404, detail="존재하지 않는 휴무입니다.")
+
+    db.delete(day_off)
+    db.commit()
+
+    return day_off
