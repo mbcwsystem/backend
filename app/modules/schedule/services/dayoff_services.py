@@ -24,12 +24,13 @@ def apply_day_off(db, user, data) -> DayOffRequest:
         .filter(
             DayOffRequest.user_id == user.id,
             DayOffRequest.start_date == req_start_date,
-            DayOffRequest.end_date == req_end_date)
-    .first()
+            DayOffRequest.end_date == req_end_date,
+        )
+        .first()
     )
 
     if exists:
-        raise HTTPException(409,"이미 해당 기간에 휴무가 존재합니다.")
+        raise HTTPException(409, "이미 해당 기간에 휴무가 존재합니다.")
 
     # 휴무 하루 단위인지 체크
     if req_start_date != req_end_date:
