@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from app.modules.admin.models import Holiday
 from app.modules.schedule.models.dayoff_models import DayOffRequest, Status
 from app.modules.schedule.models.schedule_models import Schedule
+from app.modules.schedule.schemas.dayoff_schemas import DayOffStatus
 from app.utils.date_utils import get_month_range
 from app.utils.permission_utils import is_admin
 
@@ -16,6 +17,20 @@ def apply_day_off(db, user, data) -> DayOffRequest:
 
     req_start_date = data.start_date.date()
     req_end_date = data.end_date.date()
+
+    # 신청한 날이 있는지 체크
+    exists = (
+        db.query(DayOffRequest)
+        .filter(
+            DayOffRequest.user_id == user.id,
+            DayOffRequest.start_date == req_start_date,
+            DayOffRequest.end_date == req_end_date,
+        )
+        .first()
+    )
+
+    if exists:
+        raise HTTPException(409, "이미 해당 기간에 휴무가 존재합니다.")
 
     # 휴무 하루 단위인지 체크
     if req_start_date != req_end_date:
@@ -88,14 +103,14 @@ def apply_day_off(db, user, data) -> DayOffRequest:
     return day_off
 
 
-def approve_day_off(db, day_off_id, user):
+def decision_day_off(data, db, day_off_id, user):
     """
-    휴무 승인
+    휴무 승인 및 거절
     """
 
     # 권한 체크
     if not is_admin(user):
-        raise HTTPException(403, "휴무 승인 권한이 없습니다.")
+        raise HTTPException(403, "휴무 거절 권한이 없습니다.")
 
     day_off = db.query(DayOffRequest).filter(DayOffRequest.id == day_off_id).first()
 
@@ -106,9 +121,33 @@ def approve_day_off(db, day_off_id, user):
     if day_off.status in (Status.approved, Status.rejected):
         raise HTTPException(status_code=409, detail="이미 처리된 휴무입니다.")
 
-    day_off.status = Status.approved
+    if data.decision == DayOffStatus.approved:
+        day_off.status = Status.approved
+    elif data.decision == DayOffStatus.rejected:
+        day_off.status = Status.rejected
+
+    day_off.processed_by = user.id
 
     db.commit()
     db.refresh(day_off)
+
+    return day_off
+
+
+def delete_day_off(db, day_off_id, user):
+    """
+    휴무 삭제
+    """
+    # 권한 체크
+    if not is_admin(user):
+        raise HTTPException(403, "휴무 삭제 권한이 없습니다.")
+
+    day_off = db.query(DayOffRequest).filter(DayOffRequest.id == day_off_id).first()
+
+    if day_off is None:
+        raise HTTPException(404, detail="존재하지 않는 휴무입니다.")
+
+    db.delete(day_off)
+    db.commit()
 
     return day_off

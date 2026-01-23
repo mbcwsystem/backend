@@ -1,6 +1,14 @@
 from datetime import datetime
+from enum import Enum
 
 from pydantic import BaseModel
+
+
+class DayOffStatus(str, Enum):
+    pending = "pending"
+    approved = "approved"
+    rejected = "rejected"
+    canceled = "canceled"
 
 
 class DayOffApplyRequest(BaseModel):
@@ -31,3 +39,11 @@ class DayOffApplyResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class DayOffDecisionRequest(BaseModel):
+    """
+    휴무 승인 및 거절
+    """
+
+    decision: DayOffStatus

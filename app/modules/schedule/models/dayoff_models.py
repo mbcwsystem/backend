@@ -33,7 +33,7 @@ class DayOffRequest(CreatedAtMixin, Base):
     is_holiday = Column(Boolean, nullable=False, default=False)
 
     # 승인자
-    approved_by = Column(Integer, ForeignKey("users.id"), nullable=True)
-    approver = relationship(
-        "User", foreign_keys=[approved_by], back_populates="approved_day_off_requests"
+    processed_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    processor = relationship(
+        "User", foreign_keys=[processed_by], back_populates="processed_day_off_requests"
     )
