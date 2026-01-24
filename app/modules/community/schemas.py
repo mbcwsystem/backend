@@ -74,7 +74,7 @@ class CommentResponse(BaseModel):
     is_liked: bool = Field(False, description="내가 좋아요를 눌렀는지 여부")
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PostListResponse(BaseModel):
@@ -98,7 +98,7 @@ class PostListResponse(BaseModel):
     comments_count: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PostResponse(BaseModel):
@@ -123,7 +123,7 @@ class PostResponse(BaseModel):
     comments_count: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PaginationParams(BaseModel):

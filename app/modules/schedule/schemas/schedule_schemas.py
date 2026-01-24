@@ -32,7 +32,7 @@ class ScheduleCreateResponse(BaseModel):
     month: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ScheduleResponse(BaseModel):
@@ -65,4 +65,4 @@ class ScheduleUpdateRequest(BaseModel):
     month: int | None = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -37,4 +37,4 @@ class StaffResponse(BaseModel):
     position: PositionEnum
 
     class Config:
-        orm_mode = True
+        from_attributes = True

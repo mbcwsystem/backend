@@ -22,7 +22,7 @@ class DayOffApplyRequest(BaseModel):
     is_holiday: bool = False
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DayOffApplyResponse(BaseModel):
@@ -38,7 +38,7 @@ class DayOffApplyResponse(BaseModel):
     reason: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DayOffDecisionRequest(BaseModel):

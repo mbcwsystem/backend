@@ -15,7 +15,7 @@ class UserWageResponse(UserWageCreate):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DefaultWageCreate(BaseModel):
@@ -27,4 +27,4 @@ class DefaultWageResponse(DefaultWageCreate):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
