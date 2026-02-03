@@ -27,6 +27,32 @@ from app.modules.community.schemas import (
 )
 
 
+# 카테고리 -----
+def get_category_post_counts(db: Session, category: CategoryEnum | None = None) -> int:
+    """
+    카테고리 별 게시글 수 조회
+    - category=None이면 전체 게시글 수 반환
+    """
+    query = db.query(func.count(Post.id))
+    if category:
+        query = query.filter(Post.category == category)
+    return query.scalar()
+
+
+def get_all_category_post_counts(db: Session) -> dict[str, int]:
+    """
+    모든 카테고리별 게시글 수 반환
+    """
+    counts = {}
+    total = 0
+    for cat in CategoryEnum:
+        cat_count = get_category_post_counts(db, cat)
+        counts[cat.value] = cat_count
+        total += cat_count
+    counts["전체"] = total
+    return counts
+
+
 # 게시글 -----
 def create_post(db: Session, user, data: PostCreate) -> PostResponse:
     """

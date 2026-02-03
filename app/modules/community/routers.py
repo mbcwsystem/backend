@@ -19,6 +19,11 @@ from app.modules.community.schemas import (
     PostResponse,
     PostUpdate,
     SearchScope,
+    CategoryCountResponse,
+)
+from app.modules.community.services import (
+    get_category_post_counts,
+    get_all_category_post_counts,
 )
 from app.utils.permission_utils import is_system
 
@@ -30,6 +35,39 @@ def get_community_user(user=Depends(get_current_user)):
     if is_system(user):
         raise HTTPException(403, "출근용 계정은 커뮤니티 기능을 사용할 수 없습니다.")
     return user
+
+
+# 카테고리별 게시글 수 API -----
+@router.get(
+    "/category-counts",
+    response_model=CategoryCountResponse,
+    status_code=200,
+    summary="카테고리별 게시글 수",
+)
+def category_counts(
+    db: Session = Depends(get_db),
+    category: str | None = Query(
+        None, description="카테고리 이름 (공지, 근무교대, 휴무신청, 자유게시판)"
+    ),
+    user=Depends(get_community_user),
+) -> CategoryCountResponse:
+    """
+    전체 또는 카테고리별 게시글 수 조회
+    - category 파라미터 없으면 전체 + 각 카테고리 count 반환
+    - category 파라미터 있으면 해당 카테고리 count만 반환
+    """
+    if category:
+        try:
+            cat_enum = CategoryEnum(category)
+        except ValueError:
+            return {"counts": {category: 0}}  # 존재하지 않는 카테고리 0
+
+        count = get_category_post_counts(db, cat_enum)
+        return {"counts": {category: count}}
+
+    # 전체 + 카테고리별
+    counts = get_all_category_post_counts(db)
+    return {"counts": counts}
 
 
 # 게시글 API -----
