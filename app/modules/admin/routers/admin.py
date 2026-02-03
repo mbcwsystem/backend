@@ -1,12 +1,11 @@
-import os
 from datetime import date
 
 import requests
-from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import get_current_admin
 from app.modules.admin import models, schemas
@@ -17,8 +16,7 @@ router = APIRouter()
 holiday_router = APIRouter()
 
 
-load_dotenv()
-HOLIDAY_API_KEY = os.getenv("HOLIDAY_API_KEY")
+HOLIDAY_API_KEY = settings.HOLIDAY_API_KEY
 
 if not HOLIDAY_API_KEY:
     raise RuntimeError("HOLIDAY_API_KEY is not set")

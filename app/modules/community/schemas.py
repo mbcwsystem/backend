@@ -10,6 +10,10 @@ from app.modules.community.models import CategoryEnum
 T = TypeVar("T")
 
 
+class CategoryCountResponse(BaseModel):
+    counts: dict[str, int]
+
+
 class PostBase(BaseModel):
     title: str = Field(..., max_length=255, description="게시글 제목")
     content: str = Field(..., description="게시글 내용")
