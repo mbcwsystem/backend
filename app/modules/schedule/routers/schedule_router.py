@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.modules.auth.models import User
-from app.modules.schedule import services
 from app.modules.schedule.routers.dayoff_router import router as dayoff_router
 from app.modules.schedule.routers.shift_router import router as shift_router
 from app.modules.schedule.schemas.schedule_schemas import (
@@ -16,6 +15,7 @@ from app.modules.schedule.schemas.schedule_schemas import (
     ScheduleResponse,
     ScheduleUpdateRequest,
 )
+from app.modules.schedule.services import schedule_services
 from app.utils.permission_utils import is_system
 
 
@@ -51,7 +51,7 @@ def create_schedule(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    return services.create_schedule(db, user, data)
+    return schedule_services.create_schedule(db, user, data)
 
 
 # 특정 주차 스케줄 조회 API
@@ -65,7 +65,7 @@ def get_schedule_week(
     week_number: int,
     db: Session = Depends(get_db),
 ):
-    return services.list_schedule(db, year, week_number)
+    return schedule_services.list_schedule(db, year, week_number)
 
 
 # 스케줄 상세 조회 API
@@ -78,7 +78,7 @@ def get_schedule(
     schedule_id: int,
     db: Session = Depends(get_db),
 ):
-    return services.get_schedule(db, schedule_id)
+    return schedule_services.get_schedule(db, schedule_id)
 
 
 # 스케줄 수정 API
@@ -89,7 +89,7 @@ def update_schedule(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    return services.update_schedule(db, schedule_id, data, user)
+    return schedule_services.update_schedule(db, schedule_id, data, user)
 
 
 # 스케줄 삭제 API
@@ -99,4 +99,4 @@ def delete_schedule(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    return services.delete_schedule(db, schedule_id, user)
+    return schedule_services.delete_schedule(db, schedule_id, user)
