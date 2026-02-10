@@ -3,12 +3,7 @@ from enum import Enum
 
 from pydantic import BaseModel
 
-
-class DayOffStatus(str, Enum):
-    pending = "pending"
-    approved = "approved"
-    rejected = "rejected"
-    canceled = "canceled"
+from app.utils.day_off import DayOffStatus
 
 
 class DayOffApplyRequest(BaseModel):
@@ -47,3 +42,16 @@ class DayOffDecisionRequest(BaseModel):
     """
 
     decision: DayOffStatus
+
+class DayOffResponse(BaseModel):
+    """
+    휴무 조회 응답
+    """
+    id: int
+    user_id: int
+    start_date: datetime
+    end_date: datetime
+    reason: str
+
+    class Config:
+        from_attributes = True
