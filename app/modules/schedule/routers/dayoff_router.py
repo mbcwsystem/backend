@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, status, Query
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -9,7 +9,8 @@ from app.modules.auth.models import User
 from app.modules.schedule.schemas.dayoff_schemas import (
     DayOffApplyRequest,
     DayOffApplyResponse,
-    DayOffDecisionRequest, DayOffResponse,
+    DayOffDecisionRequest,
+    DayOffResponse,
 )
 from app.modules.schedule.services import dayoff_services
 from app.utils.day_off import DayOffStatus
@@ -68,17 +69,13 @@ def delete_day_off(
 
 
 # 휴무 리스트 조회 API
-@router.get(
-    "",
-    response_model=List[DayOffResponse],
-    summary="휴무 리스트 조회"
-)
+@router.get("", response_model=List[DayOffResponse], summary="휴무 리스트 조회")
 def get_day_off_list(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
     status: DayOffStatus = Query(
         DayOffStatus.pending,
-        description="필터링할 휴무 상태 (예: PENDING/APPROVED/REJECTED)"
+        description="필터링할 휴무 상태 (예: PENDING/APPROVED/REJECTED)",
     ),
 ):
     return dayoff_services.get_day_off_list(db, user, status)

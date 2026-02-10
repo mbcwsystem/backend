@@ -162,8 +162,6 @@ def get_day_off_list(db, user, status):
     if not is_admin(user):
         raise HTTPException(403, "휴무 리스트를 볼 권한이 없습니다.")
 
-    query = db.query(DayOffRequest).filter(
-        DayOffRequest.status == status
-    )
+    query = db.query(DayOffRequest).filter(DayOffRequest.status == status)
 
     return query.all()

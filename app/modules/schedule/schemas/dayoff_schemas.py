@@ -42,10 +42,12 @@ class DayOffDecisionRequest(BaseModel):
 
     decision: DayOffStatus
 
+
 class DayOffResponse(BaseModel):
     """
     휴무 조회 응답
     """
+
     id: int
     user_id: int
     start_date: datetime
