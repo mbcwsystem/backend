@@ -151,3 +151,17 @@ def delete_day_off(db, day_off_id, user):
     db.commit()
 
     return day_off
+
+
+def get_day_off_list(db, user, status):
+    """
+    휴무 리스트
+    """
+
+    # 권한 체크
+    if not is_admin(user):
+        raise HTTPException(403, "휴무 리스트를 볼 권한이 없습니다.")
+
+    query = db.query(DayOffRequest).filter(DayOffRequest.status == status)
+
+    return query.all()
