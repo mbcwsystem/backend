@@ -17,6 +17,7 @@ origins = [
     "http://localhost:5173",
     "http://mbansan.iptime.org",
     "http://mbansan.iptime.org:8000",
+    "https://frontend-bay-gamma-33.vercel.app/",
 ]
 
 app.add_middleware(
