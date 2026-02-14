@@ -229,6 +229,7 @@ class PayrollService:
         return PayrollPayResponse(
             # 기본 정보
             name=user.name,
+            position=user.position,
             birth_date=user.birth_date,
             pay_date=pay_date,
             # 급여 항목

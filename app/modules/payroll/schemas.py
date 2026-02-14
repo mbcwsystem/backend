@@ -92,6 +92,7 @@ class PayrollPayResponse(BaseModel):
 
     # 기본 식별 정보
     name: Optional[str] = None  # 이름
+    position: Optional[str] = None  # 직급
     birth_date: Optional[date] = None  # 생년월일
     pay_date: Optional[date] = None  # 지급일
 
