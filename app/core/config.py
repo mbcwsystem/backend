@@ -4,6 +4,8 @@ from datetime import datetime, timedelta, timezone
 
 from pydantic_settings import BaseSettings
 from sqlalchemy import Column, DateTime
+from typing import List
+from pydantic import field_validator
 
 os.environ["TZ"] = "Asia/Seoul"
 
@@ -65,8 +67,11 @@ class Settings(BaseSettings):
     # Holiday config
     HOLIDAY_API_KEY: str
 
-    # ssn
+    # Ssn
     SSN_SECRET_KEY: str
+
+    # Cors
+    CORS_ORIGINS: List[str] = []
 
     @property
     def DATABASE_URL(self) -> str:
@@ -79,6 +84,13 @@ class Settings(BaseSettings):
         env_file = f"envs/.env.{os.getenv('MODE', 'dev')}"
         env_file_encoding = "utf-8"
         extra = "ignore"
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def assemble_cors_origins(cls, v):
+        if isinstance(v, str):
+            return [i.strip() for i in v.split(",")]
+        return v
 
 
 settings = Settings()
