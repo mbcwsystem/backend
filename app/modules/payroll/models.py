@@ -1,6 +1,7 @@
 from decimal import Decimal
 
-from sqlalchemy import DECIMAL, Column, Date, ForeignKey, Integer, UniqueConstraint
+from sqlalchemy import (DECIMAL, Column, Date, ForeignKey, Integer,
+                        UniqueConstraint)
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base

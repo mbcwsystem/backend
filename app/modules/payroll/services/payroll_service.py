@@ -7,10 +7,7 @@ from sqlalchemy.orm import Session
 from app.modules.admin.models import InsuranceRate
 from app.modules.auth.models import User
 from app.modules.payroll.models import Payroll, PayrollPayDate
-from app.modules.payroll.schemas import (
-    PayrollPayResponse,
-    PayrollResponse,
-)
+from app.modules.payroll.schemas import PayrollPayResponse, PayrollResponse
 from app.modules.workstatus.models import Attendance
 from app.utils.permission_utils import is_admin
 

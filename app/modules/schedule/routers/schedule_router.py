@@ -10,11 +10,8 @@ from app.modules.auth.models import User
 from app.modules.schedule.routers.dayoff_router import router as dayoff_router
 from app.modules.schedule.routers.shift_router import router as shift_router
 from app.modules.schedule.schemas.schedule_schemas import (
-    ScheduleCreateRequest,
-    ScheduleCreateResponse,
-    ScheduleResponse,
-    ScheduleUpdateRequest,
-)
+    ScheduleCreateRequest, ScheduleCreateResponse, ScheduleResponse,
+    ScheduleUpdateRequest)
 from app.modules.schedule.services import schedule_services
 from app.utils.permission_utils import is_system
 

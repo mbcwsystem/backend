@@ -4,18 +4,8 @@ import enum
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import (
-    DECIMAL,
-    JSON,
-    Boolean,
-    Column,
-    Date,
-    DateTime,
-    Enum,
-    ForeignKey,
-    Integer,
-    String,
-)
+from sqlalchemy import (DECIMAL, JSON, Boolean, Column, Date, DateTime, Enum,
+                        ForeignKey, Integer, String)
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base

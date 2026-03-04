@@ -1,9 +1,4 @@
-from sqlalchemy import (
-    Column,
-    DateTime,
-    ForeignKey,
-    Integer,
-)
+from sqlalchemy import Column, DateTime, ForeignKey, Integer
 from sqlalchemy.dialects.mysql import DECIMAL
 from sqlalchemy.orm import relationship
 

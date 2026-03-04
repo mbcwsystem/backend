@@ -10,7 +10,8 @@ from app.core.database import get_db
 from app.core.security import get_current_admin
 from app.modules.admin import models, schemas
 from app.modules.admin.models import InsuranceRate
-from app.modules.admin.schemas import InsuranceRateCreate, InsuranceRateResponse
+from app.modules.admin.schemas import (InsuranceRateCreate,
+                                       InsuranceRateResponse)
 
 router = APIRouter()
 holiday_router = APIRouter()

@@ -1,11 +1,11 @@
 import os
 import time
 from datetime import datetime, timedelta, timezone
+from typing import List
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 from sqlalchemy import Column, DateTime
-from typing import List
-from pydantic import field_validator
 
 os.environ["TZ"] = "Asia/Seoul"
 
