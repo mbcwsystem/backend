@@ -1,7 +1,15 @@
 from enum import Enum as PyEnum
 
-from sqlalchemy import (Boolean, Column, Enum, ForeignKey, Integer, String,
-                        Text, UniqueConstraint)
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from app.core.config import TimeStampedMixin

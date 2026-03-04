@@ -1,5 +1,12 @@
-from sqlalchemy import (Boolean, Column, Date, ForeignKey, Integer, Time,
-                        UniqueConstraint)
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Date,
+    ForeignKey,
+    Integer,
+    Time,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base

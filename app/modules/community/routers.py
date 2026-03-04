@@ -7,15 +7,24 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.modules.community import services
 from app.modules.community.models import CategoryEnum
-from app.modules.community.schemas import (CategoryCountResponse,
-                                           CommentCreate, CommentResponse,
-                                           CommentUpdate, OrderBy,
-                                           PaginatedResponse, PaginationParams,
-                                           PostCreate, PostListResponse,
-                                           PostResponse, PostUpdate,
-                                           SearchScope)
-from app.modules.community.services import (get_all_category_post_counts,
-                                            get_category_post_counts)
+from app.modules.community.schemas import (
+    CategoryCountResponse,
+    CommentCreate,
+    CommentResponse,
+    CommentUpdate,
+    OrderBy,
+    PaginatedResponse,
+    PaginationParams,
+    PostCreate,
+    PostListResponse,
+    PostResponse,
+    PostUpdate,
+    SearchScope,
+)
+from app.modules.community.services import (
+    get_all_category_post_counts,
+    get_category_post_counts,
+)
 from app.utils.permission_utils import is_system
 
 router = APIRouter()

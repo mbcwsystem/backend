@@ -6,18 +6,25 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.core.pagination import paginate
 from app.modules.auth.models import User
-from app.modules.community.models import (CategoryEnum, Comment, CommentLike,
-                                          Post)
-from app.modules.community.permissions import (can_delete_comment,
-                                               can_delete_post,
-                                               can_update_comment,
-                                               can_update_post,
-                                               can_write_comment,
-                                               can_write_post)
-from app.modules.community.schemas import (CommentCreate, CommentResponse,
-                                           CommentUpdate, PaginatedResponse,
-                                           PostCreate, PostListResponse,
-                                           PostResponse, PostUpdate)
+from app.modules.community.models import CategoryEnum, Comment, CommentLike, Post
+from app.modules.community.permissions import (
+    can_delete_comment,
+    can_delete_post,
+    can_update_comment,
+    can_update_post,
+    can_write_comment,
+    can_write_post,
+)
+from app.modules.community.schemas import (
+    CommentCreate,
+    CommentResponse,
+    CommentUpdate,
+    PaginatedResponse,
+    PostCreate,
+    PostListResponse,
+    PostResponse,
+    PostUpdate,
+)
 
 
 # 카테고리 -----
