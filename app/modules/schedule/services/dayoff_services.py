@@ -8,6 +8,8 @@ from app.modules.schedule.models.schedule_models import Schedule
 from app.modules.schedule.schemas.dayoff_schemas import DayOffStatus
 from app.utils.date_utils import get_month_range
 from app.utils.permission_utils import is_admin
+from app.modules.community.models import Post, CategoryEnum
+
 
 
 def apply_day_off(db, user, data) -> DayOffRequest:
@@ -97,6 +99,22 @@ def apply_day_off(db, user, data) -> DayOffRequest:
     )
 
     db.add(day_off)
+    db.flush()
+
+    post = Post(
+        title=f"[휴무 신청] {user.name} - {req_start_date}",
+        content=(
+            f"{user.name}님이 휴무를 신청했습니다.\n\n"
+            f"날짜: {req_start_date}\n"
+            f"사유: {data.reason}"
+        ),
+        category=CategoryEnum.dayoff,
+        author_id=user.id,
+        system_generated=True,
+    )
+
+    db.add(post)
+
     db.commit()
     db.refresh(day_off)
 
