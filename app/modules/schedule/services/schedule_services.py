@@ -17,7 +17,7 @@ def _build_schedule_response(schedule: Schedule) -> ScheduleResponse:
     return ScheduleResponse(
         id=schedule.id,
         user_id=schedule.user_id,
-        user_name=schedule.user.name,
+        user_name=schedule.target.name,
         start_date=schedule.start_date,
         end_date=schedule.end_date,
         week_number=schedule.week_number,
