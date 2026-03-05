@@ -3,13 +3,12 @@ from datetime import datetime, time
 from fastapi import HTTPException
 
 from app.modules.admin.models import Holiday
+from app.modules.community.models import CategoryEnum, Post
 from app.modules.schedule.models.dayoff_models import DayOffRequest, Status
 from app.modules.schedule.models.schedule_models import Schedule
 from app.modules.schedule.schemas.dayoff_schemas import DayOffStatus
 from app.utils.date_utils import get_month_range
 from app.utils.permission_utils import is_admin
-from app.modules.community.models import Post, CategoryEnum
-
 
 
 def apply_day_off(db, user, data) -> DayOffRequest:
@@ -127,8 +126,7 @@ def decision_day_off(data, db, day_off_id, user):
     """
 
     # 권한 체크
-    if not is_admin(user):
-        raise HTTPException(403, "휴무 거절 권한이 없습니다.")
+    admin_check(user, "휴무 거절 권한이 없습니다.")
 
     day_off = db.query(DayOffRequest).filter(DayOffRequest.id == day_off_id).first()
 
@@ -157,8 +155,7 @@ def delete_day_off(db, day_off_id, user):
     휴무 삭제
     """
     # 권한 체크
-    if not is_admin(user):
-        raise HTTPException(403, "휴무 삭제 권한이 없습니다.")
+    admin_check(user, "휴무 삭제 권한이 없습니다.")
 
     day_off = db.query(DayOffRequest).filter(DayOffRequest.id == day_off_id).first()
 
@@ -176,10 +173,15 @@ def get_day_off_list(db, user, status):
     휴무 리스트
     """
 
-    # 권한 체크
-    if not is_admin(user):
-        raise HTTPException(403, "휴무 리스트를 볼 권한이 없습니다.")
+    admin_check(user, "휴무 리스트를 볼 권한이 없습니다.")
 
     query = db.query(DayOffRequest).filter(DayOffRequest.status == status)
 
     return query.all()
+
+
+def admin_check(user, message):
+
+    # 권한 체크
+    if not is_admin(user):
+        raise HTTPException(403, message)
