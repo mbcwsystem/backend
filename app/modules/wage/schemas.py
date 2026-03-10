@@ -1,4 +1,3 @@
-# app/modules/wage/schemas.py
 from datetime import date
 from typing import Optional
 
@@ -16,7 +15,7 @@ class UserWageResponse(UserWageCreate):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DefaultWageCreate(BaseModel):
@@ -28,4 +27,4 @@ class DefaultWageResponse(DefaultWageCreate):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True

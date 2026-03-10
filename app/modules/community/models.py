@@ -3,16 +3,16 @@ from enum import Enum as PyEnum
 from sqlalchemy import (
     Boolean,
     Column,
-    DateTime,
     Enum,
     ForeignKey,
     Integer,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
-from app.core.config import settings
+from app.core.config import TimeStampedMixin
 from app.core.database import Base
 
 
@@ -23,7 +23,7 @@ class CategoryEnum(str, PyEnum):
     free_board = "자유게시판"
 
 
-class Post(Base):
+class Post(TimeStampedMixin, Base):
     __tablename__ = "community_post"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -39,20 +39,6 @@ class Post(Base):
     )
     system_generated = Column(
         Boolean, nullable=False, default=False, comment="시스템 자동생성 여부"
-    )
-
-    created_at = Column(
-        DateTime,
-        nullable=False,
-        default=settings.now_kst,
-        comment="작성일시",
-    )
-    updated_at = Column(
-        DateTime,
-        nullable=False,
-        default=settings.now_kst,
-        onupdate=settings.now_kst,
-        comment="수정일시",
     )
 
     author = relationship("User", back_populates="posts")
@@ -75,7 +61,31 @@ class Post(Base):
         )
 
 
-class Comment(Base):
+class CommentLike(Base):
+    __tablename__ = "community_comment_like"
+    __table_args__ = (
+        # 좋아요는 한 번만
+        UniqueConstraint("user_id", "comment_id", name="uq_comment_like_user_comment"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    comment_id = Column(
+        Integer,
+        ForeignKey("community_comment.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="대상 댓글 id",
+    )
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="유저 id",
+    )
+
+    comment = relationship("Comment", back_populates="likes")
+
+
+class Comment(TimeStampedMixin, Base):
     __tablename__ = "community_comment"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -89,13 +99,11 @@ class Comment(Base):
         Integer, ForeignKey("users.id"), nullable=False, comment="작성자 id"
     )
     content = Column(Text, nullable=False, comment="내용")
-    created_at = Column(DateTime, nullable=False, default=settings.now_kst)
-    updated_at = Column(
-        DateTime, nullable=False, default=settings.now_kst, onupdate=settings.now_kst
-    )
-
     post = relationship("Post", back_populates="comments")
     author = relationship("User", back_populates="comments")
+    likes = relationship(
+        "CommentLike", back_populates="comment", cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         short_content = (

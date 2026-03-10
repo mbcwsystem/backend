@@ -8,29 +8,52 @@ from sqlalchemy.orm import Session
 
 from app.modules.admin import schemas
 from app.modules.admin.models import Holiday, InsuranceRate
-from app.modules.admin.schemas import InsuranceRateSet
+from app.modules.admin.schemas import InsuranceRateCreate, InsuranceRateUpdate
 from app.modules.auth.models import User
-from app.modules.auth.services import hash_password  # ← 해시 적용
+from app.modules.auth.services import decrypt_ssn, encrypt_ssn, hash_password
 
 
 # --------- Users ----------
 def create_user(db: Session, data: schemas.UserCreate) -> User:
     user = User(
         username=data.username,
-        password=hash_password(data.password),  # ← 해시 저장
+        password=hash_password(data.password),
         name=data.name,
         position=data.position,
         gender=data.gender,
+        birth_date=data.birth_date,
+        ssn=encrypt_ssn(data.ssn) if data.ssn else None,
         phone=data.phone,
-        email=data.email,
+        email=str(data.email) if data.email else None,
+        bank_name=data.bank_name,
+        account_number=data.account_number,
+        hire_date=data.hire_date,
+        retire_date=data.retire_date,
+        unavailable_days=data.unavailable_days,
+        health_cert_expire=data.health_cert_expire,
         is_active=data.is_active,
     )
+
     db.add(user)
+
     try:
         db.flush()
     except IntegrityError:
         db.rollback()
         raise ValueError("이미 사용 중인 username 입니다.")
+
+    return user
+
+
+def get_user_detail(db: Session, memberId: int) -> User:
+    user = db.get(User, memberId)
+    if not user:
+        raise LookupError("사용자를 찾을 수 없습니다.")
+
+    # 관리자만 복호화
+    if user.ssn:
+        user.ssn = decrypt_ssn(user.ssn)
+
     return user
 
 
@@ -129,23 +152,67 @@ def delete_holiday(db: Session, holiday_id: int) -> None:
     db.delete(h)
 
 
-# --------- Insurance Rates (카테고리별 레코드) ----------
-def get_insurance_rates(db: Session) -> List[InsuranceRate]:
-    stmt = select(InsuranceRate).order_by(
-        InsuranceRate.effective_date.desc(), InsuranceRate.category.asc()
-    )
+def get_insurance_rates(db: Session) -> list[InsuranceRate]:
+    stmt = select(InsuranceRate).order_by(InsuranceRate.year.desc())
     return db.execute(stmt).scalars().all()
 
 
-def set_insurance_rate(db: Session, payload: InsuranceRateSet):
-    obj = InsuranceRate(
-        national_pension=payload.national_pension,
-        health_insurance=payload.health_insurance,
-        employment_insurance=payload.employment_insurance,
-        industrial_accident=payload.industrial_accident,
-        effective_date=payload.effective_date,
+def get_insurance_rate_by_year(
+    db: Session,
+    year: int,
+) -> InsuranceRate | None:
+    stmt = select(InsuranceRate).where(InsuranceRate.year == year)
+    return db.execute(stmt).scalars().first()
+
+
+def create_insurance_rate(
+    db: Session,
+    payload: InsuranceRateCreate,
+) -> InsuranceRate:
+    rate = InsuranceRate(
+        year=payload.year,
+        national_pension_rate=payload.national_pension_rate,
+        health_insurance_rate=payload.health_insurance_rate,
+        long_term_care_rate=payload.long_term_care_rate,
+        employment_insurance_rate=payload.employment_insurance_rate,
     )
-    db.add(obj)
+    db.add(rate)
     db.commit()
-    db.refresh(obj)
-    return obj
+    db.refresh(rate)
+    return rate
+
+
+def update_insurance_rate_full(
+    db: Session,
+    rate: InsuranceRate,
+    payload: InsuranceRateCreate,
+) -> InsuranceRate:
+    rate.national_pension_rate = payload.national_pension_rate
+    rate.health_insurance_rate = payload.health_insurance_rate
+    rate.long_term_care_rate = payload.long_term_care_rate
+    rate.employment_insurance_rate = payload.employment_insurance_rate
+
+    db.commit()
+    db.refresh(rate)
+    return rate
+
+
+def update_insurance_rate_partial(
+    db: Session,
+    rate: InsuranceRate,
+    payload: InsuranceRateUpdate,
+) -> InsuranceRate:
+    for field, value in payload.dict(exclude_unset=True).items():
+        setattr(rate, field, value)
+
+    db.commit()
+    db.refresh(rate)
+    return
+
+
+def delete_insurance_rate(
+    db: Session,
+    rate: InsuranceRate,
+) -> None:
+    db.delete(rate)
+    db.commit()

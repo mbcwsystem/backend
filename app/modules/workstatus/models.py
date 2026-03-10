@@ -1,4 +1,12 @@
-from sqlalchemy import Column, Date, ForeignKey, Integer, Time, UniqueConstraint
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Date,
+    ForeignKey,
+    Integer,
+    Time,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -21,5 +29,6 @@ class Attendance(Base):
 
     total_work_minutes = Column(Integer, default=0)
     total_break_minutes = Column(Integer, default=0)
+    is_payroll_applied = Column(Boolean, default=False)
 
     user = relationship("User", back_populates="attendances")

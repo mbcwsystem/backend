@@ -1,10 +1,17 @@
 from datetime import datetime
-from typing import List, Optional
+from enum import Enum
+from typing import Generic, List, Optional, TypeVar
 
 from pydantic import BaseModel, Field
 
 from app.modules.auth.models import PositionEnum
 from app.modules.community.models import CategoryEnum
+
+T = TypeVar("T")
+
+
+class CategoryCountResponse(BaseModel):
+    counts: dict[str, int]
 
 
 class PostBase(BaseModel):
@@ -67,8 +74,35 @@ class CommentResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+    like_count: int = Field(0, description="좋아요 개수")
+    is_liked: bool = Field(False, description="내가 좋아요를 눌렀는지 여부")
+
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+class PostListResponse(BaseModel):
+    """
+    게시글 목록조회 응답
+    """
+
+    id: int
+    category: CategoryEnum
+
+    title: str
+    content: str
+
+    author_id: int
+    author_name: str
+    author_position: PositionEnum
+
+    created_at: datetime
+    updated_at: datetime
+
+    comments_count: int
+
+    class Config:
+        from_attributes = True
 
 
 class PostResponse(BaseModel):
@@ -90,8 +124,51 @@ class PostResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    # 게시글에 달린 댓글까지 포함
-    comments: List[CommentResponse] = Field(default_factory=list)
+    comments_count: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+class PaginationParams(BaseModel):
+    """
+    페이지네이션 유효성
+    """
+
+    page: int = Field(1, ge=1, description="요청한 페이지 번호(1부터 시작)")
+    page_size: int = Field(5, ge=1, le=50, description="한 페이지에 보여줄 개수")
+
+
+class PaginatedResponse(BaseModel, Generic[T]):
+    """
+    페이지네이션 응답
+    """
+
+    items: List[T] = Field(default_factory=list)
+    total: int = Field(..., ge=0, description="전체 개수")
+    page: int = Field(..., ge=1, description="요청한 페이지 번호(1부터 시작)")
+    page_size: int = Field(..., ge=1, description="한 페이지에 보여줄 개수")
+    total_pages: int = Field(..., ge=1, description="전체 페이지 수")
+    previous: int | None = Field(None, description="이전 페이지 번호")
+    next: int | None = Field(None, description="다음 페이지 번호")
+
+
+class SearchScope(str, Enum):
+    """
+    검색 범위
+    """
+
+    all = "all"  # 전체
+    title = "title"  # 제목 검색
+    content = "content"  # 내용 검색
+    author = "author"  # 작성자 검색
+
+
+class OrderBy(str, Enum):
+    """
+    정렬 기준
+    """
+
+    latest = "latest"  # 최신순
+    oldest = "oldest"  # 오래된 순
+    popular = "popular"  # 인기순 (댓글 많은 순)
